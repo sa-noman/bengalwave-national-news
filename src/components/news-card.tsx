@@ -1,4 +1,5 @@
 import Link from "next/link";
+import {NewsImage} from "./news-image";
 import type {NewsItem} from "@/lib/demo-news";
 
 export type CardVariant="regular"|"lead"|"middle"|"text"|"latest"|"feature";
@@ -12,7 +13,7 @@ export function NewsCard({item,compact=false,hero=false,variant}:{
   return <article className={"bw-card bw-card-"+kind}>
    <Link href={href} className="bw-card-link" aria-label={item.title}>
     {kind!=="text"&&<span className="bw-img-frame">
-      <img src={item.image} alt={item.isDemo?"নমুনা প্রতিবেদনের প্রতীকী ছবি":""} loading={kind==="lead"?"eager":"lazy"}/>
+      <NewsImage src={item.image} alt={item.isDemo?"নমুনা প্রতিবেদনের প্রতীকী ছবি":""} eager={kind==="lead"}/>
     </span>}
     <span className="bw-card-copy">
       <span className="bw-tag">{item.category}</span>
