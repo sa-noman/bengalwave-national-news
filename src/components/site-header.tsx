@@ -44,7 +44,7 @@ export function SiteHeader(){
     <div className="bw-wrap bw-masthead-inner">
       <Link href="/" className="bw-brand" aria-label="Bengal Wave প্রচ্ছদ">
         <span className="bw-brand-mark"><img src="/brand/logo-prototype.webp" alt="Bengal Wave-এর মূল লোগো"/></span>
-        <span className="bw-brand-words"><strong>Bengal<i>Wave</i></strong><small>ইতিহাস,সংবাদ ও সংস্কৃতির প্রতিচ্ছবি</small></span>
+        <span className="bw-brand-words"><strong>Bengal<i>Wave</i></strong><small>ইতিহাস, সংবাদ ও সংস্কৃতির প্রতিচ্ছবি</small></span>
       </Link>
       <div className="bw-brand-actions">
        <div className="bw-follow-shell">
