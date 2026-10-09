@@ -11,6 +11,7 @@ type DatabaseArticle={
 };
 
 const articlePhotos:Record<string,string>={
+ "mithun-cabinet-rank-cultural-adviser-oct-2026":"/news/mithun-cultural-adviser-2026.png",
  "nana-patekar-dies-at-75-oct-2026":"/news/nana-patekar-2026.png",
  "us-israel-iran-attack-plan-election-report-oct-2026":"/news/israel-iran-attack-report-2026.png",
  "nationwide-postal-service-week-oct-2026":"/news/postal-service-week-2026.png",
