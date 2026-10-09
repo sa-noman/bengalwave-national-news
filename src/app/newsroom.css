@@ -335,12 +335,12 @@ body{background:var(--bw-bg);color:var(--bw-ink);font-family:var(--bw-sans)}
 
 /* Footer scenery is drawn in SVG and scales without bitmap assets. */
 
-/* Image integrity: hide incomplete image streams until decoded. */
-.bw-img-frame{background:#f0eee8}
-.bw-img-frame .bw-image-pending{opacity:0;visibility:hidden}
+/* Images occupy the entire frame at every screen width.
+   Next/Image serves responsive, compressed versions of large source PNGs. */
+.bw-img-frame{position:relative;overflow:hidden;isolation:isolate;background:#f0eee8}
+.bw-img-frame > img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center}
+.bw-img-frame .bw-image-pending{opacity:0;visibility:hidden;transform:none}
 .bw-img-frame .bw-image-ready{opacity:1;visibility:visible}
-.bw-img-frame .bw-image-placeholder{position:absolute;inset:0;display:grid;place-items:center;background:#f0eee8;color:#78857b;font:500 12px var(--bw-sans);text-align:center;padding:12px}
-.bw-img-frame .bw-image-ready+.bw-image-placeholder{display:none}
+.bw-img-frame .bw-image-placeholder{position:absolute;inset:0;z-index:0;display:grid;place-items:center;background:#f0eee8;color:#78857b;font:500 12px var(--bw-sans);text-align:center;padding:12px}
 .bw-img-frame:has(.bw-image-ready) .bw-image-placeholder{display:none}
-.bw-img-frame:has(.bw-image-pending) .bw-image-placeholder{display:grid}
 .bw-card-link:hover .bw-img-frame .bw-image-pending{transform:none}
