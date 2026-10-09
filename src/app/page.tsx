@@ -4,6 +4,7 @@ import Link from "next/link";
 import {NewsCard} from "@/components/news-card";
 import {getPublishedNews} from "@/lib/news-feed";
 import type {NewsItem} from "@/lib/demo-news";
+import {HomeInvitationRedirect} from "@/components/auth/home-invitation-redirect";
 
 function Cards({items,columns=3}:{items:NewsItem[];columns?:3|4}){
   if(!items.length)return <p className="empty-news">এখনো এই বিভাগে কোনো সংবাদ প্রকাশিত হয়নি।</p>;
@@ -17,6 +18,7 @@ export default async function Home(){
   const world=articles.filter(a=>["international","economy"].includes(a.categorySlug||"")).slice(0,3);
   const features=articles.filter(a=>["features","culture","entertainment"].includes(a.categorySlug||"")).slice(0,3);
   return <main>
+    <HomeInvitationRedirect/>
     <section className="container newsroom">
       <div className="home-context"><span>{new Date().toLocaleDateString("bn-BD",{timeZone:"Asia/Dhaka",dateStyle:"full"})}</span><span>বাংলার কণ্ঠ, বিশ্বের খবর</span></div>
       {!lead ? <div className="empty-news news-empty-home"><h1>বেঙ্গল ওয়েভে স্বাগতম</h1><p>প্রথম যাচাইকৃত সংবাদ প্রকাশিত হলে এখানে দেখতে পাবেন।</p></div> :
