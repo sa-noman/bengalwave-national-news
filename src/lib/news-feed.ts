@@ -10,6 +10,10 @@ type DatabaseArticle={
  source_name:string|null;source_url:string|null;
 };
 
+const articlePhotos:Record<string,string>={
+ "charmonai-pir-local-election-shariah-oct-2026":"/news/charmonai-council-2026.webp"
+};
+
 const fallbackImages:Record<string,string>={
  national:"/illustrations/river.svg",international:"/illustrations/world.svg",
  politics:"/illustrations/city.svg",economy:"/illustrations/economy.svg",
@@ -28,7 +32,7 @@ function asNewsItem(row:DatabaseArticle):NewsItem {
     categorySlug:category?.slug||"",
     featured:row.is_featured,
     publishedAt:row.published_at||undefined,
-    image:fallbackImages[category?.slug||""]||"/illustrations/river.svg",
+    image:articlePhotos[row.slug]||fallbackImages[category?.slug||""]||"/illustrations/river.svg",
   };
 }
 export async function getPublishedNews(limit=60):Promise<NewsItem[]> {

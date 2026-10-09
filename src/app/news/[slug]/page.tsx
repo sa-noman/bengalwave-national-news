@@ -22,7 +22,7 @@ export default async function ArticlePage({params}:{params:Promise<{slug:string}
     <p className="bw-article-deck">{item.summary}</p>
     <div className="bw-article-byline">{item.isDemo?"নমুনা প্রতিবেদন · বাস্তব সংবাদ নয়":
       "Bengal Wave · "+(item.publishedAt?new Date(item.publishedAt).toLocaleString("bn-BD",{timeZone:"Asia/Dhaka",dateStyle:"medium",timeStyle:"short"}):"")}</div>
-    <figure><img src={item.image} alt={item.isDemo?"নমুনা প্রতিবেদনের প্রতীকী অলংকরণ":"প্রতীকী সংবাদ চিত্র"}/><figcaption>প্রতীকী অলংকরণ</figcaption></figure>
+    <figure><img src={item.image} alt={item.slug==="charmonai-pir-local-election-shariah-oct-2026"?"জাতীয় শ্রমিক কাউন্সিলে বক্তব্য দিচ্ছেন চরমোনাই পীর":item.isDemo?"নমুনা প্রতিবেদনের প্রতীকী অলংকরণ":"প্রতীকী সংবাদ চিত্র"}/><figcaption>{item.slug==="charmonai-pir-local-election-shariah-oct-2026"?"ছবি: ইসলামী আন্দোলনের সৌজন্যে":"প্রতীকী অলংকরণ"}</figcaption></figure>
     <div className="bw-article-body">{item.body.split(/\n\s*\n/).filter(Boolean).map((paragraph,i)=><p key={i}>{paragraph}</p>)}</div>
     {item.sourceUrl&&!item.isDemo&&<div className="bw-article-source">সূত্র: <a href={item.sourceUrl} target="_blank" rel="noopener noreferrer nofollow">{item.sourceName||"মূল উৎস"}</a></div>}
    </article>
