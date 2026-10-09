@@ -104,6 +104,33 @@ body{background:var(--bw-bg);color:var(--bw-ink);font-family:var(--bw-sans)}
 .bw-card-latest:first-child{padding-top:4px}
 .bw-rule{border:0;border-top:1px solid var(--bw-line);margin:0}
 .bw-section{padding:26px 0}
+
+/* V2: faint, full-width newsroom section bands in the Bengal Wave palette.
+   Tinting is deliberately subtle; article cards, images and headline hierarchy
+   remain unchanged. The gold Feature & Culture panel keeps its approved color. */
+.bw-home .bw-lead-band{background:#fcfbf6;border-bottom:1px solid #e7e7dc;color:#1c2922}
+.bw-home .bw-lead-band .bw-card-summary,
+.bw-home .bw-lead-band .bw-card-meta,
+.bw-home .bw-lead-band .bw-hero-label,
+.bw-home .bw-lead-band .bw-card-latest .bw-tag{color:#69746c}
+.bw-home .bw-section{padding-block:39px 43px;border-bottom:1px solid #e5e7db;color:#192820}
+.bw-home .bw-section--cream{background:#fff9ed;border-bottom-color:#ece3d0}
+.bw-home .bw-section--mint{background:#f3f8f4;border-bottom-color:#e3ebe3}
+.bw-home .bw-section--ivory{background:#fdfbf5;border-bottom-color:#eae8db}
+.bw-home .bw-section--sage{background:#f5f9f6;border-bottom-color:#e3ebe4}
+.bw-home .bw-section--sand{background:#fff9f0;border-bottom-color:#ede5d7}
+.bw-home .bw-section--feature{background:#fcf7e8;border-bottom-color:#e9dfc5}
+.bw-home .bw-section .bw-card-summary,
+.bw-home .bw-section .bw-card-meta{color:#647067}
+.bw-home .bw-section .bw-card-title{color:#192820}
+.bw-home .bw-section .bw-selected-box{background:#fff4df;border-color:#edddbb}
+.bw-home .bw-section--feature .bw-feature-panel{background:#F4D36185}
+.bw-home .bw-section--feature .bw-card-summary,
+.bw-home .bw-section--feature .bw-card-meta{color:#5b4a14}
+@media(max-width:760px){
+ .bw-home .bw-section{padding-block:27px 30px}
+}
+
 .bw-section-heading{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:18px}
 .bw-section-heading h2,.bw-section-heading h1{font-size:24px;line-height:1.35;border-left:5px solid var(--bw-red);padding-left:12px;margin:0}
 .bw-section-heading a{font-weight:700;color:var(--bw-green);font-size:14px;white-space:nowrap}
