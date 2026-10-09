@@ -7,9 +7,9 @@ test("footer scene is truly inline vector code without image files",()=>{
  const footer=read("src/components/site-footer.tsx");
  const scene=read("src/components/footer-riverscape.tsx");
  assert.match(footer,/<FooterRiverscape\/>/);
- assert.match(scene,/<svg className="bw-footer-scene" viewBox="0 0 1600 340"/);
+ assert.match(scene,/<svg className="bw-footer-scene" viewBox="0 0 1600 220" preserveAspectRatio="xMidYMid slice"/);
  assert.match(scene,/<clipPath id="bw-footer-outline">/);
- assert.match(scene,/<circle cx="1155" cy="115"/);
+ assert.match(scene,/<circle cx="1155" cy="155"/);
  assert.match(scene,/stroke="#FBB040"/);
  assert.match(scene,/<path d="M1070 263/);
  assert.doesNotMatch(scene,/<image\b|<img\b|\.png|\.webp|\.avif|href="https?:\/\//);
