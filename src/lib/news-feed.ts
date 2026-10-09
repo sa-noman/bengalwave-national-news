@@ -11,6 +11,7 @@ type DatabaseArticle={
 };
 
 const articlePhotos:Record<string,string>={
+ "litton-miraz-resistance-afghanistan-test-oct-2026":"/news/litton-miraz-test-2026.png",
  "delhi-cockroach-protest-internet-shutdown-oct-2026":"/news/delhi-protest-security-2026.png",
  "pm-mental-health-stigma-awareness-oct-2026":"/news/pm-mental-health-2026.png",
  "bobby-hajjaj-drug-control-social-change-oct-2026":"/news/bobby-hajjaj-drug-control-2026.png",
