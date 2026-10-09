@@ -1,6 +1,6 @@
 /** Pure inline SVG, with no image/raster assets or remote requests. */
 export function FooterRiverscape(){
- return <><svg className="bw-footer-scene" viewBox="0 0 1600 220" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+ return <svg className="bw-footer-scene" viewBox="0 0 1600 340" preserveAspectRatio="none" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
   <defs>
    <linearGradient id="bw-footer-sky" x1="0" y1="0" x2=".16" y2="1">
     <stop offset="0" stopColor="#01382f"/>
@@ -22,17 +22,18 @@ export function FooterRiverscape(){
     <stop offset=".52" stopColor="#e1bf60" stopOpacity=".42"/>
     <stop offset="1" stopColor="#cdb563" stopOpacity="0"/>
    </linearGradient>
+   <clipPath id="bw-footer-outline">
+    <path d="M0 27 C180 11 360 11 540 24 S900 40 1080 24 S1420 12 1600 22 V340 H0 Z"/>
+   </clipPath>
    <g id="bw-footer-palm" fill="#062d28">
     <path d="M0 0 Q5 -23 -3 -53" fill="none" stroke="#062d28" strokeWidth="5" strokeLinecap="round"/>
     <path d="M-3 -53 Q-24 -79 -44 -66 Q-23 -67 -3 -47 Q-25 -60 -40 -49 Q-17 -53 -3 -46 Q-12 -78 4 -91 Q-2 -74 2 -48 Q17 -80 38 -76 Q16 -67 3 -47 Q25 -64 41 -50 Q22 -52 3 -45 Q29 -53 37 -35 Q17 -45 3 -44Z"/>
    </g>
   </defs>
-  <g opacity=".76">
+  <g clipPath="url(#bw-footer-outline)">
    <rect width="1600" height="340" fill="url(#bw-footer-sky)"/>
    <rect width="1600" height="340" fill="url(#bw-footer-sunset)"/>
-   {/* Keep the original objects at their natural proportions; crop the background instead of squashing them. */}
-   <g transform="translate(0 -75)">
-   <circle cx="1155" cy="155" r="46" fill="#e7b851" opacity=".57"/>
+   <circle cx="1155" cy="115" r="46" fill="#e7b851" opacity=".57"/>
    <path d="M0 155 Q150 128 275 152 T530 147 T785 151 T1040 146 T1320 155 T1600 141 V211 H0Z" fill="#174c3c" opacity=".43"/>
    <path d="M0 178 Q90 161 178 183 Q260 151 360 181 Q472 161 548 187 Q641 150 755 183 Q856 158 955 184 Q1060 148 1156 181 Q1280 153 1385 180 Q1500 151 1600 174 V212 H0Z" fill="#0e473a" opacity=".73"/>
    <path d="M0 195 Q85 175 150 196 Q235 171 318 204 Q415 178 494 199 Q582 173 665 199 Q760 183 848 201 Q943 173 1017 198 Q1125 174 1220 198 Q1325 177 1418 199 Q1510 173 1600 198 V227 H0Z" fill="#073a32" opacity=".94"/>
@@ -83,12 +84,7 @@ export function FooterRiverscape(){
     <path d="M1050 321 Q1180 311 1430 323"/>
    </g>
    <rect width="1600" height="340" fill="#002c26" opacity=".16"/>
-   </g>
   </g>
- </svg>
- <svg className="bw-footer-wave" viewBox="0 0 1600 30" preserveAspectRatio="none" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
-  <path d="M0 30V27 C180 11 360 11 540 24 S900 40 1080 24 S1420 12 1600 22 V30Z" fill="#04382f"/>
   <path d="M0 27 C180 11 360 11 540 24 S900 40 1080 24 S1420 12 1600 22" fill="none" stroke="#FBB040" strokeWidth="3"/>
- </svg></>;
+ </svg>;
 }
-

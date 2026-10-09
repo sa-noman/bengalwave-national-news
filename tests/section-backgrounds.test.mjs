@@ -30,7 +30,6 @@ test("original header, heritage art and gold footer wave are preserved",()=>{
  const css=read("src/app/newsroom.css");
  assert.match(css,/\.bw-heritage\{[^}]*heritage-banner.webp/);
  const scene=read("src/components/footer-riverscape.tsx");
- assert.match(css,/\.bw-footer-scene\{[^}]*inset:0/);
- assert.match(css,/\.bw-footer-wave\{[^}]*top:-29px/);
+ assert.match(css,/\.bw-footer-scene\{[^}]*inset:-29px 0 0/);
  assert.match(scene,/stroke="#FBB040"/);
 });

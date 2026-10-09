@@ -9,7 +9,6 @@ test("heritage artwork touches the footer with no empty strip",()=>{
 });
 test("the existing gold-outlined wave overlays the heritage artwork",()=>{
  const scene=readFileSync(new URL("../src/components/footer-riverscape.tsx",import.meta.url),"utf8");
- assert.match(css,/\.bw-footer-scene\{[^}]*inset:0/);
- assert.match(css,/\.bw-footer-wave\{[^}]*top:-29px/);
+ assert.match(css,/\.bw-footer-scene\{[^}]*inset:-29px 0 0/);
  assert.match(scene,/stroke="#FBB040"/);
 });
