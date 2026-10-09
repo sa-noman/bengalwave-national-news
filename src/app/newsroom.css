@@ -105,9 +105,9 @@ body{background:var(--bw-bg);color:var(--bw-ink);font-family:var(--bw-sans)}
 .bw-rule{border:0;border-top:1px solid var(--bw-line);margin:0}
 .bw-section{padding:26px 0}
 
-/* White editorial canvas: no section-colored backgrounds.
-   Keep fine separators and the existing structural card layout, masthead,
-   heritage art, footer and gold wave exactly as separate components. */
+/* White full-width editorial sections with thin separators.
+   Preserve the original cream Selected Reports box and golden
+   Feature & Culture panel; only the extra blue/red section tints are removed. */
 .bw-home,.bw-website.bw-home{background:#fff;color:#192820}
 .bw-home .bw-lead-band{background:#fff;border-bottom:1px solid #e6e6e6;color:#192820}
 .bw-home .bw-lead-band .bw-card-summary,
@@ -118,10 +118,10 @@ body{background:var(--bw-bg);color:var(--bw-ink);font-family:var(--bw-sans)}
 .bw-home .bw-section .bw-card-summary,
 .bw-home .bw-section .bw-card-meta{color:#647067}
 .bw-home .bw-section .bw-card-title{color:#192820}
-.bw-home .bw-section .bw-selected-box{background:#fff;border:1px solid #e6e6e6}
-.bw-home .bw-section--feature .bw-feature-panel{background:#fff;border:1px solid #e6e6e6;color:#192820}
+.bw-home .bw-section .bw-selected-box{background:#fcf0da;border:1px solid #f0dcb4}
+.bw-home .bw-section--feature .bw-feature-panel{background:#F4D36185;border:1px solid #e2b93c88;color:#16231e}
 .bw-home .bw-section--feature .bw-card-summary,
-.bw-home .bw-section--feature .bw-card-meta{color:#647067}
+.bw-home .bw-section--feature .bw-card-meta{color:#5b4a14}
 @media(max-width:760px){
  .bw-home .bw-section{padding-block:27px 30px}
 }

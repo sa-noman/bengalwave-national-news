@@ -11,10 +11,11 @@ This is a separate branch for the next round of user-requested frontend adjustme
 - The existing gold-outline wave on the footer remains unless the owner specifically requests a change.
 
 
-## White background refinement
-- Per owner instruction, all news section backgrounds, including Selected Reports, National, International, Sports, Economy and Feature & Culture, are plain white (`#FFFFFF`).
-- Removed blue/red tone properties and related CSS instead of layering new palette overrides.
-- Lead story area, selected-reports box and formerly golden feature panel now have white background.
-- Hairline gray separators still visually separate sections without color bands.
+## Corrected section background refinement
+- Only the *full-width news section backgrounds* and lead-story section are white (`#FFFFFF`).
+- Removed added blue/red alternating division colors and their tone classes.
+- **Selected Reports inner box stays original cream `#FCF0DA`**, with its warm gold border.
+- **Feature & Culture inner panel stays original translucent gold `#F4D36185`**, with its original border and dark text.
+- Thin gray hairlines still distinguish the otherwise white news sections.
 - Headline cards and editorial layout, cream header, original heritage banner and the gold wave over the footer are preserved.
 - `design/bengalwave-v2` only. Do not merge to `main` without explicit permission.
