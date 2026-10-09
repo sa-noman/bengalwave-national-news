@@ -1,28 +1,25 @@
 import Link from "next/link";
 import {categories} from "@/lib/demo-news";
+import {NewsletterDemo} from "@/components/newsletter-demo";
 
 export function SiteFooter(){
- return <footer>
-  <section className="heritage-banner">
-    <div className="container heritage-content">
-      <div>
-        <span className="eyebrow">BENGAL WAVE · STORIES OF BENGAL</span>
-        <h2>বাংলার গল্প,<br/>বিশ্বের জানালা</h2>
-        <p>সংবাদ, ইতিহাস, ঐতিহ্য ও মানুষের কথা। গভীরতায় ও দায়িত্বে বাংলা সাংবাদিকতার নতুন পথচলা।</p>
-      </div>
+ return <footer className="bw-footer">
+  <div className="bw-wrap">
+   <NewsletterDemo/>
+   <div className="bw-footer-grid">
+    <div className="bw-footer-brand">
+      <Link href="/" className="bw-footer-logo" aria-label="Bengal Wave প্রচ্ছদ"><span className="bw-brand-mark"><img src="/brand/logo-prototype.webp" alt="Bengal Wave"/></span></Link>
+      <strong>Bengal<i>Wave</i></strong>
+      <p>বাংলার কণ্ঠ, বিশ্বের খবর।</p><p>বিশ্বস্ত তথ্য, গভীর বিশ্লেষণ ও মানুষের গল্প নিয়ে আপনার পাশে।</p>
     </div>
-  </section>
-  <div className="footer-main">
-    <div className="container footer-grid">
-      <div className="footer-about">
-        <h2><span>Bengal</span><em>Wave</em></h2>
-        <p>বাংলার কণ্ঠ, বিশ্বের খবর। তথ্যভিত্তিক সংবাদ ও মানুষের গল্পকে গুরুত্ব দিয়ে আমাদের পথচলা।</p>
-      </div>
-      <div><h3>প্রধান বিভাগ</h3><nav aria-label="ফুটার বিভাগ">{categories.slice(0,5).map(c=><Link href={"/category/"+c.slug} key={c.slug}>{c.label}</Link>)}</nav></div>
-      <div><h3>বেঙ্গল ওয়েভ</h3><nav aria-label="প্রতিষ্ঠান"><Link href="/about">আমাদের কথা</Link><Link href="/editorial-policy">সম্পাদকীয় নীতিমালা</Link><Link href="/contact">যোগাযোগ</Link></nav></div>
-      <div><h3>সংবাদ খুঁজুন</h3><p>আগ্রহের বিষয় ও প্রাসঙ্গিক শব্দ লিখে প্রতিবেদনের খোঁজ করুন।</p><nav><Link href="/search">অনুসন্ধান ↗</Link></nav></div>
-    </div>
-    <div className="container footer-bottom"><span>© ২০২৬ Bengal Wave · সর্বস্বত্ব সংরক্ষিত</span><span>উন্নয়নাধীন সংবাদমাধ্যম</span></div>
+    <div><h4>প্রধান বিভাগ</h4><div className="bw-footer-links">{categories.filter(c=>["national","international","economy","technology","sports","entertainment","features","culture"].includes(c.slug)).map(c=><Link key={c.slug} href={"/category/"+c.slug}>{c.label}</Link>)}</div></div>
+    <div><h4>আমাদের সম্পর্কে</h4><div className="bw-footer-links"><Link href="/about">পরিচিতি</Link><Link href="/contact">যোগাযোগ</Link><Link href="/editorial-policy">সম্পাদকীয় নীতিমালা</Link><Link href="/privacy">গোপনীয়তা নীতি</Link></div></div>
+    <div><h4>যুক্ত থাকুন</h4><p>সামাজিক যোগাযোগমাধ্যমের অফিসিয়াল লিংক শিগগিরই যুক্ত হবে।</p><Link className="bw-footer-search" href="/search">সংবাদ খুঁজুন ↗</Link></div>
+   </div>
   </div>
+  <div className="bw-footer-bottom"><div className="bw-wrap bw-footer-bottom-inner">
+   <span>© ২০২৬ বেঙ্গল ওয়েভ। সর্বস্বত্ব সংরক্ষিত।</span>
+   <span>বাংলার কণ্ঠ, বিশ্বের খবর</span>
+  </div></div>
  </footer>;
 }

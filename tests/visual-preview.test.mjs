@@ -9,7 +9,7 @@ test("demo fixtures cannot reach a Vercel production deployment",()=>{
  assert.match(impl,/if\(!isDesignPreview\(\)\) return null/);
  assert.match(impl,/if\(isDesignPreview\(\)\) return \{items:previewNews/);
 });
-test("visual preview labels example articles unmistakably",()=>{
+test("visual preview labels sample articles unmistakably",()=>{
  const home=read("src/app/page.tsx");
  const notice=read("src/components/preview-notice.tsx");
  assert.match(home,/showingSamples && <PreviewNotice/);
@@ -22,9 +22,9 @@ test("missing heritage cover is not requested by CSS",()=>{
 test("no unowned domain is advertised in the footer",()=>{
  assert.doesNotMatch(read("src/components/site-footer.tsx"),/bengalwavenews\.com/);
 });
-test("same editorial sections on sample and published layouts",()=>{
+test("prototype editorial sections are present",()=>{
  const home=read("src/app/page.tsx");
- for(const label of ["সর্বশেষ সংবাদ","বাংলাদেশ","আন্তর্জাতিক ও অর্থনীতি","ফিচার ও সংস্কৃতি"]){
+ for(const label of ["সর্বশেষ সংবাদ","জাতীয়","আন্তর্জাতিক","খেলাধুলা","অর্থনীতি","ফিচার ও সংস্কৃতি"]){
   assert.ok(home.includes(label),label);
  }
 });
