@@ -1,0 +1,71 @@
+name: Import one approved article photo
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/import-news-photo.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  import-photo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch matching original photograph
+        run: |
+          python3 - <<'PY'
+          from html.parser import HTMLParser
+          from urllib.request import Request, urlopen
+          from pathlib import Path
+          import html, re, time
+          ARTICLE = "https://www.prothomalo.com/politics/5staka3n3h"
+          TARGET = Path("public/news/charmonai-council-2026.jpg")
+          class Metadata(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.images = []
+              def handle_starttag(self, tag, attrs):
+                  if tag != "meta":
+                      return
+                  values = dict(attrs)
+                  if values.get("property") in ("og:image", "og:image:url") or values.get("name") == "twitter:image":
+                      self.images.append(values.get("content", ""))
+          headers = {"User-Agent": "Mozilla/5.0 (compatible; BengalWave/1.0)", "Accept": "text/html,application/xhtml+xml"}
+          with urlopen(Request(ARTICLE, headers=headers), timeout=30) as response:
+              source = response.read().decode("utf-8", errors="replace")
+          parser = Metadata()
+          parser.feed(source)
+          candidates = parser.images
+          candidates += re.findall(r'https?:\\?/\\?/media\\?.prothomalo\\?.com[^"\\s<>]+', source)[:5]
+          if not candidates:
+              raise RuntimeError("No original article photograph found in article metadata")
+          for candidate in candidates:
+              url = html.unescape(candidate).replace("\\/", "/")
+              if not url.startswith("http"):
+                  continue
+              try:
+                  with urlopen(Request(url, headers={"User-Agent":"Mozilla/5.0", "Accept":"image/jpeg,image/*;q=0.8"}), timeout=30) as response:
+                      content = response.read()
+                      mime = response.headers.get("Content-Type", "")
+                  if not content.startswith(b"\\xff\\xd8"):
+                      print(f"Skipping image with unexpected JPEG format: {mime}")
+                      continue
+                  TARGET.parent.mkdir(parents=True, exist_ok=True)
+                  TARGET.write_bytes(content)
+                  print(f"Saved {len(content)} bytes of article image to {TARGET}")
+                  break
+              except Exception as error:
+                  print(f"Photo candidate unavailable: {error}")
+          else:
+              raise RuntimeError("No valid original JPEG could be downloaded")
+          PY
+      - name: Commit the article photo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/news/charmonai-council-2026.jpg
+          git commit -m "assets(news): add original Chormonai council photograph"
+          git push
