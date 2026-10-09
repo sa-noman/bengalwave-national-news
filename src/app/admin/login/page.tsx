@@ -6,6 +6,7 @@ const errors:Record<string,string>={
   setup:"Supabase-এর নিরাপদ Environment Variables এখনো যুক্ত করা হয়নি।",
   credentials:"ইমেইল বা পাসওয়ার্ড সঠিক হয়নি।",
   access:"আপনার অ্যাকাউন্টে সম্পাদকীয় অনুমতি নেই।",
+  invite:"আমন্ত্রণের লিংকটি অবৈধ বা মেয়াদোত্তীর্ণ। নতুন আমন্ত্রণ নিতে হবে।",
 };
 export default async function LoginPage({searchParams}:{searchParams:Promise<{error?:string}>}) {
   const {error}=await searchParams;
