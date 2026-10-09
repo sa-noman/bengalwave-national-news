@@ -9,7 +9,7 @@ The attached user-provided document \`বেঙ্গল ওয়েভ_ হো
 - \`Noto Serif Bengali\` editorial headings and \`Hind Siliguri\` body text.
 - Main 3-column editorial grid, two mini-headlines under lead, middle stories, latest-news sidebar.
 - Four-column Selected Reports/National/International/Sports/Economy sections, mobile swipe layout.
-- Pale-gold two-column Feature & Culture section, heritage banner, newsletter-style footer with wave border.
+- Pale-gold two-column Feature & Culture section, heritage banner, compact reference-matched two-row footer (logo, navigation, legal links and social icon placeholders) with the existing gold-outline wave border.
 - Responsive mobile bottom navigation (home, latest, categories, search), keyboard-closeable right drawer and accessible search.
 - Consistent latest, category, search, article, about, contact, editorial policy and privacy page styling.
 - Dark-mode device preference, keyboard focus, reduced-motion accommodations.
@@ -17,5 +17,5 @@ The attached user-provided document \`বেঙ্গল ওয়েভ_ হো
 - Actual news still comes only from Supabase published rows; admin/CMS/database/source automation untouched.
 
 ## Intentionally deferred
-- The HTML prototype bundles unverified mock-news photography and a demo newsletter. Real editorial images, official social links and subscription integration require later content/service approval. Existing repository logo is used without redrawing.
+- The HTML prototype bundles unverified mock-news photography. The newsletter preview has been removed from the footer to match the later user-provided compact footer reference. Real editorial images, official social links and subscription integration require later content/service approval. Existing repository logo is used without redrawing.
 - Do **not** merge \`design/bengalwave-review\` into main without owner review. No manual Vercel launch was done.

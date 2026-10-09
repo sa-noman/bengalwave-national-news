@@ -28,12 +28,11 @@ test("homepage follows prototype sections and wave heritage banner",()=>{
   assert.match(home,new RegExp(section));
  }
 });
-test("prototype typography, carousel cards and footer newsletter are present",()=>{
+test("prototype typography and carousel cards remain present",()=>{
  const css=read("src/app/newsroom.css");
  assert.match(css,/Noto Serif Bengali/);
  assert.match(css,/scroll-snap-type:x mandatory/);
- assert.match(read("src/components/site-footer.tsx"),/NewsletterDemo/);
- assert.match(read("src/components/newsletter-demo.tsx"),/এখনো কোনো ইমেইল সংরক্ষণ করা হচ্ছে না/);
+ assert.match(read("src/components/site-footer.tsx"),/bw-footer-nav/);
 });
 test("news routing and published-only data constraints remain intact",()=>{
  assert.match(read("src/components/news-card.tsx"),/const href="\/news\/"/);
