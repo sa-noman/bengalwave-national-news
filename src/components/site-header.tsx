@@ -65,6 +65,7 @@ export function SiteHeader(){
    </div></nav>
    {drawerOpen&&<div className="bw-overlay" role="presentation" onClick={()=>setDrawerOpen(false)}/>}
    <aside id="bw-side-drawer" className={"bw-drawer"+(drawerOpen?" bw-drawer-open":"")} aria-label="বেঙ্গল ওয়েভ মেনু" aria-hidden={!drawerOpen} inert={!drawerOpen}>
+    <div className="bw-menu-background" aria-hidden="true"><img className="bw-bg-art" src="/prototype/offcanvas-menu-watermark.svg" alt="" draggable={false}/></div>
     <div className="bw-drawer-head">
      <Link href="/" className="bw-drawer-mark" onClick={()=>setDrawerOpen(false)} aria-label="প্রচ্ছদ"><img src="/brand/logo-prototype.webp" alt="Bengal Wave"/></Link>
      <button ref={closeButton} type="button" className="bw-drawer-close" onClick={()=>{setDrawerOpen(false);menuButton.current?.focus()}} aria-label="মেনু বন্ধ করুন">✕</button>
