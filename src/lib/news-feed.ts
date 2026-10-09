@@ -11,6 +11,7 @@ type DatabaseArticle={
 };
 
 const articlePhotos:Record<string,string>={
+ "pm-mental-health-stigma-awareness-oct-2026":"/news/pm-mental-health-2026.png",
  "bobby-hajjaj-drug-control-social-change-oct-2026":"/news/bobby-hajjaj-drug-control-2026.png",
  "charmonai-pir-local-election-shariah-oct-2026":"/news/charmonai-council-2026.webp",
  "us-sanctions-icc-after-navi-pillay-nobel-2026":"/news/icc-us-sanctions-2026.webp"
