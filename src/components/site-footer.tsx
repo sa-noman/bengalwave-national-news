@@ -1,4 +1,5 @@
 import Link from "next/link";
+import {FooterRiverscape} from "@/components/footer-riverscape";
 
 const links=[
   {name:"প্রচ্ছদ",href:"/"},
@@ -20,6 +21,7 @@ function SocialIcon({type}:{type:"facebook"|"youtube"|"x"|"instagram"}){
 
 export function SiteFooter(){
  return <footer className="bw-footer">
+   <FooterRiverscape/>
    <div className="bw-footer-inner">
     <div className="bw-footer-top">
       <Link href="/" className="bw-footer-identity" aria-label="Bengal Wave প্রচ্ছদ">

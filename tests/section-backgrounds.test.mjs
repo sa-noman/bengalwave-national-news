@@ -29,6 +29,7 @@ test("section hairlines and responsive content width remain unchanged",()=>{
 test("original header, heritage art and gold footer wave are preserved",()=>{
  const css=read("src/app/newsroom.css");
  assert.match(css,/\.bw-heritage\{[^}]*heritage-banner.webp/);
- assert.match(css,/\.bw-footer::after\{[^}]*top:-29px;height:30px/);
- assert.match(css,/stroke='%23FBB040'/);
+ const scene=read("src/components/footer-riverscape.tsx");
+ assert.match(css,/\.bw-footer-scene\{[^}]*inset:-29px 0 0/);
+ assert.match(scene,/stroke="#FBB040"/);
 });

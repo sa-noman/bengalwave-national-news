@@ -18,8 +18,9 @@ test("compact footer uses two rows, navigation and thin gold divider",()=>{
 test("the gold wave remains and the footer meets the preceding banner",()=>{
  const css=read("src/app/newsroom.css");
  assert.match(css,/\.bw-footer\{[^}]*margin-top:0/);
- assert.match(css,/\.bw-footer::after\{[^}]*top:-29px;height:30px/);
- assert.match(css,/stroke='%23FBB040'/);
+ const scene=read("src/components/footer-riverscape.tsx");
+ assert.match(css,/\.bw-footer-scene\{[^}]*inset:-29px 0 0/);
+ assert.match(scene,/stroke="#FBB040"/);
 });
 test("social platform icons have no invented official links",()=>{
  const footer=read("src/components/site-footer.tsx");

@@ -1,19 +1,18 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
-const read = p=>readFileSync(new URL("../"+p,import.meta.url),"utf8");
-test("footer and its wave use one uninterrupted riverscape image",()=>{
+const read=p=>readFileSync(new URL("../"+p,import.meta.url),"utf8");
+test("top wave and scene share one clipping path, while footer controls remain intact",()=>{
  const css=read("src/app/newsroom.css");
  const footer=read("src/components/site-footer.tsx");
+ const scene=read("src/components/footer-riverscape.tsx");
  assert.match(css,/\.bw-footer\{[^}]*isolation:isolate[^}]*background:#04382f/);
- assert.match(css,/\.bw-footer::before\{[^}]*inset:-29px 0 0[^}]*footer-riverscape\.avif/);
- assert.match(css,/\.bw-footer::before\{[^}]*mask-image:[^}]*linear-gradient\(#000,#000\)/);
- assert.match(css,/\.bw-footer::after\{[^}]*FBB040/);
+ assert.match(css,/\.bw-footer-scene\{[^}]*inset:-29px 0 0[^}]*z-index:0/);
  assert.match(css,/\.bw-footer-inner\{position:relative;z-index:1/);
- assert.match(css,/@media \(max-width:760px\)\{\.bw-footer::before\{background-position:center,70% center/);
- assert.match(footer,/<footer className="bw-footer">/);
- assert.match(footer,/bw-footer-identity/);
- assert.match(footer,/bw-footer-nav/);
- assert.match(footer,/bw-footer-legal/);
- assert.match(footer,/bw-footer-social/);
+ assert.match(scene,/<g clipPath="url\(#bw-footer-outline\)">/);
+ assert.match(scene,/<path d="M0 27 C180 11/);
+ assert.match(scene,/stroke="#FBB040"/);
+ for(const classname of ["bw-footer-identity","bw-footer-nav","bw-footer-legal","bw-footer-social"]){
+  assert.ok(footer.includes(classname),classname);
+ }
 });
