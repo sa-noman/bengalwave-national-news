@@ -47,7 +47,7 @@ body{background:var(--bw-bg);color:var(--bw-ink);font-family:var(--bw-sans)}
 .bw-nav-scroll a.bw-active::before{content:"";position:absolute;right:6px;top:5px;width:6px;height:6px;border-radius:50%;background:var(--bw-red)}
 .bw-menu-trigger{height:40px;width:40px}
 .bw-overlay{position:fixed;inset:0;background:#0009;backdrop-filter:blur(4px);z-index:69}
-.bw-drawer{position:fixed;top:0;left:0;right:auto;bottom:0;width:min(400px,88vw);background:var(--bw-dark);color:#fff;z-index:70;transform:translateX(-100%);transition:transform .3s;display:flex;flex-direction:column;gap:17px;padding:22px;overflow:auto;visibility:hidden;font-family:var(--bw-serif)}
+.bw-drawer{position:fixed;top:0;right:0;left:auto;bottom:0;width:min(400px,88vw);background:var(--bw-dark);color:#fff;z-index:70;transform:translateX(100%);transition:transform .3s;display:flex;flex-direction:column;gap:17px;padding:22px;overflow:auto;visibility:hidden;font-family:var(--bw-serif)}
 .bw-drawer.bw-drawer-open{transform:translateX(0);visibility:visible}
 /* Supplied off-canvas artwork is decoration only, layered below every menu control. */
 .bw-drawer>.bw-menu-background{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;overflow:hidden;background:
