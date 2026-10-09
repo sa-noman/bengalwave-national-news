@@ -9,7 +9,7 @@ test("top wave and scene share one clipping path, while footer controls remain i
  assert.match(css,/\.bw-footer\{[^}]*isolation:isolate[^}]*background:#04382f/);
  assert.match(css,/\.bw-footer-scene\{[^}]*inset:-29px 0 0[^}]*z-index:0/);
  assert.match(css,/\.bw-footer-inner\{position:relative;z-index:1/);
- assert.match(scene,/<g clipPath="url\(#bw-footer-outline\)">/);
+ assert.match(scene,/<g clipPath="url\(#bw-footer-outline\)" opacity="\.76">/);
  assert.match(scene,/<path d="M0 27 C180 11/);
  assert.match(scene,/stroke="#FBB040"/);
  for(const classname of ["bw-footer-identity","bw-footer-nav","bw-footer-legal","bw-footer-social"]){
