@@ -1,0 +1,1 @@
+Original Bengal Wave artwork is used as provided, not redrawn. `logo.webp` is a low-resolution optimized preview copied from the source asset; replace with a higher-resolution original-derived version before launch. The heritage banner also needs to be uploaded in an optimized version before public deployment.
