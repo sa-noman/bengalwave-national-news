@@ -11,7 +11,8 @@ type DatabaseArticle={
 };
 
 const articlePhotos:Record<string,string>={
- "charmonai-pir-local-election-shariah-oct-2026":"/news/charmonai-council-2026.webp"
+ "charmonai-pir-local-election-shariah-oct-2026":"/news/charmonai-council-2026.webp",
+ "us-sanctions-icc-after-navi-pillay-nobel-2026":"/news/icc-us-sanctions-2026.webp"
 };
 
 const fallbackImages:Record<string,string>={
