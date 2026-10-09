@@ -11,6 +11,7 @@ type DatabaseArticle={
 };
 
 const articlePhotos:Record<string,string>={
+ "us-israel-iran-attack-plan-election-report-oct-2026":"/news/israel-iran-attack-report-2026.png",
  "nationwide-postal-service-week-oct-2026":"/news/postal-service-week-2026.png",
  "litton-miraz-resistance-afghanistan-test-oct-2026":"/news/litton-miraz-test-2026.png",
  "delhi-cockroach-protest-internet-shutdown-oct-2026":"/news/delhi-protest-security-2026.png",
