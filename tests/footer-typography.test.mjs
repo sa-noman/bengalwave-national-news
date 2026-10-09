@@ -14,7 +14,7 @@ test("footer labels do not use bold Hind Siliguri and retain smaller readable si
  assert.doesNotMatch(css,/\.bw-footer-nav a\{[^}]*font:700/);
 });
 test("wave outline, compact rows, logo and footer divider are preserved",()=>{
- assert.match(css,/\.bw-footer::before\{[^}]*top:-29px;height:30px/);
+ assert.match(css,/\.bw-footer::after\{[^}]*top:-29px;height:30px/);
  assert.match(css,/stroke='%23FBB040'/);
  assert.match(css,/\.bw-footer-divider\{[^}]*background:#c5a150/);
  assert.match(css,/\.bw-footer-mark\{[^}]*border-radius:13px/);
