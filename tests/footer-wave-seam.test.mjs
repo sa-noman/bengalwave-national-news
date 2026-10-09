@@ -9,7 +9,10 @@ test("existing wave curve and footer contents stay unchanged behind replacement 
  assert.match(css,/\.bw-footer\{[^}]*margin-top:0/);
  assert.match(css,/\.bw-footer-wave\{[^}]*top:-29px[^}]*height:30px/);
  assert.match(css,/\.bw-footer-inner\{position:relative;z-index:1/);
- assert.match(scene,/<path d="M0 27 C180 11 360 11 540 24 S900 40 1080 24 S1420 12 1600 22" fill="none" stroke="#FBB040" strokeWidth="3"/);
+ assert.match(scene,/<svg className="bw-footer-wave" viewBox="0 0 1440 30" preserveAspectRatio="none"/);
+ assert.match(scene,/M0 16C180 0 360 0 540 14S900 30 1080 14 1320 2 1440 12/);
+ assert.match(scene,/stroke="#FBB040" strokeWidth="3" vectorEffect="non-scaling-stroke"/);
+ assert.doesNotMatch(scene,/S900 40 1080 24/);
  for(const klass of ["bw-footer-identity","bw-footer-nav","bw-footer-legal","bw-footer-social"]){
   assert.ok(footer.includes(klass),klass);
  }

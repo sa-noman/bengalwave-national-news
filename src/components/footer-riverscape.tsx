@@ -29,9 +29,9 @@ export function FooterRiverscape(){
     </g>
    </svg>
   </div>
-  <svg className="bw-footer-wave" viewBox="0 0 1600 30" preserveAspectRatio="none" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
-   <path d="M0 30V27 C180 11 360 11 540 24 S900 40 1080 24 S1420 12 1600 22 V30Z" fill="#04382f"/>
-   <path d="M0 27 C180 11 360 11 540 24 S900 40 1080 24 S1420 12 1600 22" fill="none" stroke="#FBB040" strokeWidth="3"/>
+  <svg className="bw-footer-wave" viewBox="0 0 1440 30" preserveAspectRatio="none" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+   <path fill="#04382f" d="M0 30V16C180 0 360 0 540 14S900 30 1080 14 1320 2 1440 12V30Z"/>
+   <path fill="none" stroke="#FBB040" strokeWidth="3" vectorEffect="non-scaling-stroke" d="M0 16C180 0 360 0 540 14S900 30 1080 14 1320 2 1440 12"/>
   </svg>
  </>;
 }
