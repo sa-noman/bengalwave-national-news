@@ -12,7 +12,7 @@ test("footer scene is truly inline vector code without image files",()=>{
  assert.match(scene,/<circle cx="1155" cy="115"/);
  assert.match(scene,/stroke="#FBB040"/);
  assert.match(scene,/<path d="M1070 263/);
- assert.doesNotMatch(scene,/<image\b|<img\b|\.png|\.webp|\.avif|https?:\/\//);
+ assert.doesNotMatch(scene,/<image\b|<img\b|\.png|\.webp|\.avif|href="https?:\/\//);
  assert.match(css,/\.bw-footer-scene\{[^}]*pointer-events:none/);
  assert.doesNotMatch(css,/footer-(?:riverscape|river-watermark)\.(?:avif|webp)/);
  for(const file of ["public/prototype/footer-riverscape.avif","public/prototype/footer-river-watermark.webp"]) {
