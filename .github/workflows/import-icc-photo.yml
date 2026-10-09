@@ -1,0 +1,50 @@
+name: Import ICC article photo
+on:
+  push:
+    branches: [main]
+    paths: [".github/workflows/import-icc-photo.yml"]
+permissions:
+  contents: write
+jobs:
+  import-photo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download original ICC court photograph without overlay
+        run: |
+          python3 -m pip install --quiet pillow
+          python3 - <<'PY'
+          import urllib.request, urllib.parse, io
+          from pathlib import Path
+          from html.parser import HTMLParser
+          from PIL import Image
+          article="https://www.prothomalo.com/world/usa/ps3pjrfgwt"
+          headers={"User-Agent":"Mozilla/5.0","Accept":"text/html,image/avif,image/webp,image/*"}
+          with urllib.request.urlopen(urllib.request.Request(article,headers=headers),timeout=25) as response:
+            source=response.read().decode("utf-8","replace")
+          class Parser(HTMLParser):
+            def __init__(self):super().__init__();self.url=""
+            def handle_starttag(self,tag,attrs):
+              a=dict(attrs)
+              if tag=="meta" and a.get("property")=="og:image":
+                self.url=a.get("content","")
+          parser=Parser();parser.feed(source)
+          if not parser.url:raise RuntimeError("Source article image missing")
+          original=parser.url.split("?")[0]
+          url=original+"?w=1000&auto=format%2Ccompress"
+          with urllib.request.urlopen(urllib.request.Request(url,headers=headers),timeout=30) as response:
+            data=response.read()
+          im=Image.open(io.BytesIO(data)).convert("RGB")
+          if im.width<400 or im.height<240:raise RuntimeError("Downloaded image too small")
+          dest=Path("public/news/icc-us-sanctions-2026.webp")
+          dest.parent.mkdir(parents=True,exist_ok=True)
+          im.save(dest,"WEBP",quality=87,method=6)
+          print(f"Saved unbranded source photograph: {im.size} {dest.stat().st_size} bytes")
+          PY
+      - name: Commit photo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/news/icc-us-sanctions-2026.webp
+          git commit -m "assets(news): add ICC courthouse photograph"
+          git push
