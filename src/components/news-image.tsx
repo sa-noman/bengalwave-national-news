@@ -1,19 +1,50 @@
 "use client";
+
+import Image from "next/image";
 import {useState} from "react";
 
-/** Only reveal fully loaded images, never a partially streamed bitmap. */
-export function NewsImage({src,alt="",eager=false}:{src:string;alt?:string;eager?:boolean}){
- const [status,setStatus]=useState<"loading"|"loaded"|"error">("loading");
- return <>
-  {status!=="loaded"&&<span className="bw-image-placeholder" aria-hidden="true">{status==="error"?"ছবি পাওয়া যায়নি":""}</span>}
-  {src&&<img key={src} src={src} alt={alt} loading={eager?"eager":"lazy"} decoding="async"
-   className={status==="loaded"?"bw-image-ready":"bw-image-pending"}
-   onLoad={event=>{
-    const img=event.currentTarget;
-    if(!img.naturalWidth||!img.naturalHeight){setStatus("error");return;}
-    img.decode().then(()=>setStatus("loaded")).catch(()=>setStatus("error"));
-   }}
-   onError={()=>setStatus("error")}
-  />}
- </>;
+/**
+ * All news thumbnails use Next.js image optimization instead of downloading
+ * the original full-size PNG. Only a decoded image may cover the placeholder.
+ * If the optimizer is temporarily unavailable, retry the original once.
+ */
+export function NewsImage({
+  src,
+  alt="",
+  eager=false,
+  sizes="(max-width: 760px) 72vw, (max-width: 1000px) 50vw, 25vw",
+}:{
+  src:string;
+  alt?:string;
+  eager?:boolean;
+  sizes?:string;
+}){
+  const [status,setStatus]=useState<"loading"|"loaded"|"error">("loading");
+  const [useOriginal,setUseOriginal]=useState(false);
+
+  return <>
+    {status!=="loaded"&&
+      <span className="bw-image-placeholder" aria-hidden="true">
+        {status==="error"?"ছবি লোড করা যায়নি":""}
+      </span>}
+    <Image
+      src={src}
+      alt={alt}
+      fill
+      sizes={sizes}
+      quality={72}
+      priority={eager}
+      unoptimized={useOriginal}
+      className={status==="loaded"?"bw-image-ready":"bw-image-pending"}
+      onLoad={()=>setStatus("loaded")}
+      onError={()=>{
+        if(!useOriginal){
+          setUseOriginal(true);
+          setStatus("loading");
+        }else{
+          setStatus("error");
+        }
+      }}
+    />
+  </>;
 }
