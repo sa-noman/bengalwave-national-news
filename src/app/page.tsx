@@ -1,3 +1,5 @@
+// News must be server-rendered after editorial publication; never bake drafts or empty feeds into a static build.
+export const dynamic = "force-dynamic";
 import Link from "next/link";
 import {NewsCard} from "@/components/news-card";
 import {getPublishedNews} from "@/lib/news-feed";
