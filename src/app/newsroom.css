@@ -117,7 +117,7 @@ body{background:var(--bw-bg);color:var(--bw-ink);font-family:var(--bw-sans)}
 .bw-home .bw-lead-band .bw-card-latest .bw-tag{color:#69746c}
 .bw-home .bw-section{padding-block:39px 43px;border-bottom:1px solid #d9dde4;color:#192820}
 .bw-home .bw-section--blue{background:#e6edf8;border-bottom-color:#cbd7e9}
-.bw-home .bw-section--red{background:#fbe7e5;border-bottom-color:#edcbca}
+.bw-home .bw-section--red{background:#fce9e9;border-bottom-color:#edcbca}
 .bw-home .bw-section .bw-card-summary,
 .bw-home .bw-section .bw-card-meta{color:#647067}
 .bw-home .bw-section .bw-card-title{color:#192820}

@@ -13,7 +13,7 @@ This is a separate branch for the next round of user-requested frontend adjustme
 
 ## Alternating blue/red section background refinement
 - Selected Reports: muted light deep-blue `#E6EDF8`
-- National: muted light red `#FBE7E5`
+- National: muted light red `#FCE9E9`
 - International: light deep-blue
 - Sports: light red
 - Economy: light deep-blue

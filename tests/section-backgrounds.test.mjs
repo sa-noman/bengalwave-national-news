@@ -21,7 +21,7 @@ test("news sections alternate deep-blue tint and soft red, starting blue",()=>{
 test("blue and red section backgrounds are distinct and not cream or header colored",()=>{
  const css=read("src/app/newsroom.css");
  assert.match(css,/\.bw-home \.bw-section--blue\{background:#e6edf8;border-bottom-color:#cbd7e9\}/);
- assert.match(css,/\.bw-home \.bw-section--red\{background:#fbe7e5;border-bottom-color:#edcbca\}/);
+ assert.match(css,/\.bw-home \.bw-section--red\{background:#fce9e9;border-bottom-color:#edcbca\}/);
  assert.match(css,/\.bw-home \.bw-lead-band\{background:#f8fafc/);
  assert.match(css,/\.bw-home \.bw-section \.bw-selected-box\{background:#f0f4fc/);
  assert.doesNotMatch(css,/\.bw-home \.bw-section--(?:cream|mint|ivory|sage|sand)\{/);
