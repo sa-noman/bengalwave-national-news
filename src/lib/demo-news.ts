@@ -8,6 +8,7 @@ export type NewsItem = {
   image: string;
   featured?: boolean;
   publishedAt?: string;
+  isDemo?: boolean;
 };
 
 // Legacy development fixtures, intentionally not used for public pages.
