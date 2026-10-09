@@ -1,6 +1,6 @@
 /** Pure inline SVG, with no image/raster assets or remote requests. */
 export function FooterRiverscape(){
- return <svg className="bw-footer-scene" viewBox="0 0 1600 220" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+ return <><svg className="bw-footer-scene" viewBox="0 0 1600 220" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
   <defs>
    <linearGradient id="bw-footer-sky" x1="0" y1="0" x2=".16" y2="1">
     <stop offset="0" stopColor="#01382f"/>
@@ -22,15 +22,12 @@ export function FooterRiverscape(){
     <stop offset=".52" stopColor="#e1bf60" stopOpacity=".42"/>
     <stop offset="1" stopColor="#cdb563" stopOpacity="0"/>
    </linearGradient>
-   <clipPath id="bw-footer-outline">
-    <path d="M0 27 C180 11 360 11 540 24 S900 40 1080 24 S1420 12 1600 22 V340 H0 Z"/>
-   </clipPath>
    <g id="bw-footer-palm" fill="#062d28">
     <path d="M0 0 Q5 -23 -3 -53" fill="none" stroke="#062d28" strokeWidth="5" strokeLinecap="round"/>
     <path d="M-3 -53 Q-24 -79 -44 -66 Q-23 -67 -3 -47 Q-25 -60 -40 -49 Q-17 -53 -3 -46 Q-12 -78 4 -91 Q-2 -74 2 -48 Q17 -80 38 -76 Q16 -67 3 -47 Q25 -64 41 -50 Q22 -52 3 -45 Q29 -53 37 -35 Q17 -45 3 -44Z"/>
    </g>
   </defs>
-  <g clipPath="url(#bw-footer-outline)" opacity=".76">
+  <g opacity=".76">
    <rect width="1600" height="340" fill="url(#bw-footer-sky)"/>
    <rect width="1600" height="340" fill="url(#bw-footer-sunset)"/>
    {/* Keep the original objects at their natural proportions; crop the background instead of squashing them. */}
@@ -88,6 +85,10 @@ export function FooterRiverscape(){
    <rect width="1600" height="340" fill="#002c26" opacity=".16"/>
    </g>
   </g>
+ </svg>
+ <svg className="bw-footer-wave" viewBox="0 0 1600 30" preserveAspectRatio="none" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+  <path d="M0 30V27 C180 11 360 11 540 24 S900 40 1080 24 S1420 12 1600 22 V30Z" fill="#04382f"/>
   <path d="M0 27 C180 11 360 11 540 24 S900 40 1080 24 S1420 12 1600 22" fill="none" stroke="#FBB040" strokeWidth="3"/>
- </svg>;
+ </svg></>;
 }
+
