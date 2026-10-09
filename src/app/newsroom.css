@@ -334,3 +334,13 @@ body{background:var(--bw-bg);color:var(--bw-ink);font-family:var(--bw-sans)}
 @media(prefers-reduced-motion:reduce){.bw-website *, .bw-drawer,.bw-nav-scroll a,.bw-brand img{animation:none!important;transition:none!important}}
 
 /* Footer scenery is drawn in SVG and scales without bitmap assets. */
+
+/* Image integrity: hide incomplete image streams until decoded. */
+.bw-img-frame{background:#f0eee8}
+.bw-img-frame .bw-image-pending{opacity:0;visibility:hidden}
+.bw-img-frame .bw-image-ready{opacity:1;visibility:visible}
+.bw-img-frame .bw-image-placeholder{position:absolute;inset:0;display:grid;place-items:center;background:#f0eee8;color:#78857b;font:500 12px var(--bw-sans);text-align:center;padding:12px}
+.bw-img-frame .bw-image-ready+.bw-image-placeholder{display:none}
+.bw-img-frame:has(.bw-image-ready) .bw-image-placeholder{display:none}
+.bw-img-frame:has(.bw-image-pending) .bw-image-placeholder{display:grid}
+.bw-card-link:hover .bw-img-frame .bw-image-pending{transform:none}
