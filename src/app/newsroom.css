@@ -105,26 +105,23 @@ body{background:var(--bw-bg);color:var(--bw-ink);font-family:var(--bw-sans)}
 .bw-rule{border:0;border-top:1px solid var(--bw-line);margin:0}
 .bw-section{padding:26px 0}
 
-/* V2: clear alternating soft navy-blue and soft red section backgrounds.
-   Selected = blue, National = red, International = blue,
-   Sports = red, Economy = blue, Feature & Culture = red.
-   Keep high-contrast editorial copy, the existing golden feature panel,
-   and the existing footer wave. */
-.bw-home .bw-lead-band{background:#f8fafc;border-bottom:1px solid #d9e1e9;color:#1c2922}
+/* White editorial canvas: no section-colored backgrounds.
+   Keep fine separators and the existing structural card layout, masthead,
+   heritage art, footer and gold wave exactly as separate components. */
+.bw-home,.bw-website.bw-home{background:#fff;color:#192820}
+.bw-home .bw-lead-band{background:#fff;border-bottom:1px solid #e6e6e6;color:#192820}
 .bw-home .bw-lead-band .bw-card-summary,
 .bw-home .bw-lead-band .bw-card-meta,
 .bw-home .bw-lead-band .bw-hero-label,
 .bw-home .bw-lead-band .bw-card-latest .bw-tag{color:#69746c}
-.bw-home .bw-section{padding-block:39px 43px;border-bottom:1px solid #d9dde4;color:#192820}
-.bw-home .bw-section--blue{background:#e6edf8;border-bottom-color:#cbd7e9}
-.bw-home .bw-section--red{background:#fce9e9;border-bottom-color:#edcbca}
+.bw-home .bw-section{padding-block:39px 43px;background:#fff;border-bottom:1px solid #e6e6e6;color:#192820}
 .bw-home .bw-section .bw-card-summary,
 .bw-home .bw-section .bw-card-meta{color:#647067}
 .bw-home .bw-section .bw-card-title{color:#192820}
-.bw-home .bw-section .bw-selected-box{background:#f0f4fc;border-color:#cbd6e8}
-.bw-home .bw-section--feature .bw-feature-panel{background:#F4D36185}
+.bw-home .bw-section .bw-selected-box{background:#fff;border:1px solid #e6e6e6}
+.bw-home .bw-section--feature .bw-feature-panel{background:#fff;border:1px solid #e6e6e6;color:#192820}
 .bw-home .bw-section--feature .bw-card-summary,
-.bw-home .bw-section--feature .bw-card-meta{color:#5b4a14}
+.bw-home .bw-section--feature .bw-card-meta{color:#647067}
 @media(max-width:760px){
  .bw-home .bw-section{padding-block:27px 30px}
 }
