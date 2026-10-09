@@ -11,6 +11,7 @@ jobs:
     steps:
       - name: Read public article metadata
         run: |
+          python3 -m pip install --quiet beautifulsoup4
           python3 - <<'PY'
           import urllib.request, re, html, json
           from html.parser import HTMLParser
@@ -33,4 +34,14 @@ jobs:
               if isinstance(d,dict):
                 print("JSON-LD:",json.dumps({k:d.get(k) for k in ("headline","description","datePublished","articleBody","image") if k in d},ensure_ascii=False)[:7000])
             except:pass
+          print("HTML LENGTH:",len(s))
+          from bs4 import BeautifulSoup
+          soup=BeautifulSoup(s,"html.parser")
+          for selector in ["article p","[class*=story] p","[class*=article] p","main p"]:
+            paras=[p.get_text(" ",strip=True) for p in soup.select(selector)]
+            paras=[p for p in paras if len(p)>40]
+            print("SELECTOR",selector,"COUNT",len(paras))
+            if paras:
+              for p in paras[:22]: print("ARTICLE PARAGRAPH:",p[:1300])
+              break
           PY
