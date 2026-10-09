@@ -22,7 +22,7 @@ jobs:
           from pathlib import Path
           import html, re, time
           ARTICLE = "https://www.prothomalo.com/politics/5staka3n3h"
-          TARGET = Path("public/news/charmonai-council-2026.jpg")
+          TARGET = Path("public/news/charmonai-council-2026.webp")
           class Metadata(HTMLParser):
               def __init__(self):
                   super().__init__()
@@ -46,11 +46,11 @@ jobs:
               if not url.startswith("http"):
                   continue
               try:
-                  with urlopen(Request(url, headers={"User-Agent":"Mozilla/5.0", "Accept":"image/jpeg,image/*;q=0.8"}), timeout=30) as response:
+                  with urlopen(Request(url, headers={"User-Agent":"Mozilla/5.0", "Accept":"image/webp,image/*;q=0.8"}), timeout=30) as response:
                       content = response.read()
                       mime = response.headers.get("Content-Type", "")
-                  if not content.startswith(b"\xff\xd8"):
-                      print(f"Skipping image with unexpected JPEG format: {mime}")
+                  if not (content.startswith(b"RIFF") and content[8:12] == b"WEBP"):
+                      print(f"Skipping image with unexpected WebP format: {mime}")
                       continue
                   TARGET.parent.mkdir(parents=True, exist_ok=True)
                   TARGET.write_bytes(content)
@@ -59,7 +59,7 @@ jobs:
               except Exception as error:
                   print(f"Photo candidate unavailable: {error}")
           else:
-              raise RuntimeError("No valid original JPEG could be downloaded")
+              raise RuntimeError("No valid original WebP could be downloaded")
           PY
       - name: Commit the article photo
         run: |
