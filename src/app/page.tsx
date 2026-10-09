@@ -1,4 +1,3 @@
-// The homepage reads published records at request time, never a build-time snapshot.
 export const dynamic="force-dynamic";
 import Link from "next/link";
 import {NewsCard} from "@/components/news-card";
@@ -6,69 +5,78 @@ import {PreviewNotice} from "@/components/preview-notice";
 import {getDisplayNews} from "@/lib/news-display";
 import type {NewsItem} from "@/lib/demo-news";
 
-function Cards({items,columns=3}:{items:NewsItem[];columns?:3|4}){
-  if(!items.length)return <p className="empty-news">এই বিভাগে এখনো সংবাদ প্রকাশিত হয়নি।</p>;
-  return <div className={columns===4?"cards-four":"cards-three"}>{items.map(item=><NewsCard item={item} key={item.id}/>)}</div>;
+function SectionHeading({title,href="/latest",linkText="আরও"}:{title:string;href?:string;linkText?:string}){
+ return <div className="bw-section-heading"><h2>{title}</h2><Link href={href}>{linkText} <span aria-hidden="true">›</span></Link></div>;
+}
+function FourColumn({items}:{items:NewsItem[]}){
+ if(!items.length)return <p className="bw-empty">এই বিভাগে এখনো সংবাদ প্রকাশিত হয়নি।</p>;
+ return <div className="bw-grid-four">{items.map(item=><NewsCard item={item} key={item.id}/>)}</div>;
+}
+function NewsSection({title,items,href,boxed=false}:{title:string;items:NewsItem[];href:string;boxed?:boolean}){
+ if(!items.length)return null;
+ return <section className="bw-section"><div className="bw-wrap">
+   <div className={boxed?"bw-selected-box":""}>
+    <SectionHeading title={title} href={href} linkText={boxed?"সব প্রতিবেদন":"আরও"}/>
+    <FourColumn items={items}/>
+   </div>
+ </div></section>;
+}
+function choose(items:NewsItem[],slugs:string[],exclude:Set<string>,limit=4) {
+ return items.filter(item=>slugs.includes(item.categorySlug||"")&&!exclude.has(item.id)).slice(0,limit);
 }
 export default async function Home(){
-  const {items:articles,showingSamples}=await getDisplayNews(70);
-  const [lead,secondary,third]=articles;
-  const featured=articles.filter(a=>a.featured);
-  const selected=featured.length?featured.slice(0,4):articles.slice(0,4);
-  const national=articles.filter(a=>a.categorySlug==="national").slice(0,3);
-  const world=articles.filter(a=>["international","economy"].includes(a.categorySlug||"")).slice(0,3);
-  const features=articles.filter(a=>["features","culture","entertainment"].includes(a.categorySlug||"")).slice(0,3);
-  const date=new Date().toLocaleDateString("bn-BD",{timeZone:"Asia/Dhaka",weekday:"long",year:"numeric",month:"long",day:"numeric"});
-  return <main>
-    {showingSamples && <PreviewNotice/>}
-    <section className="container newsroom">
-      <div className="home-context"><span>{date}</span><span>বাংলার কণ্ঠ, বিশ্বের খবর</span></div>
-      {!lead ?
-        <div className="news-empty-home">
-          <div className="empty-ornament" aria-hidden="true">BW</div>
-          <span className="eyebrow">BENGAL WAVE · NEWSROOM</span>
-          <h1>খবর আসবে, গল্প চলবে</h1>
-          <p>ওয়েবসাইটের প্রস্তুতি চলছে। প্রথম যাচাইকৃত সংবাদ প্রকাশের পর এখানে সর্বশেষ খবর দেখতে পাবেন।</p>
-          <div className="empty-rule" aria-hidden="true"/>
-          <p className="empty-small">বাংলাদেশ · আন্তর্জাতিক · অর্থনীতি · ফিচার ও সংস্কৃতি</p>
-        </div>:
-        <div className="lead-grid">
-          <div className="lead-column">
-            <NewsCard item={lead} hero/>
-            <div className="mini-news-row">{articles.slice(3,5).map(item=><article key={item.id}>
-              <span className="category">{item.category}</span>
-              <h3 className="story-title"><Link className="headline-link" href={"/news/"+item.slug}>{item.title}</Link></h3>
-            </article>)}</div>
-          </div>
-          <div className="middle-column">{[secondary,third].filter((x):x is NewsItem=>Boolean(x)).map(item=><NewsCard key={item.id} item={item}/>)}</div>
-          <aside className="latest-column">
-            <div className="section-heading"><h2>সর্বশেষ সংবাদ</h2><Link href="/latest">সব খবর <span aria-hidden="true">↗</span></Link></div>
-            {articles.slice(3,9).map(item=><article className="latest-item" key={item.id}>
-              <div><span className="category">{item.category}</span>
-              <h3><Link className="headline-link" href={"/news/"+item.slug}>{item.title}</Link></h3>
-              {item.isDemo && <span className="news-meta">নমুনা</span>}</div>
-              <Link href={"/news/"+item.slug} aria-label={item.title}><img src={item.image} alt="" loading="lazy"/></Link>
-            </article>)}
-          </aside>
-        </div>}
-    </section>
-    {articles.length>0 && <>
-      <section className="selected-section"><div className="container section-block">
-        <div className="section-heading"><h2>{featured.length?"নির্বাচিত প্রতিবেদন":"আরও সংবাদ"}</h2><Link href="/latest">সব সংবাদ ↗</Link></div>
-        <Cards items={selected} columns={4}/>
-      </div></section>
-      <section className="container section-block">
-        <div className="section-heading"><h2>বাংলাদেশ</h2><Link href="/category/national">সব খবর ↗</Link></div>
-        <Cards items={national}/>
-      </section>
-      <section className="container section-block">
-        <div className="section-heading"><h2>আন্তর্জাতিক ও অর্থনীতি</h2><Link href="/category/international">সব খবর ↗</Link></div>
-        <Cards items={world}/>
-      </section>
-      <section className="feature-section"><div className="container section-block">
-        <div className="section-heading"><h2>ফিচার ও সংস্কৃতি</h2><Link href="/category/features">সব ফিচার ↗</Link></div>
-        <Cards items={features}/>
-      </div></section>
-    </>}
-  </main>;
+ const {items:articles,showingSamples}=await getDisplayNews(100);
+ const lead=articles[0];
+ const rest=articles.slice(1);
+ const latest=articles.slice(3,8);
+ const selected=articles.filter(a=>a.featured).slice(0,4);
+ const select=selected.length?selected:articles.slice(0,4);
+ const national=choose(articles,["national","politics"],new Set<string>(),4);
+ const world=choose(articles,["international"],new Set<string>(),4);
+ const sports=choose(articles,["sports"],new Set<string>(),4);
+ const economy=choose(articles,["economy"],new Set<string>(),4);
+ const feature=choose(articles,["features","culture","entertainment"],new Set<string>(),2);
+ return <main className="bw-website bw-home">
+  {showingSamples && <PreviewNotice/>}
+  {!lead ? <section className="bw-wrap bw-empty-home">
+    <div className="bw-empty-symbol">BW</div>
+    <span className="bw-small-label">BENGAL WAVE · NEWSROOM</span>
+    <h1>খবর আসবে, গল্প চলবে</h1>
+    <p>প্রথম যাচাইকৃত সংবাদ প্রকাশিত হলে এখানে দেশের ও বিশ্বের খবর দেখতে পাবেন।</p>
+  </section>:
+  <>
+   <section className="bw-lead-band"><div className="bw-wrap bw-hero">
+    <div className="bw-hero-lead">
+      <div className="bw-hero-label">প্রধান প্রতিবেদন / ০১</div>
+      <NewsCard item={lead} variant="lead"/>
+      <div className="bw-lead-short">{rest.slice(0,2).map(item=><NewsCard key={item.id} item={item} variant="text"/>)}</div>
+    </div>
+    <div className="bw-hero-middle">
+      <div className="bw-hero-label">দেশ ও বিশ্ব</div>
+      {rest.slice(2,4).map(item=><NewsCard key={item.id} item={item} variant="middle"/>)}
+    </div>
+    <aside className="bw-hero-latest" id="latest-news">
+      <SectionHeading title="সর্বশেষ সংবাদ" href="/latest"/>
+      <div className="bw-latest-list">{latest.map(item=><NewsCard key={item.id} item={item} variant="latest"/>)}</div>
+    </aside>
+   </div></section>
+   <NewsSection title="নির্বাচিত প্রতিবেদন" href="/latest" boxed items={select}/>
+   <NewsSection title="জাতীয়" href="/category/national" items={national}/>
+   <NewsSection title="আন্তর্জাতিক" href="/category/international" items={world}/>
+   <NewsSection title="খেলাধুলা" href="/category/sports" items={sports}/>
+   <NewsSection title="অর্থনীতি" href="/category/economy" items={economy}/>
+   <section className="bw-section bw-section--feature"><div className="bw-wrap"><div className="bw-feature-panel">
+      <SectionHeading title="ফিচার ও সংস্কৃতি" href="/category/features" linkText="আরও পড়ুন"/>
+      {feature.length?<div className="bw-feature-grid">{feature.map(item=><NewsCard key={item.id} item={item} variant="feature"/>)}</div>:<p className="bw-empty">এখনো কোনো ফিচার প্রকাশিত হয়নি।</p>}
+   </div></div></section>
+  </>}
+  <section className="bw-heritage">
+   <div className="bw-wrap">
+     <span className="bw-tag">বাংলার গল্প</span>
+     <h2>যে বাংলার গল্প<br/>শেষ হওয়ার নয়</h2>
+     <p>ইতিহাস, ঐতিহ্য, দেশ ও মানুষের কথা নিয়েই Bengal Wave-এর পথচলা।</p>
+     <Link href="/about">আমাদের সম্পর্কে <span aria-hidden="true">›</span></Link>
+   </div>
+  </section>
+ </main>;
 }

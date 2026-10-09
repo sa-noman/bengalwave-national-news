@@ -1,22 +1,25 @@
 import Link from "next/link";
-import type { NewsItem } from "@/lib/demo-news";
+import type {NewsItem} from "@/lib/demo-news";
 
-export function NewsCard({item,compact=false,hero=false}:{
-  item:NewsItem; compact?:boolean; hero?:boolean;
-}) {
+export type CardVariant="regular"|"lead"|"middle"|"text"|"latest"|"feature";
+export function NewsCard({item,compact=false,hero=false,variant}:{
+  item:NewsItem;compact?:boolean;hero?:boolean;variant?:CardVariant;
+}){
+  const kind=variant||(hero?"lead":compact?"text":"regular");
   const href="/news/"+item.slug;
-  return <article className={"news-card"+(compact?" compact":"")+(hero?" hero-card":"")}>
-    <Link className="news-image-link" href={href} aria-label={item.title}>
-      <img className="news-image" src={item.image} alt={item.isDemo?"নমুনা প্রতিবেদনের প্রতীকী অলংকরণ":""} loading={hero?"eager":"lazy"}/>
-    </Link>
-    <div className="news-copy">
-      <span className="category">{item.category}</span>
-      <h3 className={hero?"hero-title":"story-title"}>
-        <Link className="headline-link" href={href}>{item.title}</Link>
-      </h3>
-      {!compact && <p className="summary">{item.summary}</p>}
-      <span className="news-meta">{item.isDemo?"নমুনা প্রতিবেদন · প্রকাশিত নয়":
-        item.publishedAt?new Date(item.publishedAt).toLocaleDateString("bn-BD",{timeZone:"Asia/Dhaka",dateStyle:"medium"}):"সংবাদ"}</span>
-    </div>
+  const time=item.isDemo?"নমুনা প্রতিবেদন · প্রকাশিত নয়":item.publishedAt?
+    new Date(item.publishedAt).toLocaleDateString("bn-BD",{timeZone:"Asia/Dhaka",dateStyle:"medium"}):"সংবাদ";
+  return <article className={"bw-card bw-card-"+kind}>
+   <Link href={href} className="bw-card-link" aria-label={item.title}>
+    {kind!=="text"&&<span className="bw-img-frame">
+      <img src={item.image} alt={item.isDemo?"নমুনা প্রতিবেদনের প্রতীকী ছবি":""} loading={kind==="lead"?"eager":"lazy"}/>
+    </span>}
+    <span className="bw-card-copy">
+      <span className="bw-tag">{item.category}</span>
+      <h3 className="bw-card-title"><span className="bw-title-underline">{item.title}</span></h3>
+      {["lead","middle","feature"].includes(kind)&&item.summary&&<span className="bw-card-summary">{item.summary}</span>}
+      {kind!=="latest"&&<span className="bw-card-meta">{time}</span>}
+    </span>
+   </Link>
   </article>;
 }

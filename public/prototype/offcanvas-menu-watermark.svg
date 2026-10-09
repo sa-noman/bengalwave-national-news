@@ -1,0 +1,108 @@
+<svg viewBox="0 0 400 860" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="bw-sun" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stop-color="#d2b25a" stop-opacity="0.72"/>
+          <stop offset="0.62" stop-color="#bca24d" stop-opacity="0.67"/>
+          <stop offset="1" stop-color="#a89645" stop-opacity="0.53"/>
+        </radialGradient>
+        <radialGradient id="bw-haze" cx="50%" cy="50%" r="50%">
+          <stop offset="0" stop-color="#d1b44f" stop-opacity="0.36" />
+          <stop offset="0.62" stop-color="#879759" stop-opacity="0.13" />
+          <stop offset="1" stop-color="#335e51" stop-opacity="0" />
+        </radialGradient>
+        <linearGradient id="bw-water" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0" stop-color="#114d42" stop-opacity="0.31" />
+          <stop offset="0.30" stop-color="#053d35" stop-opacity="0.56" />
+          <stop offset="1" stop-color="#001f1b" stop-opacity="0.95" />
+        </linearGradient>
+        <linearGradient id="bw-shore" x1="0" x2="1" y1="0" y2="1">
+          <stop offset="0" stop-color="#123e32" stop-opacity="0" />
+          <stop offset="1" stop-color="#092a21" stop-opacity="0.92" />
+        </linearGradient>
+        <filter id="bw-soft" x="-40%" y="-40%" width="180%" height="180%">
+          <feGaussianBlur stdDeviation="17" />
+        </filter>
+        <filter id="bw-light-soft" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="2.1" />
+        </filter>
+      </defs>
+
+      <!-- Subtle upper-right silhouette, like the atmospheric reference. -->
+      <path d="M256 76 271 64 278 77 296 75 305 88 323 87 337 104 357 105
+      368 127 359 143 370 161 354 179 356 197 340 204 336 220
+      317 232 302 248 288 247 278 261 263 251 246 255 234 240
+      222 237 218 216 202 208 216 188 207 173 219 153 212 133
+      226 119 220 101 240 95Z" fill="#8eaa76" opacity="0.105"/>
+      <path d="M263 78 272 87 282 82 290 92 309 95 316 109 333 114 339 140
+      320 154 323 174 300 183 308 201 289 213 268 199 257 211
+      246 190 230 182 237 165 228 149 246 134 239 117 253 107Z"
+      fill="#789a73" opacity="0.055" filter="url(#bw-light-soft)"/>
+
+      <!-- Warm golden glow from the distant sun. -->
+      <ellipse cx="367" cy="312" rx="190" ry="165" fill="url(#bw-haze)" filter="url(#bw-soft)" />
+      <circle cx="374" cy="320" r="98" fill="url(#bw-sun)" opacity="0.78" />
+
+      <!-- Distant tree line and shore silhouettes. -->
+      <path d="M-5 368 C37 347 62 376 101 354 137 340 164 360 195 350
+      231 335 255 368 279 354 296 342 312 363 329 346 354 334 371 353 412 337
+      L412 449 -5 449Z" fill="#174638" opacity="0.53"/>
+      <path d="M-5 410 Q52 391 91 398 T183 393 Q227 391 252 402
+      T336 388 T412 393 L412 455 -5 455Z" fill="#0d4238" opacity="0.70" />
+      <!-- Haze lines crossing sunlight. -->
+      <g fill="#0b493b" opacity="0.38">
+        <path d="M205 289 Q266 284 323 289 Q368 280 413 289 L413 296 Q321 292 205 296Z" />
+        <path d="M220 324 Q289 318 408 323 L408 330 Q296 327 220 331Z" />
+        <path d="M190 355 Q265 344 414 354 L414 361 Q301 354 190 360Z" />
+      </g>
+
+      <!-- Tiny birds near the sun. -->
+      <g stroke="#123e34" fill="none" stroke-width="1.7" stroke-linecap="round" opacity="0.72">
+        <path d="M350 300 q6 -5 12 0 q6 -5 12 0" />
+        <path d="M328 326 q4 -3 8 0 q4 -3 8 0" />
+        <path d="M385 272 q5 -4 10 0 q5 -4 10 0" />
+      </g>
+
+      <!-- River. -->
+      <path d="M-10 433 H410 V867 H-10Z" fill="url(#bw-water)" />
+      <g stroke-linecap="round" fill="none" opacity="0.46">
+        <path d="M-10 474 Q89 470 178 476 T418 472" stroke="#4f8970" stroke-width="0.8" />
+        <path d="M-10 502 Q94 497 179 503 T413 499" stroke="#336f60" stroke-width="1" />
+        <path d="M9 528 Q112 520 216 527 T410 523" stroke="#537c63" stroke-width="0.8" />
+        <path d="M-8 567 Q101 559 198 565 T422 560" stroke="#568067" stroke-width="0.7" />
+        <path d="M7 601 Q138 595 248 602 T422 594" stroke="#3a695a" stroke-width="1" />
+        <path d="M-5 646 Q78 638 185 644 T420 640" stroke="#59886b" stroke-width="0.8" />
+        <path d="M-5 692 Q102 688 190 691 T421 685" stroke="#406d5d" stroke-width="0.9" />
+        <path d="M-10 747 Q95 740 184 747 T422 741" stroke="#3e7360" stroke-width="0.8" />
+      </g>
+
+      <!-- Soft broken gold reflections across the river. -->
+      <g stroke="#b8a157" stroke-linecap="round" fill="none" opacity="0.46">
+        <path d="M277 450 h70 m-41 7 h86 m-105 7 h60 m-87 8 h135" stroke-width="1.4" />
+        <path d="M267 486 h122 m-91 7 h86 m-135 10 h132" stroke-width="1.9" />
+        <path d="M261 517 h115 m-91 8 h99 m-137 11 h151" stroke-width="1.3" />
+        <path d="M245 548 h151 m-120 10 h103 m-162 9 h145" stroke-width="1.6" />
+        <path d="M234 596 h156 m-125 8 h125 m-187 9 h167" stroke-width="1.5" />
+        <path d="M225 628 h157 m-118 8 h130 m-176 11 h180" stroke-width="1.1" />
+        <path d="M259 662 h101 m-135 12 h155 m-119 11 h108" stroke-width="1.1" />
+        <path d="M285 710 h82 m-106 9 h136 m-120 12 h90" stroke-width="1" />
+      </g>
+
+      <!-- Fishing boat silhouette, placed low enough to remain behind menu links. -->
+      <g transform="translate(272 520)" fill="#052e28" stroke="#082d25" stroke-linejoin="round">
+        <path d="M-14 43 Q26 51 71 41 L123 35 Q102 68 72 76 L26 74 Q2 62 -14 43Z" />
+        <path d="M-8 42 Q39 44 76 39 L122 35" fill="none" stroke="#8d8244" stroke-opacity="0.45" stroke-width="1.8" />
+        <path d="M40 40 L43 -16" stroke-width="2" fill="none" />
+        <path d="M43 -16 Q29 0 29 26 L43 25Z" opacity="0.67" />
+        <path d="M46 40 L48 -3 Q65 6 76 31Z" opacity="0.76" />
+        <path d="M15 40 V25 H35 L40 41 M76 40 V28 H89 L93 38" fill="none" stroke-width="2" />
+        <path d="M92 36 105 17 110 36" fill="none" stroke-width="2" />
+        <circle cx="44" cy="7" r="4" />
+        <path d="M42 11 38 27 50 34 M40 18 29 27" fill="none" stroke-width="3" stroke-linecap="round" />
+      </g>
+      <!-- Boat reflected on the river. -->
+      <path d="M280 615 Q324 625 385 614" stroke="#5c7955" opacity="0.47" stroke-width="2" fill="none" filter="url(#bw-light-soft)" />
+
+      <!-- Low-right dark bank and ambient curved outlines. -->
+      <path d="M403 736 Q344 750 327 790 Q303 831 267 860 H408Z" fill="url(#bw-shore)" />
+      <path d="M417 747 Q360 755 341 797 T283 864" fill="none" stroke="#56734b" stroke-opacity="0.15" stroke-width="2" />
+    </svg>
