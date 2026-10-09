@@ -12,7 +12,7 @@ function FourColumn({items}:{items:NewsItem[]}){
  if(!items.length)return <p className="bw-empty">এই বিভাগে এখনো সংবাদ প্রকাশিত হয়নি।</p>;
  return <div className="bw-grid-four">{items.map(item=><NewsCard item={item} key={item.id}/>)}</div>;
 }
-function NewsSection({title,items,href,boxed=false,tone="ivory"}:{title:string;items:NewsItem[];href:string;boxed?:boolean;tone?:"ivory"|"mint"|"sage"|"sand"|"cream"}){
+function NewsSection({title,items,href,boxed=false,tone="blue"}:{title:string;items:NewsItem[];href:string;boxed?:boolean;tone?:"blue"|"red"}){
  if(!items.length)return null;
  return <section className={"bw-section bw-section--"+tone}><div className="bw-wrap">
    <div className={boxed?"bw-selected-box":""}>
@@ -60,12 +60,12 @@ export default async function Home(){
       <div className="bw-latest-list">{latest.map(item=><NewsCard key={item.id} item={item} variant="latest"/>)}</div>
     </aside>
    </div></section>
-   <NewsSection title="নির্বাচিত প্রতিবেদন" href="/latest" tone="cream" boxed items={select}/>
-   <NewsSection title="জাতীয়" href="/category/national" tone="mint" items={national}/>
-   <NewsSection title="আন্তর্জাতিক" href="/category/international" tone="ivory" items={world}/>
-   <NewsSection title="খেলাধুলা" href="/category/sports" tone="sage" items={sports}/>
-   <NewsSection title="অর্থনীতি" href="/category/economy" tone="sand" items={economy}/>
-   <section className="bw-section bw-section--feature"><div className="bw-wrap"><div className="bw-feature-panel">
+   <NewsSection title="নির্বাচিত প্রতিবেদন" href="/latest" tone="blue" boxed items={select}/>
+   <NewsSection title="জাতীয়" href="/category/national" tone="red" items={national}/>
+   <NewsSection title="আন্তর্জাতিক" href="/category/international" tone="blue" items={world}/>
+   <NewsSection title="খেলাধুলা" href="/category/sports" tone="red" items={sports}/>
+   <NewsSection title="অর্থনীতি" href="/category/economy" tone="blue" items={economy}/>
+   <section className="bw-section bw-section--red bw-section--feature"><div className="bw-wrap"><div className="bw-feature-panel">
       <SectionHeading title="ফিচার ও সংস্কৃতি" href="/category/features" linkText="আরও পড়ুন"/>
       {feature.length?<div className="bw-feature-grid">{feature.map(item=><NewsCard key={item.id} item={item} variant="feature"/>)}</div>:<p className="bw-empty">এখনো কোনো ফিচার প্রকাশিত হয়নি।</p>}
    </div></div></section>

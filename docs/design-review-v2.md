@@ -11,10 +11,14 @@ This is a separate branch for the next round of user-requested frontend adjustme
 - The existing gold-outline wave on the footer remains unless the owner specifically requests a change.
 
 
-## Section background refinement
-- Brand-derived near-white bands now distinguish the home feed: cream-gold Selected Reports, pale mint National, soft ivory International, pale sage Sports, soft honey Economy and pale gold Feature & Culture.
-- The three-column lead has an almost-white neutral wash.
-- Thin separator lines define boundaries without changing any article card or photo.
-- Background colors apply full width; text and cards retain the original content width.
-- The previously approved golden Features panel and footer wave remain unchanged.
-- This remains **review-only**, never merge into main without explicit permission.
+## Alternating blue/red section background refinement
+- Selected Reports: muted light deep-blue `#E6EDF8`
+- National: muted light red `#FBE7E5`
+- International: light deep-blue
+- Sports: light red
+- Economy: light deep-blue
+- Feature & Culture: light red as the outer band, keeping the established golden feature panel inside
+- The hero/news lead gets a neutral cool white `#F8FAFC` to separate it from the cream masthead.
+- Soft 1px section borders and a lightly blue selected-reports card box retain section clarity.
+- Full-width section bands, original content-width article grids, responsive layouts and footer wave are preserved.
+- Changes are preview only in `design/bengalwave-v2`; do not merge to main until specifically approved.
