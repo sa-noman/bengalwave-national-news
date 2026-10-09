@@ -162,8 +162,10 @@ body{background:var(--bw-bg);color:var(--bw-ink);font-family:var(--bw-sans)}
 .bw-heritage h2{font-size:clamp(26px,3.3vw,36px);margin:2px 0 7px}
 .bw-heritage p{color:#2b3b34;max-width:540px;font-size:15px}
 .bw-heritage a{display:inline-block;margin-top:12px;color:#a82a1e;font-size:14px;font-weight:700}
-.bw-footer{position:relative;isolation:isolate;margin-top:0;background:#04382f;color:#fff;padding:0}
-.bw-footer-scene{position:absolute;inset:-29px 0 0;width:100%;height:calc(100% + 29px);z-index:0;display:block;pointer-events:none}
+.bw-footer{position:relative;isolation:isolate;margin-top:0;background:linear-gradient(180deg,#04382f,#03342b);color:#fff;padding:0}
+.bw-footer-artwork{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.bw-footer-scene{position:absolute;bottom:0;left:50%;width:max(100%,900px);height:auto;transform:translateX(-50%);display:block;pointer-events:none}
+.bw-footer-wave{position:absolute;top:-29px;left:0;right:0;width:100%;height:30px;z-index:2;display:block;pointer-events:none}
 .bw-footer-inner{position:relative;z-index:1;width:min(1680px,90%);margin-inline:auto;font-family:var(--bw-serif)}
 .bw-footer-top{display:flex;align-items:center;gap:52px;padding:44px 0 35px;min-height:149px}
 .bw-footer-identity{display:flex;align-items:center;gap:14px;flex:none;padding-right:52px;border-right:1px solid #c5a150;min-height:60px;white-space:nowrap}

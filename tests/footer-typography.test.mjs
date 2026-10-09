@@ -15,7 +15,7 @@ test("footer labels do not use bold Hind Siliguri and retain smaller readable si
 });
 test("wave outline, compact rows, logo and footer divider are preserved",()=>{
  const scene=readFileSync(new URL("../src/components/footer-riverscape.tsx",import.meta.url),"utf8");
- assert.match(css,/\.bw-footer-scene\{[^}]*inset:-29px 0 0/);
+ assert.match(css,/\.bw-footer-wave\{[^}]*top:-29px/);
  assert.match(scene,/stroke="#FBB040"/);
  assert.match(css,/\.bw-footer-divider\{[^}]*background:#c5a150/);
  assert.match(css,/\.bw-footer-mark\{[^}]*border-radius:13px/);
