@@ -17,11 +17,7 @@ export async function setInvitedPassword(formData:FormData) {
 
   const {error:changeError}=await supabase.auth.updateUser({password});
   if(changeError) redirect("/admin/set-password?error=update");
-  // An already approved Owner/Editor should reach the dashboard immediately.
-  // Only users without an active editorial role wait for approval.
-  const {data:profile}=await supabase.from("profiles")
-    .select("role,is_active").eq("id",user.id).maybeSingle();
-  if(profile?.is_active && ["owner","editor","contributor"].includes(profile.role))
-    redirect("/admin");
-  redirect("/admin/awaiting-approval");
+  // The dashboard separately enforces the user's active editorial role.
+  // This action never assigns privileges to the user.
+  redirect("/admin");
 }
