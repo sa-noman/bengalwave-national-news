@@ -74,7 +74,7 @@ test("live new article may publish in one click, with permission checks and no i
 test("published articles remain editable and updated images are saved by the actual media ID",()=>{
   const actions=read("src/app/admin/actions.ts");
   const control=read("src/components/admin/article-submit-controls.tsx");
-  assert.match(actions,/intent==="save"/);
+  assert.match(actions,/changeArticle\(formData,"save"\)/);
   assert.match(actions,/mediaId=photo\.mediaId|mediaId=upload\.mediaId/);
   assert.match(actions,/hero_media_id:mediaId/);
   assert.match(control,/status\?"পরিবর্তন সংরক্ষণ করুন"/);
