@@ -1,6 +1,12 @@
 "use client";
 
 import {useFormStatus} from "react-dom";
+import {
+  approveArticle,
+  submitArticleForReview,
+  publishArticle,
+  unpublishArticle,
+} from "@/app/admin/actions";
 
 export function ArticleSubmitControls({status,isEditor}:{
   status?:string;
@@ -9,23 +15,23 @@ export function ArticleSubmitControls({status,isEditor}:{
   const {pending}=useFormStatus();
   return <>
     <div className="admin-controls">
-      <button className="admin-primary" type="submit" name="intent" value="save" disabled={pending}>
+      <button className="admin-primary" type="submit"  disabled={pending}>
         {pending?"সংরক্ষণ হচ্ছে…":"খসড়া সংরক্ষণ / পরিবর্তন সংরক্ষণ"}
       </button>
       {status==="draft"&&
-        <button className="admin-secondary" type="submit" name="intent" value="submit" disabled={pending}>
+        <button className="admin-secondary" type="submit" formAction={submitArticleForReview} disabled={pending}>
           পর্যালোচনার জন্য পাঠান
         </button>}
       {status&&isEditor&&["draft","in_review"].includes(status)&&
-        <button className="admin-secondary" type="submit" name="intent" value="approve" disabled={pending}>
+        <button className="admin-secondary" type="submit" formAction={approveArticle} disabled={pending}>
           অনুমোদন করুন
         </button>}
       {status==="approved"&&isEditor&&
-        <button className="admin-primary" type="submit" name="intent" value="publish" disabled={pending}>
+        <button className="admin-primary" type="submit" formAction={publishArticle} disabled={pending}>
           সংবাদ প্রকাশ করুন
         </button>}
       {status==="published"&&isEditor&&
-        <button className="admin-danger" type="submit" name="intent" value="unpublish" disabled={pending}>
+        <button className="admin-danger" type="submit" formAction={unpublishArticle} disabled={pending}>
           প্রকাশনা বন্ধ করুন
         </button>}
     </div>
