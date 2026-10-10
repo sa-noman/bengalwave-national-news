@@ -8,6 +8,9 @@ export type NewsItem = {
   image: string;
   fullImage?: string;
   fullImageWidth?: number;
+  imageAlt?: string;
+  imageCaption?: string;
+  imageCredit?: string;
   featured?: boolean;
   publishedAt?: string;
   isDemo?: boolean;
