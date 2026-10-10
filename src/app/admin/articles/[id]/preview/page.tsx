@@ -2,11 +2,10 @@ import type {Metadata} from "next";
 import Link from "next/link";
 import {notFound} from "next/navigation";
 import {requireStaff} from "@/lib/auth/require-staff";
-import {isDesignPreview} from "@/lib/news-display";
 import {publicNewsImageUrl} from "@/lib/news-media-paths";
 import {NewsImage} from "@/components/news-image";
 
-// This page is an authenticated editorial preview, NEVER a public article.
+// This page is an authenticated editorial preview in BOTH Preview and Production; NEVER a public article.
 // Publishing is an explicit separate action on the edit form.
 export const dynamic="force-dynamic";
 export const metadata:Metadata={
@@ -30,7 +29,6 @@ type Category={slug:string;label_bn:string};
 export default async function PreviewArticle({params}:{
   params:Promise<{id:string}>;
 }){
-  if(!isDesignPreview())notFound();
   const {supabase}=await requireStaff();
   const {id}=await params;
   if(!/^[a-f\d-]{36}$/i.test(id))notFound();
