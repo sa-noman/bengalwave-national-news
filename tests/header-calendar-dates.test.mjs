@@ -61,3 +61,4 @@ test("header-specific styles contain no new colors or other-section selectors",(
   assert.doesNotMatch(css,/\.bw-(?:article|card|footer|nav|masthead|section)/);
   assert.match(read("src/app/layout.tsx"),/import "\.\/header-calendar\.css"/);
 });
+// This feature branch runs the full CI for the date-only preview change.
