@@ -63,6 +63,7 @@ type PublicClient=NonNullable<ReturnType<typeof createSupabasePublicClient>>;
 type AttachedMedia={
   storage_path:string;alt_text:string;caption:string|null;credit:string|null;
 };
+type PublishedMediaRow=AttachedMedia & {article_id:string};
 
 /**
  * Resolve CMS images using a published-only, read-only database function.
@@ -79,7 +80,7 @@ async function loadAttachedMedia(supabase:PublicClient,rows:DatabaseArticle[]){
     p_article_ids:articleIds,
   });
   if(!error){
-    return new Map((data||[]).map(m=>[m.article_id,{
+    return new Map<string,AttachedMedia>(((data||[]) as PublishedMediaRow[]).map(m=>[m.article_id,{
       storage_path:m.storage_path,
       alt_text:m.alt_text,
       caption:m.caption,
@@ -97,8 +98,8 @@ async function loadAttachedMedia(supabase:PublicClient,rows:DatabaseArticle[]){
     console.error("Bengal Wave: published image metadata unavailable",legacyError.code);
     return new Map<string,AttachedMedia>();
   }
-  const byMediaId=new Map((legacy||[]).map(m=>[m.id,m]));
-  return new Map(withHero.flatMap(row=>{
+  const byMediaId=new Map<string,AttachedMedia>((legacy||[]).map(m=>[m.id,m]));
+  return new Map<string,AttachedMedia>(withHero.flatMap(row=>{
     const media=byMediaId.get(row.hero_media_id as string);
     return media?[[row.id,media as AttachedMedia] as const]:[];
   }));
