@@ -1,7 +1,7 @@
 name: Website checks
 on:
   push:
-    branches: [main, "feature/**"]
+    branches: [main, "feature/**", "fix/**"]
   pull_request:
     branches: [main]
 jobs:

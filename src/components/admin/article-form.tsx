@@ -1,12 +1,18 @@
 import {createDraft,updateArticle} from "@/app/admin/actions";
+import {ArticleImageField} from "./article-image-field";
+import {ArticleSubmitControls} from "./article-submit-controls";
 type Category={id:string;label_bn:string};
 type Article={
  id:string;slug:string;headline:string;summary:string;body:string;
  status:string;category_id:string|null;source_name:string|null;source_url:string|null;
- is_featured:boolean;
+ is_featured:boolean;hero_media_id?:string|null;
 };
-export function ArticleForm({categories,article,role}:{categories:Category[];article?:Article;role:string}) {
+export function ArticleForm({categories,article,role,media}:{
+  categories:Category[];article?:Article;role:string;
+  media?:{url:string;alt:string;caption:string;credit:string}|null;
+}) {
   const isEditor=role==="owner"||role==="editor";
+  const previewOnly=process.env.VERCEL_ENV==="preview"||process.env.NODE_ENV==="development";
   return <form className="admin-form article-editor" action={article?updateArticle:createDraft}>
     {article && <input type="hidden" name="id" value={article.id}/>}
     <div className="admin-grid-form">
@@ -34,20 +40,18 @@ export function ArticleForm({categories,article,role}:{categories:Category[];art
       <label className="full-span">উৎসের URL (ঐচ্ছিক)
         <input name="source_url" type="url" defaultValue={article?.source_url||""} placeholder="https://example.com/article"/>
       </label>
+      <ArticleImageField
+        currentUrl={media?.url}
+        currentAlt={media?.alt}
+        currentCaption={media?.caption}
+        currentCredit={media?.credit}
+        hasCurrentImage={Boolean(article?.hero_media_id)}
+      />
       {isEditor && <label className="admin-checkbox full-span">
         <input type="checkbox" name="is_featured" defaultChecked={article?.is_featured||false}/> নির্বাচিত সংবাদ হিসেবে চিহ্নিত করুন
       </label>}
     </div>
-    <div className="admin-controls">
-      <button className="admin-primary" type="submit" name="intent" value="save">খসড়া সংরক্ষণ / পরিবর্তন সংরক্ষণ</button>
-      {article?.status==="draft" && <button className="admin-secondary" type="submit" name="intent" value="submit">পর্যালোচনার জন্য পাঠান</button>}
-      {article && isEditor && ["draft","in_review"].includes(article.status) &&
-        <button className="admin-secondary" type="submit" name="intent" value="approve">অনুমোদন করুন</button>}
-      {article?.status==="approved" && isEditor &&
-        <button className="admin-primary" type="submit" name="intent" value="publish">সংবাদ প্রকাশ করুন</button>}
-      {article?.status==="published" && isEditor &&
-        <button className="admin-danger" type="submit" name="intent" value="unpublish">প্রকাশনা বন্ধ করুন</button>}
-    </div>
+    <ArticleSubmitControls status={article?.status} isEditor={isEditor} previewOnly={previewOnly}/>
     <p className="admin-note">প্রকাশের আগে শিরোনাম, তথ্য, উৎস ও ছবির স্বত্ব যাচাই করুন। সংরক্ষিত প্রতিটি পরিবর্তনের ইতিহাস ডেটাবেজে থাকবে।</p>
   </form>;
 }

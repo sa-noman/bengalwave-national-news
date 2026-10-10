@@ -2,7 +2,7 @@ export const dynamic="force-dynamic";
 import Link from "next/link";
 import {NewsCard} from "@/components/news-card";
 import {PreviewNotice} from "@/components/preview-notice";
-import {getDisplayNews} from "@/lib/news-display";
+import {getDisplayNews,isDesignPreview} from "@/lib/news-display";
 import type {NewsItem} from "@/lib/demo-news";
 
 function SectionHeading({title,href="/latest",linkText="আরও"}:{title:string;href?:string;linkText?:string}){
@@ -37,7 +37,7 @@ export default async function Home(){
  const economy=choose(articles,["economy"],new Set<string>(),4);
  const feature=choose(articles,["features","culture","entertainment"],new Set<string>(),2);
  return <main className="bw-website bw-home">
-  {showingSamples && <PreviewNotice/>}
+  {(isDesignPreview()||showingSamples) && <PreviewNotice samples={showingSamples}/>}
   {!lead ? <section className="bw-wrap bw-empty-home">
     <div className="bw-empty-symbol">BW</div>
     <span className="bw-small-label">BENGAL WAVE · NEWSROOM</span>

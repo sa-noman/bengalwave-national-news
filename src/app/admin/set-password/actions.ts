@@ -17,5 +17,7 @@ export async function setInvitedPassword(formData:FormData) {
 
   const {error:changeError}=await supabase.auth.updateUser({password});
   if(changeError) redirect("/admin/set-password?error=update");
-  redirect("/admin/awaiting-approval");
+  // The dashboard separately enforces the user's active editorial role.
+  // This action never assigns privileges to the user.
+  redirect("/admin");
 }
