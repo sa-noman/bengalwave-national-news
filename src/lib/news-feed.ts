@@ -24,6 +24,30 @@ const articlePhotos:Record<string,string>={
  "us-sanctions-icc-after-navi-pillay-nobel-2026":"/news/icc-us-sanctions-2026.webp"
 };
 
+
+// Full-resolution article images. The existing image map above serves thumbnails.
+const articleFullPhotos:Record<string,string>={
+ "mithun-cabinet-rank-cultural-adviser-oct-2026":"/news/mithun-cultural-adviser-2026-article.webp",
+ "us-israel-iran-attack-plan-election-report-oct-2026":"/news/israel-iran-attack-report-2026-article.webp",
+ "nationwide-postal-service-week-oct-2026":"/news/postal-service-week-2026-article.webp",
+ "delhi-cockroach-protest-internet-shutdown-oct-2026":"/news/delhi-protest-security-2026-article.webp",
+};
+// Display a photo at no more than its actual source resolution.
+// A 640px source cannot become sharper by stretching it to 940px.
+const fullPhotoNativeWidths:Record<string,number>={
+ "shaheed-jehad-day-student-unity-oct-2026":750,
+ "mithun-cabinet-rank-cultural-adviser-oct-2026":1200,
+ "nana-patekar-dies-at-75-oct-2026":1200,
+ "us-israel-iran-attack-plan-election-report-oct-2026":1200,
+ "nationwide-postal-service-week-oct-2026":1200,
+ "litton-miraz-resistance-afghanistan-test-oct-2026":857,
+ "delhi-cockroach-protest-internet-shutdown-oct-2026":1200,
+ "pm-mental-health-stigma-awareness-oct-2026":995,
+ "bobby-hajjaj-drug-control-social-change-oct-2026":995,
+ "charmonai-pir-local-election-shariah-oct-2026":1200,
+ "us-sanctions-icc-after-navi-pillay-nobel-2026":640
+};
+
 const fallbackImages:Record<string,string>={
  national:"/illustrations/river.svg",international:"/illustrations/world.svg",
  politics:"/illustrations/city.svg",economy:"/illustrations/economy.svg",
@@ -43,6 +67,8 @@ function asNewsItem(row:DatabaseArticle):NewsItem {
     featured:row.is_featured,
     publishedAt:row.published_at||undefined,
     image:articlePhotos[row.slug]||fallbackImages[category?.slug||""]||"/illustrations/river.svg",
+    fullImage:articleFullPhotos[row.slug],
+    fullImageWidth:fullPhotoNativeWidths[row.slug],
   };
 }
 export async function getPublishedNews(limit=60):Promise<NewsItem[]> {
