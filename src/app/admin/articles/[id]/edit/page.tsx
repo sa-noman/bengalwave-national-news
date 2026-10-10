@@ -56,6 +56,12 @@ export default async function EditArticle({params,searchParams}:{
         metadata:"ছবি সংরক্ষণের তথ্য আপডেট হয়নি। আবার চেষ্টা করুন।",
         not_ready:"ছবি আপলোড শুধু Preview সংস্করণে চালু আছে।",
       } as Record<string,string>)[query.image_error]||"ছবি সংরক্ষণ করা যায়নি।"}</p>}
+      <div className="admin-editor-preview-action">
+        <Link className="admin-secondary" href={"/admin/articles/"+article.id+"/preview"}>
+          <span aria-hidden="true">◉</span> ওয়েবসাইটের মতো প্রিভিউ দেখুন (লাইভ নয়)
+        </Link>
+        <p>Approved মানে প্রকাশিত নয়। প্রিভিউতে সম্পূর্ণ সংবাদ ও ছবিটি যাচাই করে তারপর প্রকাশের সিদ্ধান্ত নিন।</p>
+      </div>
       <ArticleForm article={article} categories={categories||[]} role={role} media={media}/>
     </div>
   </main>;
