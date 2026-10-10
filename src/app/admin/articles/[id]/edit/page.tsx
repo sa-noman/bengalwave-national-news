@@ -8,7 +8,8 @@ export const metadata:Metadata={title:"সংবাদ সম্পাদনা"
 const errorLabels:Record<string,string>={
  validation:"ফর্মের তথ্য আবার যাচাই করুন।",save:"পরিবর্তন সংরক্ষণ করা যায়নি।",
  transition:"অনুমোদন বা প্রকাশের অবস্থা পরিবর্তন হয়নি। পেজ রিফ্রেশ করে আবার চেষ্টা করুন।",
- publish:"প্রকাশের আগে অন্তত ৩০ অক্ষরের সংবাদ, ১০ অক্ষরের বিবরণ ও বিভাগ নির্বাচন প্রয়োজন।"
+ publish:"প্রকাশের আগে অন্তত ৩০ অক্ষরের সংবাদ, ১০ অক্ষরের বিবরণ ও বিভাগ নির্বাচন প্রয়োজন।",
+ "preview-protected":"Preview মূল সাইটের একই ডাটাবেজ ব্যবহার করে। লাইভ সংবাদ প্রকাশ বা পরিবর্তন এখানে নিরাপত্তার জন্য বন্ধ রাখা হয়েছে।"
 };
 export default async function EditArticle({params,searchParams}:{
   params:Promise<{id:string}>;searchParams:Promise<{error?:string;success?:string;created?:string;image_error?:string}>
