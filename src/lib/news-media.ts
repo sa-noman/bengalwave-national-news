@@ -7,9 +7,14 @@ import {NEWS_MEDIA_BUCKET} from "@/lib/news-media-paths";
 export const MAX_IMAGE_BYTES=4*1024*1024;
 
 /** The storage bucket is intentionally preview-only until production is approved. */
+/** Preview editing is isolated from shared production publishing. */
 export function isPreviewMediaEnabled(){
   return process.env.VERCEL_ENV==="preview" ||
     process.env.NODE_ENV==="development";
+}
+/** Both official production and preview deployments allow editor uploads. */
+export function isMediaUploadEnabled(){
+  return process.env.VERCEL_ENV==="production" || isPreviewMediaEnabled();
 }
 
 type NewsMediaResult=
@@ -22,7 +27,7 @@ export async function uploadNewsImage(
   userId:string,
   supabase:Awaited<ReturnType<typeof createSupabaseServerClient>>
 ):Promise<NewsMediaResult>{
-  if(!isPreviewMediaEnabled())return {ok:false,error:"not_ready"};
+  if(!isMediaUploadEnabled())return {ok:false,error:"not_ready"};
   if(file.size>MAX_IMAGE_BYTES)return {ok:false,error:"too_large"};
   if(file.size<100 || !["image/jpeg","image/png","image/webp"].includes(file.type))
     return {ok:false,error:"invalid_file"};
