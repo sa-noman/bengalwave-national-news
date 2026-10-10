@@ -29,7 +29,7 @@ export async function uploadNewsImage(
 ):Promise<NewsMediaResult>{
   if(!isMediaUploadEnabled())return {ok:false,error:"not_ready"};
   if(file.size>MAX_IMAGE_BYTES)return {ok:false,error:"too_large"};
-  if(file.size<100 || !["image/jpeg","image/png","image/webp"].includes(file.type))
+  if(file.size<100 || !["image/jpeg","image/png","image/webp","image/avif"].includes(file.type))
     return {ok:false,error:"invalid_file"};
 
   let full:Buffer;
@@ -39,10 +39,10 @@ export async function uploadNewsImage(
     const image=sharp(bytes,{failOn:"error",limitInputPixels:25000000});
     const info=await image.metadata();
     const expectedFormats:Record<string,string>={
-      "image/jpeg":"jpeg","image/png":"png","image/webp":"webp"
+      "image/jpeg":"jpeg","image/png":"png","image/webp":"webp","image/avif":"heif"
     };
-    if(info.format!==expectedFormats[file.type] || (info.pages||1)!==1 ||
-       (info.width||0)<940 || (info.height||0)<450 ||
+    if((file.type==="image/avif"? !["heif","avif"].includes(info.format):info.format!==expectedFormats[file.type]) || (info.pages||1)!==1 ||
+       Math.max(info.width||0,info.height||0)<640 || Math.min(info.width||0,info.height||0)<360 ||
        (info.width||0)*(info.height||0)>25000000)
       return {ok:false,error:"invalid_image"};
     // Two COMPLETE WebP files, stripping EXIF and never enlarging the source.
