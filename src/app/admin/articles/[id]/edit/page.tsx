@@ -40,7 +40,7 @@ export default async function EditArticle({params,searchParams}:{
       {query.image_error && <p className="admin-alert" role="alert">{({
         invalid_file:"শুধু JPG, PNG অথবা WebP ফাইল আপলোড করুন।",
         invalid_image:"ছবি অসম্পূর্ণ, নষ্ট অথবা রেজোলিউশন কম। অন্তত 940 × 450 পিক্সেলের সম্পূর্ণ ছবি দিন।",
-        too_large:"ছবি সর্বোচ্চ ১২ MB হতে পারবে।",
+        too_large:"ছবি সর্বোচ্চ ৪ MB হতে পারবে।",
         missing_bucket:"Preview Image Storage প্রস্তুত হয়নি। Supabase Storage সেটআপ প্রয়োজন।",
         storage:"ছবি আপলোড করা যায়নি। আবার চেষ্টা করুন।",
         metadata:"ছবি সংরক্ষণের তথ্য আপডেট হয়নি। আবার চেষ্টা করুন।",
