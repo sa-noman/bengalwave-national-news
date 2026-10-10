@@ -12,6 +12,7 @@ export function ArticleForm({categories,article,role,media}:{
   media?:{url:string;alt:string;caption:string;credit:string}|null;
 }) {
   const isEditor=role==="owner"||role==="editor";
+  const previewOnly=process.env.VERCEL_ENV==="preview"||process.env.NODE_ENV==="development";
   return <form className="admin-form article-editor" action={article?updateArticle:createDraft}>
     {article && <input type="hidden" name="id" value={article.id}/>}
     <div className="admin-grid-form">
@@ -50,7 +51,7 @@ export function ArticleForm({categories,article,role,media}:{
         <input type="checkbox" name="is_featured" defaultChecked={article?.is_featured||false}/> নির্বাচিত সংবাদ হিসেবে চিহ্নিত করুন
       </label>}
     </div>
-    <ArticleSubmitControls status={article?.status} isEditor={isEditor}/>
+    <ArticleSubmitControls status={article?.status} isEditor={isEditor} previewOnly={previewOnly}/>
     <p className="admin-note">প্রকাশের আগে শিরোনাম, তথ্য, উৎস ও ছবির স্বত্ব যাচাই করুন। সংরক্ষিত প্রতিটি পরিবর্তনের ইতিহাস ডেটাবেজে থাকবে।</p>
   </form>;
 }
