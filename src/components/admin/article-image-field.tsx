@@ -1,6 +1,6 @@
 "use client";
 
-import {useEffect,useState} from "react";
+import {useEffect,useRef,useState} from "react";
 
 const MAX_SIZE=12*1024*1024;
 const accepted=["image/jpeg","image/png","image/webp"];
@@ -19,6 +19,7 @@ export function ArticleImageField({
   hasCurrentImage?:boolean;
 }){
   const [file,setFile]=useState<File|null>(null);
+  const fileInput=useRef<HTMLInputElement>(null);
   const [preview,setPreview]=useState<string|null>(null);
   const [error,setError]=useState("");
   const [remove,setRemove]=useState(false);
@@ -56,6 +57,7 @@ export function ArticleImageField({
           ছবি নির্বাচন করুন
           <input
             id="article-image-file"
+            ref={fileInput}
             type="file"
             name="image_file"
             accept="image/jpeg,image/png,image/webp"
@@ -78,7 +80,7 @@ export function ArticleImageField({
         {error&&<p className="admin-alert" role="alert">{error}</p>}
         {hasCurrentImage&&<label className="admin-image-remove">
           <input type="checkbox" name="remove_image" value="on"
-            checked={remove} onChange={event=>{setRemove(event.target.checked);if(event.target.checked)setFile(null);}}/>
+            checked={remove} onChange={event=>{setRemove(event.target.checked);if(event.target.checked){setFile(null);if(fileInput.current)fileInput.current.value="";}}}/>
           বর্তমান ছবিটি সরিয়ে দিন
         </label>}
         <p className="admin-image-hint">ছবি পরিবর্তন করলে আগের ফাইল মুছে ফেলা হবে না; সংবাদে নতুন ছবিটি দেখা যাবে।</p>
