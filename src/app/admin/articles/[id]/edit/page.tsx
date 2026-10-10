@@ -49,13 +49,13 @@ export default async function EditArticle({params,searchParams}:{
         (!article.summary?.trim() || article.summary.trim().length<10) &&
         <p className="admin-note" role="note">প্রকাশের আগে সংক্ষিপ্ত বিবরণে অন্তত ১০ অক্ষর লিখতে হবে। অনুমোদন ও প্রকাশ দুটি আলাদা ধাপ।</p>}
       {query.image_error && <p className="admin-alert" role="alert">{({
-        invalid_file:"শুধু JPG, PNG অথবা WebP ফাইল আপলোড করুন।",
-        invalid_image:"ছবি অসম্পূর্ণ, নষ্ট অথবা রেজোলিউশন কম। অন্তত 940 × 450 পিক্সেলের সম্পূর্ণ ছবি দিন।",
+        invalid_file:"JPG, PNG, WebP অথবা AVIF ছবি দিন।",
+        invalid_image:"ছবি অসম্পূর্ণ, নষ্ট অথবা রেজোলিউশন কম। অন্তত 640 × 360 পিক্সেলের সম্পূর্ণ ছবি দিন।",
         too_large:"ছবি সর্বোচ্চ ৪ MB হতে পারবে।",
-        missing_bucket:"Preview Image Storage প্রস্তুত হয়নি। Supabase Storage সেটআপ প্রয়োজন।",
+        missing_bucket:"Image Storage পাওয়া যায়নি। Supabase Storage সেটআপ পরীক্ষা করুন।",
         storage:"ছবি আপলোড করা যায়নি। আবার চেষ্টা করুন।",
         metadata:"ছবি সংরক্ষণের তথ্য আপডেট হয়নি। আবার চেষ্টা করুন।",
-        not_ready:"ছবি আপলোড শুধু Preview সংস্করণে চালু আছে।",
+        not_ready:"ছবি আপলোড সাময়িকভাবে বন্ধ।",
       } as Record<string,string>)[query.image_error]||"ছবি সংরক্ষণ করা যায়নি।"}</p>}
       <div className="admin-editor-preview-action">
         <Link className="admin-secondary" href={"/admin/articles/"+article.id+"/preview"}>
