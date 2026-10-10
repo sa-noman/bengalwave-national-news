@@ -7,7 +7,7 @@ import {publicNewsImageUrl} from "@/lib/news-media-paths";
 export const metadata:Metadata={title:"সংবাদ সম্পাদনা",robots:{index:false,follow:false}};
 const errorLabels:Record<string,string>={
  validation:"ফর্মের তথ্য আবার যাচাই করুন।",save:"পরিবর্তন সংরক্ষণ করা যায়নি।",
- transition:"এই অবস্থায় উল্লিখিত প্রকাশনা কার্যক্রম অনুমোদিত নয়।",
+ transition:"অনুমোদন বা প্রকাশের অবস্থা পরিবর্তন হয়নি। পেজ রিফ্রেশ করে আবার চেষ্টা করুন।",
  publish:"প্রকাশের আগে অন্তত ৩০ অক্ষরের সংবাদ, ১০ অক্ষরের বিবরণ ও বিভাগ নির্বাচন প্রয়োজন।"
 };
 export default async function EditArticle({params,searchParams}:{
@@ -36,7 +36,17 @@ export default async function EditArticle({params,searchParams}:{
     <div className="admin-panel">
       <span className="category">বর্তমান অবস্থা: {article.status}</span><h1>সংবাদ সম্পাদনা</h1>
       {query.error && <p className="admin-alert" role="alert">{errorLabels[query.error]||"পরিবর্তন সম্পন্ন হয়নি।"}</p>}
-      {(query.success||query.created) && <p className="admin-success" role="status">সংবাদ সংরক্ষিত হয়েছে।</p>}
+      {(query.success||query.created) && <p className="admin-success" role="status">{
+        query.created?"নতুন খসড়া তৈরি হয়েছে।":
+        query.success==="approve"?"সংবাদ অনুমোদিত হয়েছে। এখন প্রকাশের জন্য প্রস্তুত।":
+        query.success==="submit"?"সংবাদটি পর্যালোচনার জন্য পাঠানো হয়েছে।":
+        query.success==="publish"?"সংবাদ প্রকাশিত হয়েছে।":
+        query.success==="unpublish"?"সংবাদটির প্রকাশনা বন্ধ হয়েছে।":
+        "সংবাদে পরিবর্তন সংরক্ষিত হয়েছে।"
+      }</p>}
+      {(article.status==="draft"||article.status==="approved") &&
+        (!article.summary?.trim() || article.summary.trim().length<10) &&
+        <p className="admin-note" role="note">প্রকাশের আগে সংক্ষিপ্ত বিবরণে অন্তত ১০ অক্ষর লিখতে হবে। অনুমোদন ও প্রকাশ দুটি আলাদা ধাপ।</p>}
       {query.image_error && <p className="admin-alert" role="alert">{({
         invalid_file:"শুধু JPG, PNG অথবা WebP ফাইল আপলোড করুন।",
         invalid_image:"ছবি অসম্পূর্ণ, নষ্ট অথবা রেজোলিউশন কম। অন্তত 940 × 450 পিক্সেলের সম্পূর্ণ ছবি দিন।",
