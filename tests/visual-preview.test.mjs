@@ -12,7 +12,8 @@ test("demo fixtures cannot reach a Vercel production deployment",()=>{
 test("visual preview labels sample articles unmistakably",()=>{
  const home=read("src/app/page.tsx");
  const notice=read("src/components/preview-notice.tsx");
- assert.match(home,/showingSamples && <PreviewNotice/);
+ assert.match(home,/isDesignPreview\(\)\|\|showingSamples/);
+ assert.match(home,/<PreviewNotice samples=\{showingSamples\}/);
  assert.match(notice,/বাস্তব সংবাদ নয়/);
  assert.match(read("src/components/news-card.tsx"),/নমুনা প্রতিবেদন · প্রকাশিত নয়/);
 });
