@@ -21,7 +21,7 @@ test("admin server validates role, transition and actual saved database status",
   assert.match(actions,/const canEdit=editor\(role\)/);
   assert.match(actions,/intent==="approve" && canEdit/);
   assert.match(actions,/intent==="publish" && canEdit/);
-  assert.match(actions,/\.update\(payload\)\.eq\("id",id\)\.select\("id,status"\)/);
+  assert.match(actions,/\.update\(payload\)\.eq\("id",id\)\.select\("id,status,hero_media_id"\)/);
   assert.match(actions,/if\(error \|\| !stored\)/);
   assert.match(actions,/stored\.status!==status/);
 });
