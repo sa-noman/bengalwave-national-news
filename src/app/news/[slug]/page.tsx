@@ -3,7 +3,7 @@ import type {Metadata} from "next";
 import Link from "next/link";
 import {NewsImage} from "@/components/news-image";
 import {notFound} from "next/navigation";
-import {getDisplayArticle} from "@/lib/news-display";
+import {getDisplayArticle,isDesignPreview} from "@/lib/news-display";
 import {PreviewNotice} from "@/components/preview-notice";
 export async function generateMetadata({params}:{params:Promise<{slug:string}>}):Promise<Metadata>{
  const {slug}=await params;
@@ -17,7 +17,7 @@ export default async function ArticlePage({params}:{params:Promise<{slug:string}
  const cmsCaption=item.imageCaption
    ? item.imageCaption+(item.imageCredit?" · ছবি: "+item.imageCredit:"")
    : item.imageCredit?"ছবি: "+item.imageCredit:null;
- return <main className="bw-website">{item.isDemo&&<PreviewNotice/>}
+ return <main className="bw-website">{isDesignPreview()&&<PreviewNotice samples={Boolean(item.isDemo)}/>}
   <div className="bw-wrap bw-article">
    <nav className="bw-breadcrumb" aria-label="অবস্থান"><Link href="/">প্রচ্ছদ</Link><span>›</span><Link href="/latest">সংবাদ</Link></nav>
    <article>
