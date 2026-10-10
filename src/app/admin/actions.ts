@@ -46,9 +46,10 @@ export async function createDraft(formData:FormData) {
       refreshArticle(input.slug);
       redirect("/admin/articles/"+data.id+"/edit?created=1&image_error="+upload.error);
     }
-    const {error:imageUpdateError}=await supabase.from("articles")
-      .update({hero_media_id:upload.mediaId}).eq("id",data.id);
-    if(imageUpdateError){
+    const {data:linked,error:imageUpdateError}=await supabase.from("articles")
+      .update({hero_media_id:upload.mediaId}).eq("id",data.id)
+      .select("hero_media_id").maybeSingle();
+    if(imageUpdateError||linked?.hero_media_id!==upload.mediaId){
       refreshArticle(input.slug);
       redirect("/admin/articles/"+data.id+"/edit?created=1&image_error=metadata");
     }
@@ -206,10 +207,12 @@ async function changeArticle(formData:FormData,intent:EditorialIntent){
   // Check the RETURNED row, not just error=null. A row blocked by RLS
   // may update zero records without surfacing a database error.
   const {data:stored,error}=await supabase.from("articles")
-    .update(payload).eq("id",id).select("id,status").maybeSingle();
+    .update(payload).eq("id",id).select("id,status,hero_media_id").maybeSingle();
   if(error || !stored) redirect("/admin/articles/"+id+"/edit?error=save");
   if(stored.status!==status)
     redirect("/admin/articles/"+id+"/edit?error=transition");
+  if((stored.hero_media_id||null)!==(mediaId||null))
+    redirect("/admin/articles/"+id+"/edit?image_error=metadata");
 
   // Alt text, caption and credit can be revised without reuploading the photo.
   if(!file&&!remove&&mediaId){
