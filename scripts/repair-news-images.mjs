@@ -21,7 +21,7 @@ const photos=[
   },
   {
     name:"delhi-protest-security-2026-fixed.webp",
-    sources:[{type:"image",url:"https://cf-images.assettype.com/newindianexpress/2026-10-01/7ze2zuto/ANI_20260929030643.jpg?auto=format%2Ccompress&fit=max&w=1200"}],
+    sources:[{type:"image",url:"https://cf-images.assettype.com/newindianexpress/2026-10-01/7ze2zuto/ANI_20260929030643.jpg"}],
   },
   {
     name:"mithun-cultural-adviser-2026-fixed.webp",
@@ -39,7 +39,7 @@ async function request(url) {
       redirect:"follow",
       headers:{
         "User-Agent":"Mozilla/5.0 (compatible; BengalWave-NewsImageRepair/1.0)",
-        "Accept":"image/avif,image/webp,image/jpeg,image/png,text/html;q=0.8",
+        "Accept":"image/jpeg,image/png,image/webp;q=0.7,text/html;q=0.6",
       },
     });
     if(!response.ok)throw new Error("HTTP "+response.status);
