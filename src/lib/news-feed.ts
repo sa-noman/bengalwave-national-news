@@ -12,12 +12,12 @@ type DatabaseArticle={
 
 const articlePhotos:Record<string,string>={
  "shaheed-jehad-day-student-unity-oct-2026":"/news/shaheed-jehad-2026.png",
- "mithun-cabinet-rank-cultural-adviser-oct-2026":"/news/mithun-cultural-adviser-2026.png",
+ "mithun-cabinet-rank-cultural-adviser-oct-2026":"/news/mithun-cultural-adviser-2026-fixed.webp",
  "nana-patekar-dies-at-75-oct-2026":"/news/nana-patekar-2026.png",
- "us-israel-iran-attack-plan-election-report-oct-2026":"/news/israel-iran-attack-report-2026.png",
- "nationwide-postal-service-week-oct-2026":"/news/postal-service-week-2026.png",
+ "us-israel-iran-attack-plan-election-report-oct-2026":"/news/israel-iran-attack-report-2026-fixed.webp",
+ "nationwide-postal-service-week-oct-2026":"/news/postal-service-week-2026-fixed.webp",
  "litton-miraz-resistance-afghanistan-test-oct-2026":"/news/litton-miraz-test-2026.png",
- "delhi-cockroach-protest-internet-shutdown-oct-2026":"/news/delhi-protest-security-2026.png",
+ "delhi-cockroach-protest-internet-shutdown-oct-2026":"/news/delhi-protest-security-2026-fixed.webp",
  "pm-mental-health-stigma-awareness-oct-2026":"/news/pm-mental-health-2026.png",
  "bobby-hajjaj-drug-control-social-change-oct-2026":"/news/bobby-hajjaj-drug-control-2026.png",
  "charmonai-pir-local-election-shariah-oct-2026":"/news/charmonai-council-2026.webp",
