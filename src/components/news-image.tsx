@@ -36,7 +36,7 @@ export function NewsImage({
       sizes={sizes}
       quality={quality}
       priority={eager}
-      unoptimized={useOriginal}
+      unoptimized={useOriginal || /^https:\/\//.test(src)}
       className={status==="loaded"?"bw-image-ready":"bw-image-pending"}
       onLoad={()=>setStatus("loaded")}
       onError={()=>{
