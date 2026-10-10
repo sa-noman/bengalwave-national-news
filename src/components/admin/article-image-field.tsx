@@ -2,7 +2,7 @@
 
 import {useEffect,useRef,useState} from "react";
 
-const MAX_SIZE=12*1024*1024;
+const MAX_SIZE=4*1024*1024;
 const accepted=["image/jpeg","image/png","image/webp"];
 
 export function ArticleImageField({
@@ -65,7 +65,7 @@ export function ArticleImageField({
               const selected=event.currentTarget.files?.[0]||null;
               setError("");
               if(selected&&(!accepted.includes(selected.type)||selected.size>MAX_SIZE)){
-                setError("JPG, PNG বা WebP দিন। ফাইল সর্বোচ্চ ১২ MB হতে পারবে।");
+                setError("JPG, PNG বা WebP দিন। ফাইল সর্বোচ্চ ৪ MB হতে পারবে।");
                 event.currentTarget.value="";
                 setFile(null);
                 return;
@@ -75,7 +75,7 @@ export function ArticleImageField({
             }}
           />
         </label>
-        <p className="admin-image-hint">JPG, PNG, WebP · সর্বোচ্চ ১২ MB · পরিষ্কার ছবির জন্য অন্তত 940 × 450 পিক্সেল</p>
+        <p className="admin-image-hint">JPG, PNG, WebP · সর্বোচ্চ ৪ MB · পরিষ্কার ছবির জন্য অন্তত 940 × 450 পিক্সেল</p>
         {file && <p className="admin-image-selected">নির্বাচিত: {file.name} ({(file.size/1048576).toFixed(1)} MB)</p>}
         {error&&<p className="admin-alert" role="alert">{error}</p>}
         {hasCurrentImage&&<label className="admin-image-remove">
