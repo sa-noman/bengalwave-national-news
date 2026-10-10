@@ -6,7 +6,7 @@ import {getDisplayNews,isDesignPreview} from "@/lib/news-display";
 import type {NewsItem} from "@/lib/demo-news";
 
 function SectionHeading({title,href="/latest",linkText="আরও"}:{title:string;href?:string;linkText?:string}){
- return <div className="bw-section-heading"><h2>{title}</h2><Link href={href}>{linkText} <span aria-hidden="true">›</span></Link></div>;
+ return <div className="bw-section-heading"><h2><Link href={href}>{title}</Link></h2><Link href={href}>{linkText} <span aria-hidden="true">›</span></Link></div>;
 }
 function FourColumn({items}:{items:NewsItem[]}){
  if(!items.length)return <p className="bw-empty">এই বিভাগে এখনো সংবাদ প্রকাশিত হয়নি।</p>;
