@@ -4,7 +4,7 @@ import {randomUUID} from "node:crypto";
 import {createSupabaseServerClient} from "@/lib/supabase/server";
 
 import {NEWS_MEDIA_BUCKET} from "@/lib/news-media-paths";
-export const MAX_IMAGE_BYTES=12*1024*1024;
+export const MAX_IMAGE_BYTES=4*1024*1024;
 
 /** The storage bucket is intentionally preview-only until production is approved. */
 export function isPreviewMediaEnabled(){
