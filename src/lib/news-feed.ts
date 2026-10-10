@@ -1,13 +1,14 @@
 import "server-only";
 import {createSupabasePublicClient} from "@/lib/supabase/public";
 import type {NewsItem} from "@/lib/demo-news";
+import {publicNewsImageUrl} from "@/lib/news-media-paths";
 
 type CategoryRef={slug:string;label_bn:string};
 type DatabaseArticle={
  id:string;slug:string;headline:string;summary:string;body:string;
  is_featured:boolean;published_at:string|null;
  categories:CategoryRef|CategoryRef[]|null;
- source_name:string|null;source_url:string|null;
+ source_name:string|null;source_url:string|null;hero_media_id:string|null;
 };
 
 const articlePhotos:Record<string,string>={
@@ -58,37 +59,65 @@ const fallbackImages:Record<string,string>={
 function normalizeCategory(value:DatabaseArticle["categories"]):CategoryRef|null {
   return Array.isArray(value) ? value[0]||null : value;
 }
-function asNewsItem(row:DatabaseArticle):NewsItem {
+type PublicClient=NonNullable<ReturnType<typeof createSupabasePublicClient>>;
+type AttachedMedia={
+  id:string;storage_path:string;alt_text:string;caption:string|null;credit:string|null;
+};
+
+async function loadAttachedMedia(supabase:PublicClient,rows:DatabaseArticle[]){
+  const ids=Array.from(new Set(rows.map(r=>r.hero_media_id)
+    .filter((id):id is string=>Boolean(id))));
+  if(!ids.length)return new Map<string,AttachedMedia>();
+  const {data,error}=await supabase.from("media_assets")
+    .select("id,storage_path,alt_text,caption,credit").in("id",ids);
+  if(error){
+    console.error("Bengal Wave: published image metadata unavailable",error.code);
+    return new Map<string,AttachedMedia>();
+  }
+  return new Map((data||[]).map(a=>[a.id,a as AttachedMedia]));
+}
+
+function asNewsItem(row:DatabaseArticle,media:AttachedMedia|undefined,supabase:PublicClient):NewsItem {
   const category=normalizeCategory(row.categories);
+  // Prefer a securely uploaded and attached CMS image. Legacy static image
+  // mappings remain intact until an editor uploads a replacement.
+  const thumb=media?publicNewsImageUrl(supabase,media.storage_path,"thumb"):null;
+  const full=media?publicNewsImageUrl(supabase,media.storage_path,"full"):null;
   return {
     id:row.id,slug:row.slug,title:row.headline,summary:row.summary,
     category:category?.label_bn||"সংবাদ",
     categorySlug:category?.slug||"",
     featured:row.is_featured,
     publishedAt:row.published_at||undefined,
-    image:articlePhotos[row.slug]||fallbackImages[category?.slug||""]||"/illustrations/river.svg",
-    fullImage:articleFullPhotos[row.slug],
-    fullImageWidth:fullPhotoNativeWidths[row.slug],
+    image:thumb||articlePhotos[row.slug]||fallbackImages[category?.slug||""]||"/illustrations/river.svg",
+    fullImage:full||articleFullPhotos[row.slug],
+    fullImageWidth:full?940:fullPhotoNativeWidths[row.slug],
+    imageAlt:media?.alt_text||undefined,
+    imageCaption:media?.caption||undefined,
+    imageCredit:media?.credit||undefined,
   };
 }
 export async function getPublishedNews(limit=60):Promise<NewsItem[]> {
   const supabase=createSupabasePublicClient();
   if(!supabase) return [];
   const {data,error}=await supabase.from("articles")
-    .select("id,slug,headline,summary,is_featured,published_at,categories(slug,label_bn)")
+    .select("id,slug,headline,summary,is_featured,published_at,hero_media_id,categories(slug,label_bn)")
     .eq("status","published").lte("published_at",new Date().toISOString())
     .order("published_at",{ascending:false}).limit(limit);
   if(error){console.error("Bengal Wave: public news fetch failed",error.code);return [];}
-  return (data||[]).map(r=>asNewsItem(r as unknown as DatabaseArticle));
+  const rows=(data||[]) as unknown as DatabaseArticle[];
+  const media=await loadAttachedMedia(supabase,rows);
+  return rows.map(row=>asNewsItem(row,media.get(row.hero_media_id||""),supabase));
 }
 export async function getPublishedArticle(slug:string) {
   const supabase=createSupabasePublicClient();
   if(!supabase) return null;
   const {data,error}=await supabase.from("articles")
-    .select("id,slug,headline,summary,body,source_name,source_url,is_featured,published_at,categories(slug,label_bn)")
+    .select("id,slug,headline,summary,body,source_name,source_url,is_featured,published_at,hero_media_id,categories(slug,label_bn)")
     .eq("slug",slug).eq("status","published")
     .lte("published_at",new Date().toISOString()).maybeSingle();
   if(error || !data)return null;
   const row=data as unknown as DatabaseArticle;
-  return {...asNewsItem(row),body:row.body,sourceName:row.source_name,sourceUrl:row.source_url};
+  const media=await loadAttachedMedia(supabase,[row]);
+  return {...asNewsItem(row,media.get(row.hero_media_id||""),supabase),body:row.body,sourceName:row.source_name,sourceUrl:row.source_url};
 }
