@@ -89,6 +89,11 @@ async function changeArticle(formData:FormData,intent:EditorialIntent){
     .select("id,status,slug,published_at,category_id,author_id,hero_media_id")
     .eq("id",id).maybeSingle();
   if(fetchError || !existing) redirect("/admin?error=missing");
+  // Preview shares the article database with production. Never allow a
+  // preview-only deployment to change a live published record or publish one.
+  if(isPreviewMediaEnabled() &&
+     (existing.status==="published" || intent==="publish" || intent==="unpublish"))
+    redirect("/admin/articles/"+id+"/edit?error=preview-protected");
 
   const canEdit=editor(role);
   if(!canEdit && existing.status!=="draft") redirect("/admin?error=permission");
