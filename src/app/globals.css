@@ -117,3 +117,35 @@ body{background:#fffefa}
 @media(max-width:720px){
   .brand-symbol{flex-basis:40px;width:40px;height:40px;border-radius:11px}
 }
+
+
+/* Newsroom media upload: accessible, editorial, responsive. */
+.admin-image-section{border:1px solid #d9e4dd;background:#f8fbf7;border-radius:10px;padding:20px;min-width:0}
+.admin-image-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:15px;margin-bottom:16px}
+.admin-image-heading h2{font-size:19px;margin:0 0 4px;color:#123d32}
+.admin-image-heading p{font-size:13px;line-height:1.7;margin:0;color:#65776c}
+.admin-image-optional{border:1px solid #d5e4d8;border-radius:99px;padding:3px 10px;font-size:12px;color:#496857;white-space:nowrap}
+.admin-image-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}
+.admin-image-preview{width:100%;aspect-ratio:16/9;display:grid;place-items:center;overflow:hidden;background:#f1eee5;border:1px dashed #b9c9bf;border-radius:9px}
+.admin-image-preview img{display:block;width:100%;height:100%;max-width:none;object-fit:contain}
+.admin-image-empty{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:3px;text-align:center;padding:20px;color:#536e62}
+.admin-image-empty>span{font-size:32px;line-height:1;color:#769485}
+.admin-image-empty strong{font-size:14px}
+.admin-image-empty small{font-size:12px;color:#70877b}
+.admin-image-options{min-width:0;display:grid;align-content:start;gap:10px}
+.admin-image-file-label{font-weight:700!important;color:#153f35}
+.admin-form .admin-image-file-label input[type=file]{width:100%;display:block;padding:9px;border-radius:7px;border:1px dashed #95b4a5;background:#fff;color:#234138;font-size:13px}
+.admin-image-file-label input[type=file]::file-selector-button{border:0;border-radius:6px;background:#073f34;color:#fff;font:600 13px "Hind Siliguri",sans-serif;padding:9px 11px;margin-right:12px;cursor:pointer}
+.admin-image-hint{font-size:12px!important;line-height:1.6;margin:0!important;color:#586d62!important}
+.admin-image-selected{font-size:13px!important;color:#126345!important;margin:0!important;word-break:break-word}
+.admin-image-remove{font-size:13px!important;display:flex!important;align-items:center;gap:8px!important;padding:8px 0;color:#9b3333}
+.admin-image-remove input{width:17px;height:17px;accent-color:#9b3333}
+.admin-image-details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:18px}
+.admin-image-details label:first-child{grid-column:1/-1}
+.admin-image-details input{min-width:0}
+@media(max-width:760px){
+ .admin-image-section{padding:14px}
+ .admin-image-layout,.admin-image-details{grid-template-columns:1fr}
+ .admin-image-details label:first-child{grid-column:auto}
+ .admin-image-heading{align-items:flex-start}
+}
