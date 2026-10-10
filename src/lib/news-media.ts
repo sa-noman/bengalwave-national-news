@@ -3,27 +3,13 @@ import sharp from "sharp";
 import {randomUUID} from "node:crypto";
 import {createSupabaseServerClient} from "@/lib/supabase/server";
 
-export const NEWS_MEDIA_BUCKET="bengalwave-preview-news-images";
+import {NEWS_MEDIA_BUCKET} from "@/lib/news-media-paths";
 export const MAX_IMAGE_BYTES=12*1024*1024;
 
 /** The storage bucket is intentionally preview-only until production is approved. */
 export function isPreviewMediaEnabled(){
   return process.env.VERCEL_ENV==="preview" ||
     process.env.NODE_ENV==="development";
-}
-
-/** All database paths include the bucket prefix; storage API object paths don't. */
-export function publicNewsImageUrl(
-  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
-  storagePath:string,
-  size:"full"|"thumb"="full"
-){
-  const prefix=NEWS_MEDIA_BUCKET+"/";
-  if(!storagePath.startsWith(prefix) || !storagePath.endsWith("/full.webp"))
-    return null;
-  const objectPath=storagePath.slice(prefix.length)
-    .replace(/\/full\.webp$/,size==="thumb"?"/thumb.webp":"/full.webp");
-  return supabase.storage.from(NEWS_MEDIA_BUCKET).getPublicUrl(objectPath).data.publicUrl;
 }
 
 type NewsMediaResult=
