@@ -56,11 +56,32 @@ export async function createDraft(formData:FormData) {
   redirect("/admin/articles/"+data.id+"/edit?created=1");
 }
 
-export async function updateArticle(formData:FormData) {
+/**
+ * Each editorial action has its OWN server-action identity. Do not rely on a
+ * submit button's name/value being included in multipart FormData: the form
+ * can be re-rendered while a large photo uploads and drop the submitter.
+ */
+export async function updateArticle(formData:FormData){
+  return changeArticle(formData,"save");
+}
+export async function submitArticleForReview(formData:FormData){
+  return changeArticle(formData,"submit");
+}
+export async function approveArticle(formData:FormData){
+  return changeArticle(formData,"approve");
+}
+export async function publishArticle(formData:FormData){
+  return changeArticle(formData,"publish");
+}
+export async function unpublishArticle(formData:FormData){
+  return changeArticle(formData,"unpublish");
+}
+type EditorialIntent="save"|"submit"|"approve"|"publish"|"unpublish";
+
+async function changeArticle(formData:FormData,intent:EditorialIntent){
   const {supabase,role,user}=await requireStaff();
   const id=String(formData.get("id")||"");
   if(!isUuid(id)) redirect("/admin?error=invalid");
-  const intent=String(formData.get("intent")||"save");
   const input=parseArticleInput(formData);
   if(!input) redirect("/admin/articles/"+id+"/edit?error=validation");
 
@@ -109,8 +130,13 @@ export async function updateArticle(formData:FormData) {
     hero_media_id:mediaId,
     ...(canEdit?{is_featured:formData.get("is_featured")==="on"}:{}),
   };
-  const {error}=await supabase.from("articles").update(payload).eq("id",id);
-  if(error) redirect("/admin/articles/"+id+"/edit?error=save");
+  // Check the RETURNED row, not just error=null. A row blocked by RLS
+  // may update zero records without surfacing a database error.
+  const {data:stored,error}=await supabase.from("articles")
+    .update(payload).eq("id",id).select("id,status").maybeSingle();
+  if(error || !stored) redirect("/admin/articles/"+id+"/edit?error=save");
+  if(stored.status!==status)
+    redirect("/admin/articles/"+id+"/edit?error=transition");
 
   // Alt text, caption and credit can be revised without reuploading the photo.
   if(!file&&!remove&&mediaId){
@@ -127,5 +153,6 @@ export async function updateArticle(formData:FormData) {
 
   refreshArticle(existing.slug);
   refreshArticle(input.slug);
-  redirect("/admin/articles/"+id+"/edit?success=1");
+  const feedback:EditorialIntent=intent;
+  redirect("/admin/articles/"+id+"/edit?success="+feedback);
 }
