@@ -13,7 +13,7 @@ test("only published rows appear in public news feeds",()=>{
 test("approved and draft articles get an authenticated preview, never automatic publication",()=>{
   const page=read("src/app/admin/articles/[id]/preview/page.tsx");
   const actions=read("src/app/admin/actions.ts");
-  assert.match(page,/if\(!isDesignPreview\(\)\)notFound\(\)/);
+  assert.doesNotMatch(page,/if\(!isDesignPreview\(\)\)notFound\(\)/);
   assert.match(page,/await requireStaff\(\)/);
   assert.match(page,/\.eq\("id",id\)\.maybeSingle\(\)/);
   assert.match(page,/robots:\{index:false,follow:false\}/);
