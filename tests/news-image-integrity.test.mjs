@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {readdirSync,readFileSync,existsSync} from "node:fs";
 import {join,resolve} from "node:path";
+import sharp from "sharp";
 
 const folder=resolve("public/news");
 const signature=Buffer.from([137,80,78,71,13,10,26,10]);
@@ -64,5 +65,25 @@ test("all four repaired reports have verified replacements",()=>{
   assert.ok(existsSync(file),name+": restored WebP missing");
   verifyWebp(readFileSync(file),name);
   assert.ok(!existsSync(join(folder,name+".png")),name+": corrupted original still present");
+ }
+});
+
+test("full article photos have enough real pixels to avoid blurry desktop upscaling",async()=>{
+ for(const name of [
+  "israel-iran-attack-report-2026",
+  "postal-service-week-2026",
+  "delhi-protest-security-2026",
+  "mithun-cultural-adviser-2026",
+ ]){
+  const full=join(folder,name+"-article.webp");
+  const preview=join(folder,name+"-fixed.webp");
+  assert.ok(existsSync(full),name+": missing high-quality full photo");
+  assert.ok(existsSync(preview),name+": missing lightweight thumbnail");
+  verifyWebp(readFileSync(full),name+" article");
+  const info=await sharp(full,{failOn:"error"}).metadata();
+  assert.equal(info.format,"webp");
+  assert.ok((info.width||0)>=1100,name+": article image too narrow");
+  assert.ok((info.height||0)>=600,name+": article image too short");
+  assert.ok(info.width*info.height>=700000,name+": article image is undersized");
  }
 });
