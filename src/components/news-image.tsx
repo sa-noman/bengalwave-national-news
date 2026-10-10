@@ -12,11 +12,13 @@ export function NewsImage({
   src,
   alt="",
   eager=false,
+  quality=78,
   sizes="(max-width: 760px) 72vw, (max-width: 1000px) 50vw, 25vw",
 }:{
   src:string;
   alt?:string;
   eager?:boolean;
+  quality?:number;
   sizes?:string;
 }){
   const [status,setStatus]=useState<"loading"|"loaded"|"error">("loading");
@@ -32,7 +34,7 @@ export function NewsImage({
       alt={alt}
       fill
       sizes={sizes}
-      quality={72}
+      quality={quality}
       priority={eager}
       unoptimized={useOriginal}
       className={status==="loaded"?"bw-image-ready":"bw-image-pending"}
