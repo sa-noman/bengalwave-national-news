@@ -63,3 +63,18 @@ using (
 -- The bucket is public because published news photographs are public.
 -- Each object has an unpredictable UUID directory. Draft article text and
 -- editor-only metadata are still restricted by the existing article RLS.
+
+-- Contributors may revise metadata for media they uploaded, while editorial
+-- roles can already modify any asset via the existing policy.
+create policy "bw_preview_media_uploader_update"
+on public.media_assets for update to authenticated
+using (
+  uploaded_by = (select auth.uid())
+  and storage_path like 'bengalwave-preview-news-images/%'
+  and public.has_cms_role(array['owner','editor','contributor']::public.cms_role[])
+)
+with check (
+  uploaded_by = (select auth.uid())
+  and storage_path like 'bengalwave-preview-news-images/%'
+  and public.has_cms_role(array['owner','editor','contributor']::public.cms_role[])
+);
