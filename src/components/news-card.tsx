@@ -14,7 +14,7 @@ export function NewsCard({item,compact=false,hero=false,variant}:{
   return <article className={"bw-card bw-card-"+kind}>
    <Link href={href} className="bw-card-link" aria-label={item.title}>
     {kind!=="text"&&<span className="bw-img-frame">
-      <NewsImage key={item.image} src={kind==="lead"?(item.fullImage||item.image):item.image} alt={item.isDemo?"নমুনা প্রতিবেদনের প্রতীকী ছবি":""} eager={kind==="lead"} quality={kind==="lead"?84:78} sizes={imageSizes}/>
+      <NewsImage key={item.image} src={kind==="lead"?(item.fullImage||item.image):item.image} alt={item.imageAlt||item.title} eager={kind==="lead"} quality={kind==="lead"?84:78} sizes={imageSizes}/>
     </span>}
     <span className="bw-card-copy">
       <span className="bw-tag">{item.category}</span>
