@@ -348,3 +348,7 @@ body{background:var(--bw-bg);color:var(--bw-ink);font-family:var(--bw-sans)}
 /* Keep article hero images decoded, cropped and responsive as well. */
 .bw-article .bw-article-image-frame{width:100%;aspect-ratio:3/2;max-height:540px;margin-bottom:0}
 .bw-article .bw-article-image-frame > img{position:absolute;inset:0;width:100%;height:100%;max-height:none;object-fit:cover}
+
+/* Article reading view: show the complete photograph, never crop or stretch it. */
+.bw-article .bw-article-image-frame{aspect-ratio:16/9;max-height:none;margin-inline:auto;background:#f4f3ee}
+.bw-article .bw-article-image-frame > img{object-fit:contain;object-position:center;max-height:none}
