@@ -11,7 +11,7 @@ export default async function NewArticle({searchParams}:{searchParams:Promise<{e
     <Link className="back-link" href="/admin">← ড্যাশবোর্ড</Link>
     <div className="admin-panel">
       <h1>নতুন সংবাদ লিখুন</h1>
-      {error && <p className="admin-alert" role="alert">{error==="validation"?"ফর্মের তথ্য যাচাই করুন।":error==="images-disabled"?"ছবি আপলোড শুধু Preview সংস্করণে চালু আছে।":"সংবাদ সংরক্ষণ করা যায়নি। Slug অন্য সংবাদের সঙ্গে মিলে গেছে কি না দেখুন।"}</p>}
+      {error && <p className="admin-alert" role="alert">{error==="validation"?"ফর্মের তথ্য যাচাই করুন।":error==="images-disabled"?"ছবি আপলোড সাময়িকভাবে বন্ধ।":error==="permission"?"শুধু অনুমোদিত Owner বা Editor লাইভ সংবাদ প্রকাশ করতে পারবেন।":error==="publish-validation"?"লাইভ প্রকাশ করতে বিভাগ, ১০ অক্ষরের সংক্ষিপ্ত বিবরণ ও ৩০ অক্ষরের সম্পূর্ণ সংবাদ দিন।":"সংবাদ সংরক্ষণ করা যায়নি। Slug অন্য সংবাদের সঙ্গে মিলে গেছে কি না দেখুন।"}</p>}
       <ArticleForm categories={categories||[]} role={role}/>
     </div>
   </main>;

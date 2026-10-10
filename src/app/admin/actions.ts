@@ -27,7 +27,7 @@ function refreshArticle(slug:string){
 }
 
 export async function createDraft(formData:FormData) {
-  const {supabase,user}=await requireStaff();
+  const {supabase,user,role}=await requireStaff();
   const input=parseArticleInput(formData);
   if(!input) redirect("/admin/articles/new?error=validation");
 
@@ -35,7 +35,8 @@ export async function createDraft(formData:FormData) {
   if(file&&!isMediaUploadEnabled())
     redirect("/admin/articles/new?error=images-disabled");
   const {data,error}=await supabase.from("articles")
-    .insert({...input,author_id:user.id,status:"draft"})
+    .insert({...input,author_id:user.id,status:"draft",
+      is_featured:editor(role)&&formData.get("is_featured")==="on"})
     .select("id").single();
   if(error || !data) redirect("/admin/articles/new?error=save");
 
@@ -45,15 +46,83 @@ export async function createDraft(formData:FormData) {
       refreshArticle(input.slug);
       redirect("/admin/articles/"+data.id+"/edit?created=1&image_error="+upload.error);
     }
-    const {error:imageUpdateError}=await supabase.from("articles")
-      .update({hero_media_id:upload.mediaId}).eq("id",data.id);
-    if(imageUpdateError){
+    const {data:linked,error:imageUpdateError}=await supabase.from("articles")
+      .update({hero_media_id:upload.mediaId}).eq("id",data.id)
+      .select("hero_media_id").maybeSingle();
+    if(imageUpdateError||linked?.hero_media_id!==upload.mediaId){
       refreshArticle(input.slug);
       redirect("/admin/articles/"+data.id+"/edit?created=1&image_error=metadata");
     }
   }
   refreshArticle(input.slug);
   redirect("/admin/articles/"+data.id+"/edit?created=1");
+}
+
+
+/**
+ * A single click publishes a new article with the selected photo.
+ * The database permits only draft -> approved -> published transitions, so
+ * perform those transitions explicitly, verifying every response. If image
+ * upload fails the story stays a private, editable draft. It is NEVER
+ * published without the image the editor selected.
+ */
+export async function createAndPublishArticle(formData:FormData){
+  const {supabase,user,role}=await requireStaff();
+  if(!editor(role)||isPreviewMediaEnabled()||process.env.VERCEL_ENV!=="production")
+    redirect("/admin/articles/new?error=permission");
+
+  const input=parseArticleInput(formData);
+  if(!input||input.body.length<30||input.summary.length<10||!input.category_id)
+    redirect("/admin/articles/new?error=publish-validation");
+
+  const file=getImageFile(formData);
+  if(file&&!isMediaUploadEnabled())
+    redirect("/admin/articles/new?error=images-disabled");
+
+  const {data:created,error:createError}=await supabase.from("articles")
+    .insert({
+      ...input,author_id:user.id,status:"draft",
+      is_featured:formData.get("is_featured")==="on",
+    })
+    .select("id").single();
+  if(createError||!created)
+    redirect("/admin/articles/new?error=save");
+
+  const editUrl="/admin/articles/"+created.id+"/edit";
+  if(file){
+    const photo=await uploadNewsImage(file,imageFields(formData,input.headline),user.id,supabase);
+    if(!photo.ok){
+      refreshArticle(input.slug);
+      redirect(editUrl+"?error=image-required&image_error="+photo.error);
+    }
+    const {data:linked,error:linkError}=await supabase.from("articles")
+      .update({hero_media_id:photo.mediaId})
+      .eq("id",created.id)
+      .select("hero_media_id").maybeSingle();
+    if(linkError||linked?.hero_media_id!==photo.mediaId){
+      refreshArticle(input.slug);
+      redirect(editUrl+"?error=image-required&image_error=metadata");
+    }
+  }
+
+  const {data:approved,error:approvalError}=await supabase.from("articles")
+    .update({status:"approved"}).eq("id",created.id)
+    .select("status").maybeSingle();
+  if(approvalError||approved?.status!=="approved"){
+    refreshArticle(input.slug);
+    redirect(editUrl+"?error=approval");
+  }
+
+  // The database trigger sets the official publication timestamp.
+  const {data:published,error:publishError}=await supabase.from("articles")
+    .update({status:"published"}).eq("id",created.id)
+    .select("status,published_at").maybeSingle();
+  if(publishError||published?.status!=="published"||!published.published_at){
+    refreshArticle(input.slug);
+    redirect(editUrl+"?error=publish-step");
+  }
+  refreshArticle(input.slug);
+  redirect("/news/"+input.slug);
 }
 
 /**
@@ -138,10 +207,12 @@ async function changeArticle(formData:FormData,intent:EditorialIntent){
   // Check the RETURNED row, not just error=null. A row blocked by RLS
   // may update zero records without surfacing a database error.
   const {data:stored,error}=await supabase.from("articles")
-    .update(payload).eq("id",id).select("id,status").maybeSingle();
+    .update(payload).eq("id",id).select("id,status,hero_media_id").maybeSingle();
   if(error || !stored) redirect("/admin/articles/"+id+"/edit?error=save");
   if(stored.status!==status)
     redirect("/admin/articles/"+id+"/edit?error=transition");
+  if((stored.hero_media_id||null)!==(mediaId||null))
+    redirect("/admin/articles/"+id+"/edit?image_error=metadata");
 
   // Alt text, caption and credit can be revised without reuploading the photo.
   if(!file&&!remove&&mediaId){

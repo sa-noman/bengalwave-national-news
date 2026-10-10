@@ -3,7 +3,7 @@
 import {useEffect,useRef,useState} from "react";
 
 const MAX_SIZE=4*1024*1024;
-const accepted=["image/jpeg","image/png","image/webp"];
+const accepted=["image/jpeg","image/png","image/webp","image/avif"];
 
 export function ArticleImageField({
   currentUrl,
@@ -37,7 +37,7 @@ export function ArticleImageField({
     <div className="admin-image-heading">
       <div>
         <h2 id="article-image-heading">সংবাদের ছবি</h2>
-        <p>কম্পিউটার বা ফোন থেকে একটি ছবি দিন। বড় প্রতিবেদনের জন্য পরিষ্কার ছবি, কার্ডের জন্য ছোট ছবি তৈরি হবে।</p>
+        <p>JPG, PNG, WebP বা AVIF দিন। প্রকাশের সময় বড় ছবির জন্য উচ্চমানের WebP ও কার্ডের জন্য দ্রুত লোডের ছবি তৈরি হবে।</p>
       </div>
       <span className="admin-image-optional">ঐচ্ছিক</span>
     </div>
@@ -60,14 +60,20 @@ export function ArticleImageField({
             ref={fileInput}
             type="file"
             name="image_file"
-            accept="image/jpeg,image/png,image/webp"
+            accept="image/jpeg,image/png,image/webp,image/avif,.avif"
             onChange={event=>{
-              const selected=event.currentTarget.files?.[0]||null;
+              const input=event.currentTarget;
+              const selected=input.files?.[0]||null;
+              input.setCustomValidity("");
               setError("");
               if(selected&&(!accepted.includes(selected.type)||selected.size>MAX_SIZE)){
-                setError("JPG, PNG বা WebP দিন। ফাইল সর্বোচ্চ ৪ MB হতে পারবে।");
-                event.currentTarget.value="";
+                const message="JPG, PNG, WebP বা AVIF দিন। ফাইল সর্বোচ্চ ৪ MB হতে পারবে।";
+                // Browser validation blocks ALL publish/save actions until the
+                // invalid selection is corrected, preventing silent no-photo posts.
+                input.setCustomValidity(message);
+                setError(message);
                 setFile(null);
+                input.reportValidity();
                 return;
               }
               setRemove(false);
@@ -75,12 +81,12 @@ export function ArticleImageField({
             }}
           />
         </label>
-        <p className="admin-image-hint">JPG, PNG, WebP · সর্বোচ্চ ৪ MB · পরিষ্কার ছবির জন্য অন্তত 940 × 450 পিক্সেল</p>
+        <p className="admin-image-hint">JPG, PNG, WebP, AVIF · সর্বোচ্চ ৪ MB · ন্যূনতম 640 × 360 (অথবা 360 × 640) পিক্সেল</p>
         {file && <p className="admin-image-selected">নির্বাচিত: {file.name} ({(file.size/1048576).toFixed(1)} MB)</p>}
         {error&&<p className="admin-alert" role="alert">{error}</p>}
         {hasCurrentImage&&<label className="admin-image-remove">
           <input type="checkbox" name="remove_image" value="on"
-            checked={remove} onChange={event=>{setRemove(event.target.checked);if(event.target.checked){setFile(null);if(fileInput.current)fileInput.current.value="";}}}/>
+            checked={remove} onChange={event=>{setRemove(event.target.checked);if(event.target.checked){setFile(null);if(fileInput.current){fileInput.current.value="";fileInput.current.setCustomValidity("");setError("");}}}}/>
           বর্তমান ছবিটি সরিয়ে দিন
         </label>}
         <p className="admin-image-hint">ছবি পরিবর্তন করলে আগের ফাইল মুছে ফেলা হবে না; সংবাদে নতুন ছবিটি দেখা যাবে।</p>

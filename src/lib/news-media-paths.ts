@@ -19,7 +19,7 @@ export function publicNewsImageUrl(
   const bucket=storagePath.slice(0,slash);
   const path=storagePath.slice(slash+1);
   if(!acceptedBuckets.has(bucket) ||
-     !/^[a-f0-9-]{36}\/^[a-f0-9-]{36}\/full\.webp$/i.test(path))
+     !/^[a-f0-9-]{36}\/[a-f0-9-]{36}\/full\.webp$/i.test(path))
      return null;
   const objectPath=path.replace(/\/full\.webp$/,size==="thumb"?"/thumb.webp":"/full.webp");
   return supabase.storage.from(bucket).getPublicUrl(objectPath).data.publicUrl;
