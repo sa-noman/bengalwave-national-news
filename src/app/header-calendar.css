@@ -1,4 +1,5 @@
 /* Only the three date labels in the existing top header bar. */
+.bw-topbar {font-size:15px}
 .bw-top-hijri {
   justify-self:end;
   text-align:right;
@@ -16,9 +17,10 @@
   }
   .bw-topbar-inner > span {
     min-width:0;
-    font-size:11px;
+    font-size:9px;
     line-height:1.45;
+    white-space:nowrap;
   }
-  .bw-top-motto {display:block;white-space:normal}
-  .bw-top-hijri {white-space:normal}
+  .bw-top-motto {display:block;white-space:nowrap}
+  .bw-top-hijri {white-space:nowrap}
 }
