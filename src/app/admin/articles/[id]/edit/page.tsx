@@ -3,7 +3,7 @@ import Link from "next/link";
 import {notFound} from "next/navigation";
 import {requireStaff} from "@/lib/auth/require-staff";
 import {ArticleForm} from "@/components/admin/article-form";
-import {publicNewsImageUrl} from "@/lib/news-media";
+import {publicNewsImageUrl} from "@/lib/news-media-paths";
 export const metadata:Metadata={title:"সংবাদ সম্পাদনা",robots:{index:false,follow:false}};
 const errorLabels:Record<string,string>={
  validation:"ফর্মের তথ্য আবার যাচাই করুন।",save:"পরিবর্তন সংরক্ষণ করা যায়নি।",
