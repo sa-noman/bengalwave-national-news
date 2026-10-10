@@ -1,5 +1,6 @@
 import {createDraft,updateArticle} from "@/app/admin/actions";
 import {ArticleImageField} from "./article-image-field";
+import {ArticleSubmitControls} from "./article-submit-controls";
 type Category={id:string;label_bn:string};
 type Article={
  id:string;slug:string;headline:string;summary:string;body:string;
@@ -49,16 +50,7 @@ export function ArticleForm({categories,article,role,media}:{
         <input type="checkbox" name="is_featured" defaultChecked={article?.is_featured||false}/> নির্বাচিত সংবাদ হিসেবে চিহ্নিত করুন
       </label>}
     </div>
-    <div className="admin-controls">
-      <button className="admin-primary" type="submit" name="intent" value="save">খসড়া সংরক্ষণ / পরিবর্তন সংরক্ষণ</button>
-      {article?.status==="draft" && <button className="admin-secondary" type="submit" name="intent" value="submit">পর্যালোচনার জন্য পাঠান</button>}
-      {article && isEditor && ["draft","in_review"].includes(article.status) &&
-        <button className="admin-secondary" type="submit" name="intent" value="approve">অনুমোদন করুন</button>}
-      {article?.status==="approved" && isEditor &&
-        <button className="admin-primary" type="submit" name="intent" value="publish">সংবাদ প্রকাশ করুন</button>}
-      {article?.status==="published" && isEditor &&
-        <button className="admin-danger" type="submit" name="intent" value="unpublish">প্রকাশনা বন্ধ করুন</button>}
-    </div>
+    <ArticleSubmitControls status={article?.status} isEditor={isEditor}/>
     <p className="admin-note">প্রকাশের আগে শিরোনাম, তথ্য, উৎস ও ছবির স্বত্ব যাচাই করুন। সংরক্ষিত প্রতিটি পরিবর্তনের ইতিহাস ডেটাবেজে থাকবে।</p>
   </form>;
 }
