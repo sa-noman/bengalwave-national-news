@@ -1,11 +1,15 @@
 import {createDraft,updateArticle} from "@/app/admin/actions";
+import {ArticleImageField} from "./article-image-field";
 type Category={id:string;label_bn:string};
 type Article={
  id:string;slug:string;headline:string;summary:string;body:string;
  status:string;category_id:string|null;source_name:string|null;source_url:string|null;
- is_featured:boolean;
+ is_featured:boolean;hero_media_id?:string|null;
 };
-export function ArticleForm({categories,article,role}:{categories:Category[];article?:Article;role:string}) {
+export function ArticleForm({categories,article,role,media}:{
+  categories:Category[];article?:Article;role:string;
+  media?:{url:string;alt:string;caption:string;credit:string}|null;
+}) {
   const isEditor=role==="owner"||role==="editor";
   return <form className="admin-form article-editor" action={article?updateArticle:createDraft}>
     {article && <input type="hidden" name="id" value={article.id}/>}
@@ -34,6 +38,13 @@ export function ArticleForm({categories,article,role}:{categories:Category[];art
       <label className="full-span">উৎসের URL (ঐচ্ছিক)
         <input name="source_url" type="url" defaultValue={article?.source_url||""} placeholder="https://example.com/article"/>
       </label>
+      <ArticleImageField
+        currentUrl={media?.url}
+        currentAlt={media?.alt}
+        currentCaption={media?.caption}
+        currentCredit={media?.credit}
+        hasCurrentImage={Boolean(article?.hero_media_id)}
+      />
       {isEditor && <label className="admin-checkbox full-span">
         <input type="checkbox" name="is_featured" defaultChecked={article?.is_featured||false}/> নির্বাচিত সংবাদ হিসেবে চিহ্নিত করুন
       </label>}
