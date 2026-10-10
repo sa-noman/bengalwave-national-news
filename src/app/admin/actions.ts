@@ -3,7 +3,7 @@ import {revalidatePath} from "next/cache";
 import {redirect} from "next/navigation";
 import {requireStaff} from "@/lib/auth/require-staff";
 import {parseArticleInput} from "@/lib/validation/article";
-import {isPreviewMediaEnabled,uploadNewsImage} from "@/lib/news-media";
+import {isPreviewMediaEnabled,isMediaUploadEnabled,uploadNewsImage} from "@/lib/news-media";
 
 function isUuid(s:string) {return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);}
 function editor(role:string) {return role==="owner" || role==="editor";}
@@ -32,7 +32,7 @@ export async function createDraft(formData:FormData) {
   if(!input) redirect("/admin/articles/new?error=validation");
 
   const file=getImageFile(formData);
-  if(file&&!isPreviewMediaEnabled())
+  if(file&&!isMediaUploadEnabled())
     redirect("/admin/articles/new?error=images-disabled");
   const {data,error}=await supabase.from("articles")
     .insert({...input,author_id:user.id,status:"draft"})
@@ -115,7 +115,7 @@ async function changeArticle(formData:FormData,intent:EditorialIntent){
 
   const file=getImageFile(formData);
   const remove=formData.get("remove_image")==="on";
-  if(file&&!isPreviewMediaEnabled())
+  if(file&&!isMediaUploadEnabled())
     redirect("/admin/articles/"+id+"/edit?image_error=not_ready");
 
   let mediaId:string|null=existing.hero_media_id||null;
