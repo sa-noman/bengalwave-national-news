@@ -1,8 +1,11 @@
 "use client";
 
 import {useFormStatus} from "react-dom";
+import {useState} from "react";
+import type {MouseEvent} from "react";
 import {
   approveArticle,
+  createAndPublishArticle,
   submitArticleForReview,
   publishArticle,
   unpublishArticle,
@@ -14,11 +17,30 @@ export function ArticleSubmitControls({status,isEditor,previewOnly=false}:{
   previewOnly?:boolean;
 }){
   const {pending}=useFormStatus();
+  const [publishError,setPublishError]=useState("");
+  function validateDirectPublish(event:MouseEvent<HTMLButtonElement>){
+    const form=event.currentTarget.form;
+    const summary=form?.elements.namedItem("summary") as HTMLTextAreaElement|null;
+    const body=form?.elements.namedItem("body") as HTMLTextAreaElement|null;
+    const category=form?.elements.namedItem("category_id") as HTMLSelectElement|null;
+    if(!category?.value || (summary?.value.trim().length||0)<10 || (body?.value.trim().length||0)<30){
+      event.preventDefault();
+      setPublishError("লাইভ প্রকাশের আগে বিভাগ, অন্তত ১০ অক্ষরের সংক্ষিপ্ত বিবরণ এবং ৩০ অক্ষরের সম্পূর্ণ সংবাদ লিখুন।");
+      return;
+    }
+    setPublishError("");
+  }
+
   return <>
     <div className="admin-controls">
       <button className="admin-primary" type="submit" disabled={pending||(previewOnly&&status==="published")}>
-        {pending?"সংরক্ষণ হচ্ছে…":"খসড়া সংরক্ষণ / পরিবর্তন সংরক্ষণ"}
+        {pending?"সংরক্ষণ হচ্ছে…":status?"পরিবর্তন সংরক্ষণ করুন":"খসড়া হিসেবে সংরক্ষণ করুন"}
       </button>
+      {!status && isEditor && !previewOnly &&
+        <button className="admin-primary" type="submit" formAction={createAndPublishArticle}
+          onClick={validateDirectPublish} disabled={pending}>
+          ছবি ও সংবাদ সরাসরি লাইভ প্রকাশ করুন
+        </button>}
       {status==="draft"&&
         <button className="admin-secondary" type="submit" formAction={submitArticleForReview} disabled={pending}>
           পর্যালোচনার জন্য পাঠান
@@ -36,6 +58,8 @@ export function ArticleSubmitControls({status,isEditor,previewOnly=false}:{
           প্রকাশনা বন্ধ করুন
         </button>}
     </div>
+    {publishError && <p className="admin-alert" role="alert">{publishError}</p>}
+    {!status&&isEditor&&!previewOnly&&<p className="admin-note">লাইভ প্রকাশ করলে নির্বাচিত ছবিটি আগে সংরক্ষণ ও যাচাই করা হবে। কোনো সমস্যা হলে সংবাদ খসড়ায় থাকবে, প্রকাশিত হবে না।</p>}
     {previewOnly && (status==="approved"||status==="published") && <p className="admin-note" role="status">
       Preview ব্রাঞ্চ মূল সাইটের ডাটাবেজ ব্যবহার করে। তাই এখানে লাইভ প্রকাশ বা প্রকাশিত সংবাদ সম্পাদনা বন্ধ।
       প্রিভিউ বাটন দিয়ে সংবাদ যাচাই করুন। লাইভ প্রকাশ করতে আলাদা অনুমোদন প্রয়োজন।
