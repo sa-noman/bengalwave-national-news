@@ -72,3 +72,14 @@ body {
   .bw-article-body {font-size:16px}
   .bw-footer-nav a,.bw-footer-legal a {font-size:16px}
 }
+
+/* The homepage section name is now a link: keep its original heading style. */
+.bw-section-heading h2 > a {
+  color:inherit;
+  font:inherit;
+  transition:color .2s ease;
+}
+.bw-section-heading h2 > a:hover,
+.bw-section-heading h2 > a:focus-visible {
+  color:var(--bw-red);
+}
