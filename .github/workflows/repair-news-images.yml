@@ -1,0 +1,37 @@
+name: Repair corrupted news photos (preview branch)
+on:
+  push:
+    branches:
+      - fix/partial-news-images-20261010
+    paths:
+      - .github/workflows/repair-news-images.yml
+      - scripts/repair-news-images.mjs
+      - package.json
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Download and verify replacement images
+        run: node scripts/repair-news-images.mjs
+      - name: Save intact WebP files to the preview branch only
+        run: |
+          git add public/news/*-fixed.webp
+          if git diff --cached --quiet; then
+            echo "No replacement images changed."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "fix: store four validated news images (preview branch only)"
+          git push origin HEAD:fix/partial-news-images-20261010
