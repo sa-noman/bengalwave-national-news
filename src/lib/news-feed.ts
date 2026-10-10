@@ -61,20 +61,48 @@ function normalizeCategory(value:DatabaseArticle["categories"]):CategoryRef|null
 }
 type PublicClient=NonNullable<ReturnType<typeof createSupabasePublicClient>>;
 type AttachedMedia={
-  id:string;storage_path:string;alt_text:string;caption:string|null;credit:string|null;
+  storage_path:string;alt_text:string;caption:string|null;credit:string|null;
 };
+type PublishedMediaRow=AttachedMedia & {article_id:string};
 
+/**
+ * Resolve CMS images using a published-only, read-only database function.
+ * The anon client can retrieve this metadata even when joining multiple
+ * media_assets RLS policies would otherwise omit it.
+ * Keys are article IDs, NEVER media IDs, to prevent a mismatched thumbnail.
+ */
 async function loadAttachedMedia(supabase:PublicClient,rows:DatabaseArticle[]){
-  const ids=Array.from(new Set(rows.map(r=>r.hero_media_id)
-    .filter((id):id is string=>Boolean(id))));
-  if(!ids.length)return new Map<string,AttachedMedia>();
-  const {data,error}=await supabase.from("media_assets")
-    .select("id,storage_path,alt_text,caption,credit").in("id",ids);
-  if(error){
-    console.error("Bengal Wave: published image metadata unavailable",error.code);
+  const withHero=rows.filter(row=>Boolean(row.hero_media_id));
+  if(!withHero.length)return new Map<string,AttachedMedia>();
+
+  const articleIds=withHero.map(row=>row.id);
+  const {data,error}=await supabase.rpc("get_published_news_media",{
+    p_article_ids:articleIds,
+  });
+  if(!error){
+    return new Map<string,AttachedMedia>(((data||[]) as PublishedMediaRow[]).map(m=>[m.article_id,{
+      storage_path:m.storage_path,
+      alt_text:m.alt_text,
+      caption:m.caption,
+      credit:m.credit,
+    }]));
+  }
+
+  // This compatibility path avoids blank images if a staging database
+  // has not yet received the published-only function migration.
+  console.warn("Bengal Wave: image resolver unavailable",error.code);
+  const mediaIds=withHero.map(row=>row.hero_media_id as string);
+  const {data:legacy,error:legacyError}=await supabase.from("media_assets")
+    .select("id,storage_path,alt_text,caption,credit").in("id",mediaIds);
+  if(legacyError){
+    console.error("Bengal Wave: published image metadata unavailable",legacyError.code);
     return new Map<string,AttachedMedia>();
   }
-  return new Map((data||[]).map(a=>[a.id,a as AttachedMedia]));
+  const byMediaId=new Map<string,AttachedMedia>((legacy||[]).map(m=>[m.id,m]));
+  return new Map<string,AttachedMedia>(withHero.flatMap(row=>{
+    const media=byMediaId.get(row.hero_media_id as string);
+    return media?[[row.id,media as AttachedMedia] as const]:[];
+  }));
 }
 
 function asNewsItem(row:DatabaseArticle,media:AttachedMedia|undefined,supabase:PublicClient):NewsItem {
@@ -107,7 +135,7 @@ export async function getPublishedNews(limit=60):Promise<NewsItem[]> {
   if(error){console.error("Bengal Wave: public news fetch failed",error.code);return [];}
   const rows=(data||[]) as unknown as DatabaseArticle[];
   const media=await loadAttachedMedia(supabase,rows);
-  return rows.map(row=>asNewsItem(row,media.get(row.hero_media_id||""),supabase));
+  return rows.map(row=>asNewsItem(row,media.get(row.id),supabase));
 }
 export async function getPublishedArticle(slug:string) {
   const supabase=createSupabasePublicClient();
@@ -119,5 +147,5 @@ export async function getPublishedArticle(slug:string) {
   if(error || !data)return null;
   const row=data as unknown as DatabaseArticle;
   const media=await loadAttachedMedia(supabase,[row]);
-  return {...asNewsItem(row,media.get(row.hero_media_id||""),supabase),body:row.body,sourceName:row.source_name,sourceUrl:row.source_url};
+  return {...asNewsItem(row,media.get(row.id),supabase),body:row.body,sourceName:row.source_name,sourceUrl:row.source_url};
 }
