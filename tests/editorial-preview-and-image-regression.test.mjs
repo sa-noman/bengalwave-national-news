@@ -46,3 +46,14 @@ test("broken live PNGs are not linked in image-repaired GitHub preview",()=>{
     assert.match(feed,new RegExp(name+"-fixed\\.webp"));
   }
 });
+
+
+test("preview cannot publish or mutate shared live articles",()=>{
+  const actions=read("src/app/admin/actions.ts");
+  const buttons=read("src/components/admin/article-submit-controls.tsx");
+  assert.match(actions,/isPreviewMediaEnabled\(\)\s*&&/);
+  assert.match(actions,/existing\.status==="published" \|\| intent==="publish" \|\| intent==="unpublish"/);
+  assert.match(actions,/error=preview-protected/);
+  assert.match(buttons,/previewOnly/);
+  assert.match(buttons,/disabled=\{pending\|\|previewOnly\}/);
+});
