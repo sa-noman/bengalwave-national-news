@@ -201,6 +201,11 @@
 /* Desktop-only spacing adjustment: lift the subtitle and "পড়ুন" links,
    reduce only the circular arrows; preserve the 260px strip, artwork and wave. */
 @media (min-width:1001px){
+  /* Remove the old 35px white gap above the gold panel. Extend only upward:
+     260px + 35px = 295px, so the lower wave stays at the exact same Y. */
+  .bw-heritage{margin-top:0;height:295px}
+  /* Keep the river/village illustration's original scale and bottom position. */
+  .bw-heritage-art{height:260px}
   /* Keep all copy safely above the untouched golden wave/green footer edge. */
   .bw-heritage > .bw-heritage-grid{padding-top:clamp(14px,1vw,20px)}
   .bw-heritage .bw-heritage-intro h2{margin-top:.08em;margin-bottom:.02em;line-height:1.05}
