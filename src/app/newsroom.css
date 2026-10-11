@@ -297,6 +297,8 @@ body{background:var(--bw-bg);color:var(--bw-ink);font-family:var(--bw-sans)}
  .bw-lead-short{grid-template-columns:1fr;gap:13px}
  .bw-lead-short>.bw-card{border:0!important;padding:0!important}
  .bw-latest-list{display:block}
+ /* Phone-only: latest news category labels keep Bengal Wave red; titles stay unchanged. */
+ .bw-home .bw-lead-band .bw-hero-latest .bw-card-latest .bw-tag{color:var(--bw-red)}
  .bw-hero-label{margin-bottom:13px}
  .bw-card-lead .bw-card-title{font-size:27px}
  .bw-hero-middle .bw-card-title{font-size:21px}
