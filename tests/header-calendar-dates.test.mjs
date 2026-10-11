@@ -50,7 +50,8 @@ test("only the top bar motto and latest label become calendar text",()=>{
   assert.match(header,/setInterval\(refresh,60_000\)/);
   // The main /latest navigation and brand text must remain unchanged.
   assert.match(header,/label:"সর্বশেষ",href:"\/latest"/);
-  assert.match(header,/বাংলার কণ্ঠ, বিশ্বের খবর/);
+  assert.match(header,/ইতিহাস, সংবাদ ও সংস্কৃতির প্রতিচ্ছবি/);
+  assert.match(header,/href="https:\/\/www\.facebook\.com\/BengalWaveOfficial"/);
 });
 
 test("header-specific styles contain no new colors or other-section selectors",()=>{
