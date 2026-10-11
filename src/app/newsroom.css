@@ -156,11 +156,9 @@ body{background:var(--bw-bg);color:var(--bw-ink);font-family:var(--bw-sans)}
 .bw-card-feature .bw-card-title{font-size:21px}
 .bw-card-feature .bw-card-summary,.bw-card-feature .bw-card-meta{color:#5b4a14}
 .bw-card-feature .bw-title-underline{background-image:linear-gradient(#9a6a00,#9a6a00)}
-.bw-heritage{margin-top:35px;min-height:245px;display:flex;align-items:center;background:linear-gradient(90deg,#fbf3e2f6 0,#fbf3e2e9 37%,#fbf3e2b1 71%,#fbf3e27b 100%),url("/prototype/heritage-banner.webp") center 58%/cover;color:#053d36;border-top:1px solid #e9dcc3}
-.bw-heritage>.bw-wrap{padding-top:30px;padding-bottom:50px}
-.bw-heritage h2{font-size:clamp(26px,3.3vw,36px);margin:2px 0 7px}
-.bw-heritage p{color:#2b3b34;max-width:540px;font-size:15px}
-.bw-heritage a{display:inline-block;margin-top:12px;color:#a82a1e;font-size:14px;font-weight:700}
+/* Heritage content/background are now supplied EXCLUSIVELY by heritage-stories.css.
+   Keep only the original site spacing and border; the masthead's artwork is separate. */
+.bw-heritage{margin-top:35px;border-top:1px solid #e9dcc3}
 .bw-footer{position:relative;isolation:isolate;margin-top:0;background:linear-gradient(180deg,#04382f,#03342b);color:#fff;padding:0}
 .bw-footer-artwork{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
 .bw-footer-scene{position:absolute;bottom:0;left:50%;width:max(100%,900px);height:auto;transform:translateX(-50%);display:block;pointer-events:none}
