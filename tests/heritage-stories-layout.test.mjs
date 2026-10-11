@@ -59,7 +59,7 @@ test("exact source HTML gradient, font scaling, positioning, mask and desktop pr
   "padding-top:calc((260px - 13.6em)/2)",
   "height:13.6em",
   "mask-composite:intersect",
-  "width:29%","width:25%",
+  "width:min(29%,308px)","width:min(25%,270px)",
   "font:700 3em/1.12",
   "font:700 1.04em/1.35",
  ]){
