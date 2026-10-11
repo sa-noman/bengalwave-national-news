@@ -70,6 +70,8 @@ body {
   .bw-card-lead .bw-card-title {font-size:25px}
   .bw-article h1 {font-size:25px}
   .bw-article-body {font-size:16px}
+  /* Only the small right-side "আরও" / "আরও পড়ুন" action, not section headings. */
+  .bw-home .bw-section-heading > a {font-size:11px}
   .bw-footer-nav a,.bw-footer-legal a {font-size:16px}
 }
 
