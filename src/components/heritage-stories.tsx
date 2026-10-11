@@ -67,7 +67,7 @@ const topics=[
 export function HeritageStories(){
   return <section className="bw-heritage" aria-labelledby="bw-heritage-heading">
     <HeritageBackground/>
-    <div className="bw-wrap bw-heritage-grid">
+    <div className="bw-heritage-grid">
       <div className="bw-heritage-intro">
         <span className="bw-heritage-eyebrow">বাংলার গল্প</span>
         <h2 id="bw-heritage-heading">হাজার বছরের<br/>বাংলা</h2>
