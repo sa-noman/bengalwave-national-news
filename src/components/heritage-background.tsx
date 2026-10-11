@@ -1,60 +1,75 @@
 /**
- * Reference artwork copied from the user-provided bangla-banner HTML.
- * This component supplies ONLY the original left/right background drawings.
- * Do not import its clip-paths, gold edge SVG, or change FooterRiverscape:
- * Bengal Wave's existing golden wave shape must remain pixel-identical.
+ * Exact background SVG drawings from the user's bangla-banner (3).html.
+ * Do NOT import the HTML's custom clipPath or edge SVG:
+ * the existing Bengal Wave gold-and-green footer wave is preserved.
  */
 export function HeritageBackground(){
   return <div className="bw-heritage-artwork" aria-hidden="true">
+    {/* Left: original boat and river sketch */}
     <svg className="bw-heritage-art bw-heritage-art-left"
       viewBox="0 0 640 540" preserveAspectRatio="xMinYMax slice" focusable="false">
-      <g fill="#9db39a" opacity=".45">
-        <ellipse cx="80" cy="150" rx="70" ry="46"/>
-        <ellipse cx="230" cy="120" rx="80" ry="50"/>
-        <ellipse cx="400" cy="200" rx="90" ry="40"/>
-        <ellipse cx="520" cy="300" rx="80" ry="30"/>
+      <defs>
+        <pattern id="bwh" width="4" height="4" patternUnits="userSpaceOnUse">
+          <path d="M0 4L4 0" stroke="#77746b" strokeWidth=".8"/>
+        </pattern>
+        <pattern id="bwvh" width="5" height="5" patternUnits="userSpaceOnUse">
+          <path d="M2.5 0V5" stroke="#77746b" strokeWidth=".7"/>
+        </pattern>
+        <g id="bwbt">
+          <path d="M0 -270L-8 -20"/>
+          <path d="M0 -262Q86 -160 112 -20H-4Z" fill="url(#bwvh)"/>
+          <path d="M-6 -230Q-66 -140 -84 -20H-8Z" fill="url(#bwvh)"/>
+          <path d="M-130 -10Q0 36 140 -16L120 6Q0 56 -112 14Z" fill="#77746b" opacity=".75"/>
+          <path d="M-30 -12L-20 -30H34L44 -12" fill="#f4eee0"/>
+          <path d="M0 -270L-126 -8M0 -270L138 -14"/>
+        </g>
+      </defs>
+      <g fill="none" stroke="#77746b" strokeWidth="1.4" strokeLinecap="round"
+        strokeLinejoin="round" opacity=".62">
+        <path d="M0 352Q40 316 80 346T170 338T260 350T350 336T460 352T640 344"/>
+        <rect y="344" width="640" height="16" fill="url(#bwh)" stroke="none" opacity=".6"/>
+        <path d="M0 424Q160 384 300 404T640 396M0 520Q220 480 420 500T640 490"/>
+        <path d="M40 452H150M200 472H330M380 456H500M90 492H210M300 500H430M520 478H610M20 520H120" opacity=".7"/>
+        <use href="#bwbt" transform="translate(236 440) scale(.9)"/>
+        <g opacity=".5"><use href="#bwbt" transform="translate(540 372) scale(.34)"/></g>
+        <path d="M220 470Q250 478 280 470M300 480Q340 490 380 478M410 468Q440 474 470 466" opacity=".6"/>
       </g>
-      <path d="M0 420Q170 396 340 408T640 424V540H0Z" fill="#7d9b3d"/>
-      <path d="M0 470Q200 450 400 462T640 470V540H0Z" fill="#a9ba4c" opacity=".8"/>
-      <path d="M130 250H250L268 330H112Z" fill="#a8532e"/>
-      <path d="M60 330H330L352 384H38Z" fill="#94452a"/>
-      <path d="M20 384H430L462 436H0Z" fill="#a8532e"/>
-      <path d="M0 436H580L620 462H0Z" fill="#86402a"/>
-      <path d="M130 250H250L254 270H126Z" fill="#6f8f3b" opacity=".7"/>
-      <path d="M120 300H260M70 356H320M30 410H440M0 450H600"
-        stroke="#5e2c1b" strokeWidth="3" opacity=".45"/>
-      <path d="M300 330H440L470 384H330Z" fill="#9b4a29"/>
-      <path d="M0 120Q150 80 320 120T640 110V250Q400 200 0 240Z"
-        fill="#f5f1e3" opacity=".5"/>
-      <ellipse cx="420" cy="470" rx="220" ry="40" fill="#f7f2e3" opacity=".55"/>
     </svg>
 
+    {/* Right: original village, field, cottages and palm trees */}
     <svg className="bw-heritage-art bw-heritage-art-right"
       viewBox="0 0 560 540" preserveAspectRatio="xMaxYMax slice" focusable="false">
       <defs>
-        <g id="bw-heritage-palm">
-          <path d="M0 0Q-34 -22 -76 4Q-38 -10 0 0M0 0Q34 -22 76 4Q38 -10 0 0M0 0Q-28 -40 -58 -36Q-28 -26 0 0M0 0Q28 -40 58 -36Q28 -26 0 0M0 0Q-6 -34 0 -52Q8 -30 0 0"/>
+        <pattern id="bwh2" width="4" height="4" patternUnits="userSpaceOnUse">
+          <path d="M0 4L4 0" stroke="#77746b" strokeWidth=".8"/>
+        </pattern>
+        <g id="bwpl">
+          <path d="M0 0Q6 -60 -2 -122"/>
+          <path d="M-2 -122Q-32 -144 -60 -122M-2 -122Q28 -146 60 -124M-2 -122Q-22 -152 -44 -154M-2 -122Q20 -154 44 -156M-2 -122Q-4 -152 2 -170M-2 -122Q-40 -128 -58 -104M-2 -122Q36 -130 58 -106"/>
+        </g>
+        <g id="bwht">
+          <path d="M0 0L30 -32L62 0Z" fill="url(#bwh2)"/>
+          <rect x="6" y="0" width="50" height="26" fill="#f4eee0"/>
+          <path d="M26 26V8h12v18"/>
         </g>
       </defs>
-      <circle cx="230" cy="180" r="72" fill="#f6b56a" opacity=".9"/>
-      <path d="M40 250H250M110 270H390" stroke="#e9a96a" strokeWidth="4" opacity=".5"/>
-      <path d="M40 380Q80 330 140 360Q190 320 250 356Q320 326 390 380V430H40Z"
-        fill="#8aa08b" opacity=".55"/>
-      <rect y="410" width="560" height="130" fill="#ebcb96" opacity=".55"/>
-      <ellipse cx="230" cy="462" rx="70" ry="8" fill="#f6b56a" opacity=".7"/>
-      <path d="M410 540V340Q450 310 490 330Q530 290 560 310V540Z" fill="#3b5b41"/>
-      <g fill="#1f3a2a">
-        <path d="M478 410Q486 300 478 192" stroke="#1f3a2a" strokeWidth="6" fill="none"/>
-        <use href="#bw-heritage-palm" transform="translate(478 192) scale(.95)"/>
-        <path d="M420 400Q426 340 422 300" stroke="#1f3a2a" strokeWidth="5" fill="none"/>
-        <use href="#bw-heritage-palm" transform="translate(422 300) scale(.6)"/>
+      <g fill="none" stroke="#77746b" strokeWidth="1.4" strokeLinecap="round"
+        strokeLinejoin="round" opacity=".62">
+        <g fill="url(#bwh2)" stroke="none" opacity=".55">
+          <ellipse cx="120" cy="396" rx="70" ry="22"/>
+          <ellipse cx="300" cy="388" rx="80" ry="20"/>
+          <ellipse cx="450" cy="392" rx="60" ry="22"/>
+        </g>
+        <path d="M0 440Q280 420 560 436M0 462Q280 442 560 458M0 486Q280 468 560 484M0 510Q280 494 560 508"/>
+        <path d="M30 470l6-14l6 14M190 480l6-14l6 14M330 474l6-14l6 14M500 482l6-14l6 14" opacity=".7"/>
+        <use href="#bwht" transform="translate(140 404)"/>
+        <use href="#bwht" transform="translate(262 414) scale(.82)"/>
+        <use href="#bwht" transform="translate(372 400) scale(.9)"/>
+        <use href="#bwpl" transform="translate(66 430) scale(1.1)"/>
+        <use href="#bwpl" transform="translate(212 418) scale(.75)"/>
+        <use href="#bwpl" transform="translate(470 424) scale(1.25)"/>
+        <use href="#bwpl" transform="translate(528 440) scale(.85)"/>
       </g>
-      <path d="M110 452Q240 486 400 436L388 450Q245 496 124 468Z" fill="#1b2420"/>
-      <circle cx="340" cy="394" r="8" fill="#1b2420"/>
-      <path d="M328 440L334 406H350L356 436Z" fill="#1b2420"/>
-      <path d="M352 410L396 448" stroke="#1b2420" strokeWidth="3"/>
-      <path d="M90 140q8 -8 16 0q8 -8 16 0M130 110q6 -6 12 0q6 -6 12 0"
-        stroke="#4a3a2a" strokeWidth="2" fill="none"/>
     </svg>
   </div>;
 }
