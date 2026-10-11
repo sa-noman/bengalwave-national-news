@@ -198,6 +198,15 @@
   outline-offset:2px;
 }
 
+/* Desktop-only spacing adjustment: lift the subtitle and "পড়ুন" links,
+   reduce only the circular arrows; preserve the 260px strip, artwork and wave. */
+@media (min-width:1001px){
+  .bw-heritage .bw-heritage-intro h2{margin-bottom:.12em}
+  .bw-heritage-read{transform:translateY(-16px)}
+  .bw-heritage-arrow{width:1.25em;height:1.25em}
+  .bw-heritage-arrow svg{width:.62em;height:.62em}
+}
+
 /* Same responsive arrangement as the provided HTML; no new wave shape. */
 @media(max-width:1000px){
   .bw-heritage{
