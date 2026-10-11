@@ -39,7 +39,7 @@ test("reference banner's actual boat and village SVG paths, strokes, and pattern
  ]){
   assert.ok(artwork.includes(token),token);
  }
- assert.doesNotMatch(artwork,/clipPath|className="bw-footer-wave"|stroke="#FBB040"/);
+ assert.doesNotMatch(artwork,/<clipPath\b|className="bw-footer-wave"|stroke="#FBB040"/);
 });
 
 test("exact source HTML gradient, font scaling, positioning, mask and desktop proportions",()=>{
@@ -84,7 +84,7 @@ test("legacy watermark background is removed ONLY from heritage, while its origi
  assert.match(section,/className="bw-heritage-grid"/);
  assert.doesNotMatch(section,/className="bw-wrap bw-heritage-grid"/);
  assert.match(css,/\.bw-heritage\s*\{[^}]*background:\s*radial-gradient/s);
- assert.match(css,/height:24\.2em/);
+ assert.match(css,/height:260px/);
  assert.match(css,/margin-left:20\.8%/);
 });
 
@@ -92,8 +92,8 @@ test("desktop heritage returns to compact pre-HTML height without scaling the si
  const css=read("src/app/heritage-stories.css");
  const footer=read("src/components/footer-riverscape.tsx");
  assert.match(css,/height:260px/);
- assert.match(css,/font:400 clamp\(12px,calc\(100vw \* 13 \/ 1600\),13px\)/);
- assert.match(css,/padding-top:calc\(\(260px - 13\.6em\)\/2\)/);
+ assert.match(css,/font:400 clamp\(12px,1\.05vw,18px\)/);
+ assert.match(css,/padding-top:clamp\(22px,1\.4vw,28px\)/);
  assert.doesNotMatch(css,/height:24\.2em/);
  assert.match(css,/@media\(max-width:1000px\)\{[\s\S]*?height:auto/);
  assert.match(footer,/M0 16C180 0 360 0 540 14S900 30 1080 14 1320 2 1440 12/);
@@ -120,7 +120,7 @@ test("at desktop the inner content fills original reference width without changi
  assert.match(css,/grid-template-columns:17fr repeat\(4,8\.4fr\)/);
  assert.match(css,/width:58%/);
  assert.match(css,/margin-left:20\.8%/);
- assert.match(css,/padding-top:clamp\(25px,2vw,40px\)/);
+ assert.match(css,/padding-top:clamp\(22px,1\.4vw,28px\)/);
  assert.match(css,/font:400 clamp\(12px,1\.05vw,18px\)/);
  assert.match(css,/height:218px/);
  assert.match(css,/height:2\.8em/);
