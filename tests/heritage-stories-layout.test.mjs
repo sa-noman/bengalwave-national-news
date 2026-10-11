@@ -52,12 +52,12 @@ test("exact source HTML gradient, font scaling, positioning, mask and desktop pr
  }
  for(const piece of [
   "linear-gradient(90deg,#eef0e2,#f8f2e3 30%,#f8f1e0 60%,#f8ecd4)",
-  "font:400 clamp(12px,calc(100vw * 13 / 1600),13px)/1.55",
+  "font:400 clamp(12px,1.05vw,18px)/1.55",
   "height:260px",
-  "grid-template-columns:17em repeat(4,8.4em)",
-  "margin-left:calc(50% - 25.3em)",
-  "padding-top:calc((260px - 13.6em)/2)",
-  "height:13.6em",
+  "grid-template-columns:17fr repeat(4,8.4fr)",
+  "margin-left:20.8%",
+  "padding-top:clamp(25px,2vw,40px)",
+  "height:218px",
   "mask-composite:intersect",
   "width:min(29%,308px)","width:min(25%,270px)",
   "font:700 3em/1.12",
@@ -99,7 +99,21 @@ test("desktop heritage returns to compact pre-HTML height without scaling the si
  assert.match(footer,/M0 16C180 0 360 0 540 14S900 30 1080 14 1320 2 1440 12/);
 });
 
-test("mobile retains original two column banner and content links work",()=>{
+test("at desktop the inner content fills original reference width without changing banner or background",()=>{
+ const css=read("src/app/heritage-stories.css");
+ assert.match(css,/height:260px/);
+ assert.match(css,/grid-template-columns:17fr repeat\(4,8\.4fr\)/);
+ assert.match(css,/width:58%/);
+ assert.match(css,/margin-left:20\.8%/);
+ assert.match(css,/padding-top:clamp\(25px,2vw,40px\)/);
+ assert.match(css,/font:400 clamp\(12px,1\.05vw,18px\)/);
+ assert.match(css,/height:218px/);
+ assert.match(css,/height:2\.8em/);
+ assert.doesNotMatch(css,/margin-left:calc\(50% - 25\.3em\)/);
+ assert.doesNotMatch(css,/font:400 clamp\(12px,calc\(100vw \* 13 \/ 1600\),13px\)/);
+ const footer=read("src/components/footer-riverscape.tsx");
+ assert.match(footer,/stroke="#FBB040" strokeWidth="3"/);
+});\n\ntest("mobile retains original two column banner and content links work",()=>{
  const css=read("src/app/heritage-stories.css");
  const section=read("src/components/heritage-stories.tsx");
  assert.match(css,/@media\(max-width:1000px\)/);
