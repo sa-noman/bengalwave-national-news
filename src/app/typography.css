@@ -1,0 +1,85 @@
+/*
+ * Bengal Wave font-only typography reference.
+ * All color, spacing, image, navigation and layout rules remain unchanged.
+ * Existing inline SVG icons are deliberately preserved.
+ */
+
+body {
+  font-family:var(--bw-serif);
+  font-size:20px;
+  font-weight:400;
+}
+.bw-website,.bw-topbar,.bw-navbar,.bw-footer,.bw-drawer,.bw-masthead {
+  font-family:var(--bw-serif);
+}
+
+/* Top date and main menu (desktop) */
+.bw-topbar {font-size:16px;font-weight:600}
+.bw-nav-scroll a {font:700 18px/1.65 var(--bw-serif)}
+
+/* Headlines and card descriptions */
+.bw-card-title,.bw-card-middle .bw-card-title,.bw-card-feature .bw-card-title {
+  font-size:20px;
+  font-weight:700;
+}
+.bw-card-lead .bw-card-title {font-size:36px;font-weight:700}
+.bw-card-text .bw-card-title {font-size:16px;font-weight:700}
+.bw-card-latest .bw-card-title {font:700 16px/1.55 var(--bw-serif)}
+.bw-card-summary {font-size:16px;font-weight:500}
+.bw-tag,.bw-card-latest .bw-tag,.bw-card-meta {font-size:14px;font-weight:500}
+
+/* Category section headers and more links */
+.bw-section-heading h1,.bw-section-heading h2,
+.bw-hero-latest .bw-section-heading h2 {font-size:18px;font-weight:400}
+.bw-section-heading a {font-size:18px;font-weight:600}
+
+/* Search */
+.bw-search-popup input,.bw-search-form input,.bw-drawer-search input {
+  font-family:var(--bw-serif);
+  font-size:16px;
+  font-weight:400;
+}
+.bw-search-popup button,.bw-search-form button {
+  font-family:var(--bw-serif);
+  font-size:15px;
+  font-weight:600;
+}
+
+/* Footer */
+.bw-footer {font-size:16px;font-weight:400}
+.bw-footer-legal,.bw-footer-social {font:400 16px/1.7 var(--bw-serif)}
+.bw-footer-nav a,.bw-footer-legal a {font:700 17px/1.65 var(--bw-serif)}
+.bw-footer-wordmark {font-family:var(--bw-serif)}
+
+/* Full news article */
+.bw-article .bw-tag {font-size:16px;font-weight:500}
+.bw-article h1 {font-size:36px;font-weight:700}
+.bw-article-deck {font-size:16px;font-weight:500}
+.bw-article-byline {font-size:16px;font-weight:400}
+.bw-article-byline strong {font-size:16px;font-weight:700}
+.bw-article-byline time {font-size:20px;font-weight:400}
+.bw-article-body {font-size:18px;font-weight:400}
+.bw-article-body h2 {font-size:32px;font-weight:700}
+.bw-article-body h3 {font-size:24px;font-weight:700}
+.bw-article-body h4 {font-size:16px;font-weight:600}
+.bw-breadcrumb {font-size:20px;font-weight:700}
+
+/* Mobile typography */
+@media (max-width:760px) {
+  .bw-nav-scroll a {font-size:14px}
+  .bw-card-lead .bw-card-title {font-size:25px}
+  .bw-article h1 {font-size:25px}
+  .bw-article-body {font-size:16px}
+  .bw-footer-nav a,.bw-footer-legal a {font-size:16px}
+}
+
+/* The homepage section name is now a link: keep its original heading style. */
+.bw-section-heading h2 > a {
+  color:inherit;
+  font:inherit;
+  transition:color .2s ease;
+}
+.bw-section-heading h2 > a:hover,
+.bw-section-heading h2 > a:focus-visible {
+  color:var(--bw-red);
+}

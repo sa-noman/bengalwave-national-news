@@ -3,6 +3,7 @@ import Link from "next/link";
 import {useEffect,useRef,useState} from "react";
 import {usePathname} from "next/navigation";
 import {categories} from "@/lib/demo-news";
+import {getHeaderDates} from "@/lib/header-calendar-dates";
 
 const topLinks=[
  {label:"প্রচ্ছদ",href:"/"},{label:"সর্বশেষ",href:"/latest"},
@@ -19,11 +20,17 @@ export function SiteHeader(){
  const [drawerOpen,setDrawerOpen]=useState(false);
  const [searchOpen,setSearchOpen]=useState(false);
  const [followOpen,setFollowOpen]=useState(false);
- const [today,setToday]=useState("");
+ const [headerDates,setHeaderDates]=useState({gregorian:"",bengali:"",hijri:""});
+ const today=headerDates.gregorian;
  const closeButton=useRef<HTMLButtonElement>(null);
  const menuButton=useRef<HTMLButtonElement>(null);
 
- useEffect(()=>{setToday(new Intl.DateTimeFormat("bn-BD",{weekday:"long",day:"numeric",month:"long",year:"numeric",timeZone:"Asia/Dhaka"}).format(new Date()));},[]);
+ useEffect(()=>{
+   const refresh=()=>setHeaderDates(getHeaderDates(new Date()));
+   refresh();
+   const interval=window.setInterval(refresh,60_000);
+   return ()=>window.clearInterval(interval);
+ },[]);
  useEffect(()=>{
    if(!drawerOpen)return;
    const onKey=(e:KeyboardEvent)=>{if(e.key==="Escape"){setDrawerOpen(false);menuButton.current?.focus();}};
@@ -37,8 +44,9 @@ export function SiteHeader(){
  const openMenu=()=>{setSearchOpen(false);setDrawerOpen(true);};
  return <>
    <div className="bw-topbar"><div className="bw-wrap bw-topbar-inner">
-     <span>{today||"বাংলাদেশ সময়"}</span><span className="bw-top-motto">বাংলার কণ্ঠ, বিশ্বের খবর</span>
-     <Link className="bw-top-latest" href="/latest"><i aria-hidden="true"/> সর্বশেষ</Link>
+     <span>{today||"বাংলাদেশ সময়"}</span>
+     <span className="bw-top-motto">{headerDates.bengali||"বাংলা তারিখ"}</span>
+     <span className="bw-top-hijri" title="হিজরি তারিখ আনুমানিক; বাংলাদেশে চাঁদ দেখার ওপর নির্ভর করে এক দিন ভিন্ন হতে পারে">{headerDates.hijri||"হিজরি তারিখ"}</span>
    </div></div>
    <header className="bw-masthead">
     <div className="bw-wrap bw-masthead-inner">

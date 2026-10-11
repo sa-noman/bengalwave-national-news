@@ -24,9 +24,12 @@ test("responsive frontend has a working client menu and mobile bottom navigation
 });
 test("homepage follows prototype sections and wave heritage banner",()=>{
  const home=read("src/app/page.tsx");
- for(const section of ["bw-hero","bw-grid-four","bw-selected-box","bw-feature-panel","bw-heritage"]){
+ for(const section of ["bw-hero","bw-grid-four","bw-selected-box","bw-feature-panel"]){
   assert.match(home,new RegExp(section));
  }
+ // The standalone HeritageStories component owns the banner markup now.
+ assert.match(home,/<HeritageStories\/>/);
+ assert.match(read("src/components/heritage-stories.tsx"),/className="bw-heritage"/);
 });
 test("prototype typography and carousel cards remain present",()=>{
  const css=read("src/app/newsroom.css");

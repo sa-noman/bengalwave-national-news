@@ -1,0 +1,241 @@
+@import url("https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;700&display=swap");
+
+/*
+ * Exact styling from the user's bangla-banner (3).html, scoped to the
+ * heritage section. EXCEPTION: The uploaded HTML's clipping paths and
+ * gold outline are deliberately NOT applied. Bengal Wave's existing
+ * footer-riverscape.tsx and its original gold/green wave shape stay intact.
+ */
+.bw-heritage{
+  --hb-g:#0b5a40;
+  --hb-r:#c3141a;
+  --hb-ink:#2f3430;
+  --hb-ln:#d9d1bd;
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  display:block;
+  /* Restore the site's original compact ~245px heritage strip (with
+     slight breathing room for the four cards). Never scale with 24.2em. */
+  height:260px;
+  min-height:0;
+  font:400 clamp(12px,1.05vw,18px)/1.55 "Hind Siliguri",sans-serif;
+  color:var(--hb-ink);
+  background:
+    radial-gradient(60% 70% at 8% 30%,#e3e9d6,#0000),
+    radial-gradient(40% 80% at 96% 40%,#fbe3b8,#0000),
+    linear-gradient(90deg,#eef0e2,#f8f2e3 30%,#f8f1e0 60%,#f8ecd4);
+}
+.bw-heritage-artwork{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  z-index:0;
+}
+.bw-heritage-art{
+  position:absolute;
+  bottom:0;
+  height:100%;
+  display:block;
+  pointer-events:none;
+}
+.bw-heritage-art-left{
+  left:0;
+  /* Keep the full 640×540 boat drawing visible in a 260px-tall banner. */
+  width:min(29%,308px);
+  /* Artwork must retain its original visual weight after shrinking the strip. */
+  transform:scale(1.27);
+  transform-origin:left bottom;
+  opacity:.9;
+  -webkit-mask-image:linear-gradient(90deg,#000 38%,#0000),linear-gradient(180deg,#0000,#000 26%,#000 62%,#0000 97%);
+  -webkit-mask-composite:source-in;
+  mask-image:linear-gradient(90deg,#000 38%,#0000),linear-gradient(180deg,#0000,#000 26%,#000 62%,#0000 97%);
+  mask-composite:intersect;
+}
+.bw-heritage-art-right{
+  right:0;
+  /* Match the right drawing's 560×540 aspect ratio at 260px height. */
+  width:min(25%,270px);
+  transform:scale(1.27);
+  transform-origin:right bottom;
+  opacity:.9;
+  -webkit-mask-image:linear-gradient(270deg,#000 42%,#0000),linear-gradient(180deg,#0000,#000 26%,#000 62%,#0000 97%);
+  -webkit-mask-composite:source-in;
+  mask-image:linear-gradient(270deg,#000 42%,#0000),linear-gradient(180deg,#0000,#000 26%,#000 62%,#0000 97%);
+  mask-composite:intersect;
+}
+
+/* Keep the source HTML's 20.8% left offset and 58% full-page footprint. */
+.bw-heritage > .bw-heritage-grid{
+  position:relative;
+  z-index:1;
+  display:grid;
+  grid-template-columns:17fr repeat(4,8.4fr);
+  width:58%;
+  max-width:none;
+  margin-left:20.8%;
+  margin-right:0;
+  padding-top:clamp(22px,1.4vw,28px);
+  padding-bottom:0;
+  gap:0;
+  align-items:stretch;
+}
+.bw-heritage-intro{
+  min-width:0;
+  align-self:auto;
+  padding-right:1.6em;
+}
+.bw-heritage-eyebrow{
+  display:inline-block;
+  color:var(--hb-r);
+  font-weight:500;
+  font-size:1.15em;
+  line-height:1.3;
+  border-bottom:1px solid var(--hb-r);
+  padding-bottom:.1em;
+}
+.bw-heritage .bw-heritage-intro h2{
+  white-space:nowrap;
+  font:700 3em/1.12 "Hind Siliguri",sans-serif;
+  color:var(--hb-g);
+  margin:.2em 0 .35em;
+  letter-spacing:normal;
+}
+.bw-heritage .bw-heritage-intro p{
+  color:var(--hb-ink);
+  font-size:.95em;
+  line-height:1.6;
+  max-width:15em;
+  margin:0;
+}
+.bw-heritage-topics{display:contents}
+.bw-heritage .bw-heritage-topic{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  min-width:0;
+  padding:0 .7em;
+  border-left:1px solid var(--hb-ln);
+  height:218px;
+  min-height:0;
+  margin:0;
+  color:inherit;
+  font-size:inherit;
+  font-weight:400;
+  text-decoration:none;
+}
+.bw-heritage-icon{
+  display:block;
+  height:2.8em;
+  width:auto;
+  flex:none;
+  margin:.1em 0 .45em;
+  opacity:.88;
+}
+.bw-heritage-icon>svg{
+  display:block;
+  height:100%;
+  width:auto;
+  object-fit:contain;
+}
+.bw-website .bw-heritage .bw-heritage-topic h3{
+  font:700 1.04em/1.35 "Noto Serif Bengali",serif;
+  letter-spacing:-.01em;
+  color:var(--hb-g);
+  margin:0 0 .45em;
+  white-space:nowrap;
+}
+.bw-heritage .bw-heritage-topic p{
+  font-size:.82em;
+  line-height:1.48;
+  color:#3b403c;
+  max-width:none;
+  margin:0;
+}
+.bw-heritage-read{
+  margin-top:auto;
+  display:flex;
+  align-items:center;
+  gap:.5em;
+  font-size:inherit;
+  font-weight:700;
+  color:var(--hb-g);
+}
+.bw-heritage-arrow{
+  display:grid;
+  place-items:center;
+  width:1.6em;
+  height:1.6em;
+  flex:none;
+  border-radius:50%;
+  background:var(--hb-g);
+  color:#fff;
+  transition:transform .25s,background .25s;
+}
+.bw-heritage-arrow svg{
+  width:.75em;
+  height:.75em;
+  margin:0;
+  stroke:#fff;
+  fill:none;
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.bw-heritage-topic:hover .bw-heritage-arrow,
+.bw-heritage-topic:focus-visible .bw-heritage-arrow{
+  transform:translateX(.3em);
+  background:#0f7352;
+}
+.bw-heritage-topic:hover h3,
+.bw-heritage-topic:focus-visible h3{
+  text-decoration:underline;
+  text-decoration-color:#e0a63a;
+  text-underline-offset:.2em;
+}
+.bw-heritage .bw-heritage-topic:focus-visible{
+  outline:2px solid var(--hb-g);
+  outline-offset:2px;
+}
+
+/* Same responsive arrangement as the provided HTML; no new wave shape. */
+@media(max-width:1000px){
+  .bw-heritage{
+    height:auto;
+    font-size:16px;
+    padding:36px 18px 70px;
+  }
+  /* Preserve the previously approved mobile artwork sizing. */
+  .bw-heritage-art{opacity:.22;height:50%;transform:none}
+  .bw-heritage-art-left{width:60%}
+  .bw-heritage-art-right{width:50%}
+  .bw-heritage > .bw-heritage-grid{
+    display:block;
+    width:auto;
+    max-width:none;
+    margin:0;
+    padding:0;
+  }
+  .bw-heritage-intro{padding:0 0 22px}
+  .bw-heritage .bw-heritage-intro h2{font-size:2.3em}
+  .bw-heritage .bw-heritage-intro p{max-width:30em}
+  .bw-heritage-topics{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px 0;
+  }
+  .bw-heritage .bw-heritage-topic{
+    height:auto;
+    padding:0 14px 6px;
+    min-height:17em;
+  }
+  .bw-heritage-icon{height:3.8em}
+  .bw-website .bw-heritage .bw-heritage-topic h3{white-space:normal}
+  .bw-heritage .bw-heritage-topic:nth-child(odd){
+    border-left:0;
+    padding-left:0;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .bw-heritage-arrow{transition:none}
+}
