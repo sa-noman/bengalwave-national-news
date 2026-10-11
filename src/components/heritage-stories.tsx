@@ -1,9 +1,9 @@
 import Link from "next/link";
+import {HeritageBackground} from "@/components/heritage-background";
 
 /**
- * Only the editorial text and icon layout.
- * The surrounding .bw-heritage background, artwork, and footer gold wave
- * continue to come from the existing stylesheet and FooterRiverscape.
+ * Existing content layout unchanged. Reference-only decorative background
+ * is layered behind it; Bengal Wave's separate footer-wave SVG is untouched.
  */
 const topics=[
   {
@@ -65,6 +65,7 @@ const topics=[
 
 export function HeritageStories(){
   return <section className="bw-heritage" aria-labelledby="bw-heritage-heading">
+    <HeritageBackground/>
     <div className="bw-wrap bw-heritage-grid">
       <div className="bw-heritage-intro">
         <span className="bw-heritage-eyebrow">বাংলার গল্প</span>
