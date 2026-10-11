@@ -68,6 +68,26 @@ test("exact source HTML gradient, font scaling, positioning, mask and desktop pr
  assert.doesNotMatch(css,/clip-path\s*:|url\(#bwv\)|url\(#bwm\)/);
 });
 
+test("legacy watermark background is removed ONLY from heritage, while its original header image remains",()=>{
+ const newsroom=read("src/app/newsroom.css");
+ const section=read("src/components/heritage-stories.tsx");
+ const css=read("src/app/heritage-stories.css");
+
+ // The original giant BengalWave logo/watermark was painted by this obsolete
+ // background. It must not survive beneath the new transparent gradients.
+ assert.match(newsroom,/\.bw-heritage\{margin-top:35px;border-top:1px solid #e9dcc3\}/);
+ assert.doesNotMatch(newsroom,/\.bw-heritage\{[^}]*url\(/);
+ assert.doesNotMatch(newsroom,/\.bw-heritage>\.bw-wrap|\.bw-heritage h2\{|\.bw-heritage p\{|\.bw-heritage a\{/);
+ assert.match(newsroom,/\.bw-masthead\{[^}]*url\("\/prototype\/heritage-banner\.webp"\)/);
+ // The old global 1180px .bw-wrap caused the HTML's 20.8% grid placement
+ // to be different. Hero content must use its own original responsive grid.
+ assert.match(section,/className="bw-heritage-grid"/);
+ assert.doesNotMatch(section,/className="bw-wrap bw-heritage-grid"/);
+ assert.match(css,/\.bw-heritage\s*\{[^}]*background:\s*radial-gradient/s);
+ assert.match(css,/height:24\.2em/);
+ assert.match(css,/margin-left:20\.8%/);
+});
+
 test("mobile retains original two column banner and content links work",()=>{
  const css=read("src/app/heritage-stories.css");
  const section=read("src/components/heritage-stories.tsx");
