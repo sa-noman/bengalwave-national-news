@@ -4,6 +4,7 @@ import {NewsCard} from "@/components/news-card";
 import {PreviewNotice} from "@/components/preview-notice";
 import {getDisplayNews,isDesignPreview} from "@/lib/news-display";
 import type {NewsItem} from "@/lib/demo-news";
+import {HeritageStories} from "@/components/heritage-stories";
 
 function SectionHeading({title,href="/latest",linkText="আরও"}:{title:string;href?:string;linkText?:string}){
  return <div className="bw-section-heading"><h2><Link href={href}>{title}</Link></h2><Link href={href}>{linkText} <span aria-hidden="true">›</span></Link></div>;
@@ -70,13 +71,6 @@ export default async function Home(){
       {feature.length?<div className="bw-feature-grid">{feature.map(item=><NewsCard key={item.id} item={item} variant="feature"/>)}</div>:<p className="bw-empty">এখনো কোনো ফিচার প্রকাশিত হয়নি।</p>}
    </div></div></section>
   </>}
-  <section className="bw-heritage">
-   <div className="bw-wrap">
-     <span className="bw-tag">বাংলার গল্প</span>
-     <h2>যে বাংলার গল্প<br/>শেষ হওয়ার নয়</h2>
-     <p>ইতিহাস, ঐতিহ্য, দেশ ও মানুষের কথা নিয়েই Bengal Wave-এর পথচলা।</p>
-     <Link href="/about">আমাদের সম্পর্কে <span aria-hidden="true">›</span></Link>
-   </div>
-  </section>
+  <HeritageStories/>
  </main>;
 }
