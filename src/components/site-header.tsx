@@ -80,7 +80,7 @@ export function SiteHeader(){
     </div>
     <form className="bw-drawer-search" action="/search" role="search"><input name="q" type="search" placeholder="সংবাদ খুঁজুন..." maxLength={120} aria-label="সংবাদ খুঁজুন"/></form>
     <nav className="bw-drawer-links" aria-label="সব বিভাগ">{allLinks.map(l=><Link key={l.href} href={l.href} onClick={()=>setDrawerOpen(false)}>{l.label}</Link>)}</nav>
-    <div className="bw-drawer-foot"><span>বাংলার কণ্ঠ, বিশ্বের খবর</span><span>{today}</span><small>© ২০২৬ বেঙ্গল ওয়েভ</small></div>
+    <div className="bw-drawer-foot"><span>ইতিহাস, সংবাদ ও<br/>সংস্কৃতির প্রতিচ্ছবি</span><span>{today}</span><small>© ২০২৬ বেঙ্গল ওয়েভ</small></div>
    </aside>
    <nav className="bw-bottom-nav" aria-label="মোবাইল নেভিগেশন">
     <Link href="/" aria-current={pathname==="/"?"page":undefined}><span aria-hidden="true">⌂</span>হোম</Link>
