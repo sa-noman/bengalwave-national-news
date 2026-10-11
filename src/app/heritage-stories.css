@@ -253,6 +253,79 @@
     padding-left:0;
   }
 }
+
+/* Phone-only: align the four story cards without changing tablet/desktop styles. */
+@media(max-width:760px){
+  .bw-heritage-topics{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-auto-rows:1fr;
+    row-gap:20px;
+    align-items:stretch;
+  }
+  .bw-heritage .bw-heritage-topic{
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    /* Identical icon/title/description/button start positions in each card. */
+    grid-template-rows:48px 57px minmax(0,1fr) 18px;
+    align-items:start;
+    justify-items:start;
+    min-height:15.5em;
+    height:100%;
+    padding:0 12px 8px;
+  }
+  .bw-heritage-icon{
+    width:70px;
+    height:46px;
+    margin:0;
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+  }
+  .bw-heritage-icon>svg{
+    display:block;
+    width:70px;
+    height:46px;
+  }
+  /* This SVG's artwork is narrower inside the same 120 x 80 viewBox. */
+  .bw-heritage-topic:nth-child(4) .bw-heritage-icon>svg{
+    transform:translateX(-6px) scale(1.18);
+    transform-origin:center center;
+  }
+  .bw-website .bw-heritage .bw-heritage-topic h3{
+    margin:0;
+    min-width:0;
+    align-self:start;
+  }
+  .bw-heritage .bw-heritage-topic p{
+    margin:0;
+    align-self:start;
+  }
+  .bw-heritage-read{
+    margin:0;
+    align-self:end;
+    display:flex;
+    align-items:center;
+    gap:.4em;
+    font-size:.8em;
+    line-height:1.25;
+  }
+  /* The circle is at most as big as the \"পড়ুন\" text, not larger. */
+  .bw-heritage-arrow{
+    width:1em;
+    height:1em;
+  }
+  .bw-heritage-arrow svg{
+    width:.56em;
+    height:.56em;
+  }
+}
+@media(max-width:360px){
+  /* Allow up to three lines for longer Bengali titles on narrow phones. */
+  .bw-heritage .bw-heritage-topic{
+    grid-template-rows:48px 75px minmax(0,1fr) 18px;
+  }
+}
+
 @media(prefers-reduced-motion:reduce){
   .bw-heritage-arrow{transition:none}
 }
