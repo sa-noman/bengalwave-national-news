@@ -273,6 +273,11 @@
     height:100%;
     padding:0 12px 8px;
   }
+  /* Keep the center divider fixed; mirror the left page inset on the right. */
+  .bw-heritage .bw-heritage-topic:nth-child(even){
+    padding-left:18px;
+    padding-right:0;
+  }
   .bw-heritage-icon{
     width:70px;
     height:46px;
