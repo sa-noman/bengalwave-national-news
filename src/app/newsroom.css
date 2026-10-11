@@ -1,4 +1,6 @@
 :root{
+ /* Until users opt into a future website-specific theme, ignore device dark mode. */
+ color-scheme:light;
  --bw-green:#053d36;--bw-red:#cf3a2c;--bw-yellow:#FBB040;
  --bw-bg:#FDFBF6;--bw-soft:#FCF0DA;--bw-ink:#1c1c1c;
  --bw-muted:#6d6d6d;--bw-line:#e6e0d3;--bw-link:#053d36;
@@ -323,16 +325,6 @@ body{background:var(--bw-bg);color:var(--bw-ink);font-family:var(--bw-sans)}
  .bw-preview-notice>.bw-wrap>span:last-child{flex-basis:100%;padding-left:16px}
  .bw-listing-grid{grid-template-columns:1fr}
  .bw-search-form>div{flex-direction:column}
-}
-@media(prefers-color-scheme:dark){
- :root{--bw-bg:#0d1914;--bw-soft:#12261e;--bw-ink:#eaf0ec;--bw-muted:#a4b6ac;--bw-line:#ffffff23;--bw-link:#7fd1b5}
- .bw-selected-box{border-color:#ffffff23}
- .bw-feature-panel{background:#F4D361;color:#16231e}
- .bw-feature-panel .bw-card-meta,.bw-feature-panel .bw-card-summary{color:#5b4a14}
- .bw-feature-panel .bw-card-link:hover .bw-card-title{color:#053d36}
- .bw-hero,.bw-section{color:var(--bw-ink)}
- .bw-nav-scroll a{color:#053d36}
- .bw-empty{color:#c9d6d0}
 }
 @media(prefers-reduced-motion:reduce){.bw-website *, .bw-drawer,.bw-nav-scroll a,.bw-brand img{animation:none!important;transition:none!important}}
 
