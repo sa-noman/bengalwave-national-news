@@ -56,7 +56,7 @@ test("exact source HTML gradient, font scaling, positioning, mask and desktop pr
   "height:260px",
   "grid-template-columns:17fr repeat(4,8.4fr)",
   "margin-left:20.8%",
-  "padding-top:clamp(25px,2vw,40px)",
+  "padding-top:clamp(22px,1.4vw,28px)",
   "height:218px",
   "mask-composite:intersect",
   "width:min(29%,308px)","width:min(25%,270px)",
