@@ -1,0 +1,141 @@
+/*
+ * Content/layout only for the existing heritage strip above the footer.
+ * IMPORTANT: Do not change .bw-heritage background imagery, color overlays,
+ * footer riverscape art or its gold wave. Those remain in newsroom.css.
+ */
+.bw-heritage > .bw-heritage-grid {
+  display:grid;
+  grid-template-columns:minmax(265px,1.72fr) minmax(0,3.65fr);
+  align-items:stretch;
+  gap:clamp(14px,2.2vw,32px);
+}
+.bw-heritage-intro {
+  align-self:center;
+  min-width:0;
+  padding-right:clamp(8px,1.5vw,22px);
+}
+.bw-heritage-eyebrow {
+  display:inline-block;
+  font-size:clamp(13px,1.12vw,17px);
+  font-weight:600;
+  line-height:1.4;
+  color:var(--bw-red);
+}
+.bw-heritage .bw-heritage-intro h2 {
+  font-family:var(--bw-serif);
+  font-size:clamp(36px,3.5vw,58px);
+  font-weight:700;
+  line-height:1.35;
+  color:var(--bw-green);
+  margin:8px 0 16px;
+  letter-spacing:-.025em;
+}
+.bw-heritage .bw-heritage-intro p {
+  max-width:24em;
+  color:#2b3b34;
+  font-size:clamp(14px,1.14vw,17px);
+  font-weight:400;
+  line-height:1.9;
+}
+.bw-heritage-topics {
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  align-items:stretch;
+  min-width:0;
+}
+.bw-heritage .bw-heritage-topic {
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  min-width:0;
+  margin:0;
+  padding:12px clamp(10px,1.35vw,21px) 5px;
+  border-left:1px solid #d9d1bd;
+  color:var(--bw-green);
+  font-size:inherit;
+  font-weight:400;
+  text-decoration:none;
+}
+.bw-heritage-icon {
+  display:flex;
+  align-items:center;
+  height:76px;
+  width:100%;
+  margin-bottom:8px;
+}
+.bw-heritage-icon > svg {
+  display:block;
+  width:min(100%,106px);
+  height:74px;
+  object-fit:contain;
+}
+.bw-website .bw-heritage-topic h3 {
+  margin:0 0 10px;
+  color:var(--bw-green);
+  font-size:clamp(16px,1.42vw,22px);
+  line-height:1.5;
+  font-weight:700;
+}
+.bw-heritage .bw-heritage-topic p {
+  max-width:none;
+  margin:0 0 14px;
+  color:#3b403c;
+  font-size:clamp(13px,1.12vw,16px);
+  font-weight:400;
+  line-height:1.8;
+}
+.bw-heritage-read {
+  margin-top:auto;
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  font-size:clamp(15px,1.25vw,19px);
+  font-weight:700;
+  color:var(--bw-green);
+}
+.bw-heritage-arrow {
+  display:inline-grid;
+  place-items:center;
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  background:var(--bw-green);
+  color:#fff;
+  flex:none;
+  transition:transform .2s ease;
+}
+.bw-heritage-arrow svg {width:18px;height:18px}
+.bw-heritage-topic:hover h3,
+.bw-heritage-topic:focus-visible h3 {
+  text-decoration:underline;
+  text-decoration-color:var(--bw-yellow);
+  text-underline-offset:5px;
+}
+.bw-heritage-topic:hover .bw-heritage-arrow,
+.bw-heritage-topic:focus-visible .bw-heritage-arrow {
+  transform:translateX(4px);
+}
+@media(max-width:1100px){
+  .bw-heritage > .bw-heritage-grid {
+    grid-template-columns:1fr;
+    gap:24px;
+  }
+  .bw-heritage-intro {padding-right:0}
+  .bw-heritage .bw-heritage-intro h2 {font-size:clamp(36px,4.5vw,54px)}
+}
+@media(max-width:700px){
+  .bw-heritage-topics {grid-template-columns:repeat(2,minmax(0,1fr));row-gap:22px}
+  .bw-heritage .bw-heritage-topic {padding:8px 14px 8px 16px}
+  .bw-heritage .bw-heritage-topic:nth-child(odd){border-left:0;padding-left:0}
+  .bw-heritage-icon {height:68px}
+  .bw-heritage-icon > svg {height:65px}
+  .bw-heritage .bw-heritage-topic p {font-size:13px}
+}
+@media(max-width:360px){
+  .bw-heritage .bw-heritage-topic {padding-right:8px;padding-left:10px}
+  .bw-website .bw-heritage-topic h3 {font-size:15px}
+  .bw-heritage-arrow {width:30px;height:30px}
+}
+@media(prefers-reduced-motion:reduce){
+  .bw-heritage-arrow {transition:none}
+}
