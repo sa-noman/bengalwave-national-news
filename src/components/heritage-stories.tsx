@@ -2,8 +2,9 @@ import Link from "next/link";
 import {HeritageBackground} from "@/components/heritage-background";
 
 /**
- * Existing content layout unchanged. Reference-only decorative background
- * is layered behind it; Bengal Wave's separate footer-wave SVG is untouched.
+ * Exact wording, icon strokes and illustrations from bangla-banner (3).html.
+ * Links point to existing site destinations in place of the demo's href="#".
+ * The original footer wave is independently drawn in FooterRiverscape.
  */
 const topics=[
   {
@@ -11,11 +12,11 @@ const topics=[
     description:"প্রাচীন সভ্যতা থেকে মুসলিম শাসন, সময়ের ধারায় বাংলার রূপান্তর।",
     href:"/search?q=ইতিহাস",
     icon:<svg viewBox="0 0 120 80" aria-hidden="true" focusable="false">
-      <path d="M14 74H106L100 58H20Z" fill="#9b4a29"/>
-      <path d="M26 58H94L88 44H32Z" fill="#a8532e"/>
-      <path d="M38 44H82L76 30H44Z" fill="#94452a"/>
-      <path d="M52 30H68L64 18H56Z" fill="#a8532e"/>
-      <path d="M20 66H100M28 52H92M38 38H82" stroke="#5e2c1b" strokeWidth="1.5" opacity=".6"/>
+      <path d="M14 74H106L100 58H20Z" fill="#b5806a"/>
+      <path d="M26 58H94L88 44H32Z" fill="#c4957f"/>
+      <path d="M38 44H82L76 30H44Z" fill="#a87258"/>
+      <path d="M52 30H68L64 18H56Z" fill="#c4957f"/>
+      <path d="M20 66H100M28 52H92M38 38H82" stroke="#8a5f4b" strokeWidth="1.5" opacity=".6"/>
     </svg>,
   },
   {
@@ -23,14 +24,14 @@ const topics=[
     description:"অসংখ্য নদী বেয়ে গড়ে ওঠা বাংলার জীবন ও সংস্কৃতি।",
     href:"/search?q=নদী",
     icon:<svg viewBox="0 0 120 80" aria-hidden="true" focusable="false">
-      <path d="M6 50Q52 74 108 12Q104 58 56 68Q20 68 6 50Z" fill="#1d1d1d"/>
-      <path d="M24 46H70" stroke="#1d1d1d" strokeWidth="4"/>
+      <path d="M6 50Q52 74 108 12Q104 58 56 68Q20 68 6 50Z" fill="#2f4a3d"/>
+      <path d="M24 46H70" stroke="#2f4a3d" strokeWidth="4"/>
       <path d="M4 72H112M16 78H100" stroke="#5a6a6a" strokeWidth="1.5" opacity=".6"/>
     </svg>,
   },
   {
     title:"মাটির মানুষ",
-    description:"কৃষি, কারিগরি আর লোকজ জীবনে বাংলার শক্তি।",
+    description:"কৃষি, কারিগরী আর লোকজ জীবনে বাংলার শক্তি।",
     href:"/search?q=লোকজ",
     icon:<svg viewBox="0 0 120 80" aria-hidden="true" focusable="false">
       <g stroke="#3d3228" strokeWidth="2" fill="#d8cdb6">
@@ -48,7 +49,7 @@ const topics=[
     description:"ভাষা, সাহিত্য, শিল্পে বহুত্বের মাঝে এক বাংলা।",
     href:"/category/culture",
     icon:<svg viewBox="0 0 120 80" aria-hidden="true" focusable="false">
-      <rect x="32" y="6" width="52" height="64" fill="#6a4a35"/>
+      <rect x="32" y="6" width="52" height="64" fill="#7b5b47"/>
       <rect x="36" y="10" width="44" height="56" fill="none" stroke="#e9dcc3" strokeWidth="1.5"/>
       <g fill="#e9dcc3">
         <ellipse cx="58" cy="26" rx="5" ry="12"/>
@@ -57,7 +58,7 @@ const topics=[
         <ellipse cx="58" cy="26" rx="4" ry="9" transform="rotate(120 58 38)"/>
         <ellipse cx="58" cy="26" rx="4" ry="9" transform="rotate(-120 58 38)"/>
       </g>
-      <circle cx="58" cy="38" r="5" fill="#6a4a35"/>
+      <circle cx="58" cy="38" r="5" fill="#7b5b47"/>
       <path d="M40 56Q58 46 76 56M40 62Q58 52 76 62" stroke="#e9dcc3" strokeWidth="1.5" fill="none"/>
     </svg>,
   },
@@ -69,7 +70,7 @@ export function HeritageStories(){
     <div className="bw-wrap bw-heritage-grid">
       <div className="bw-heritage-intro">
         <span className="bw-heritage-eyebrow">বাংলার গল্প</span>
-        <h2 id="bw-heritage-heading">হাজার<br/>বছরের বাংলা</h2>
+        <h2 id="bw-heritage-heading">হাজার বছরের<br/>বাংলা</h2>
         <p>নদী, মাটি, মানুষ আর সংস্কৃতির অসীম যাত্রায় গড়ে ওঠা এক অনন্য বাংলার গল্প।</p>
       </div>
       <div className="bw-heritage-topics">
@@ -77,7 +78,7 @@ export function HeritageStories(){
           <span className="bw-heritage-icon">{topic.icon}</span>
           <h3>{topic.title}</h3>
           <p>{topic.description}</p>
-          <span className="bw-heritage-read">পড়ুন
+          <span className="bw-heritage-read">পড়ুন
             <span className="bw-heritage-arrow" aria-hidden="true">
               <svg viewBox="0 0 24 24" focusable="false">
                 <path d="M4 12h16M14 6l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
