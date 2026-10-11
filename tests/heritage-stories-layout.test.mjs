@@ -99,6 +99,21 @@ test("desktop heritage returns to compact pre-HTML height without scaling the si
  assert.match(footer,/M0 16C180 0 360 0 540 14S900 30 1080 14 1320 2 1440 12/);
 });
 
+test("desktop background artwork stays proportional to the reference within the unchanged compact shape",()=>{
+ const css=read("src/app/heritage-stories.css");
+ const artwork=read("src/components/heritage-background.tsx");
+ assert.match(css,/height:260px/);
+ assert.match(css,/width:min\(29%,308px\)/);
+ assert.match(css,/width:min\(25%,270px\)/);
+ assert.equal((css.match(/transform:scale\(1\.27\)/g)||[]).length,2);
+ assert.match(css,/transform-origin:left bottom/);
+ assert.match(css,/transform-origin:right bottom/);
+ assert.match(css,/\.bw-heritage-art\{opacity:\.22;height:50%;transform:none\}/);
+ assert.match(artwork,/viewBox="0 0 640 540"/);
+ assert.match(artwork,/viewBox="0 0 560 540"/);
+ assert.doesNotMatch(css,/clip-path\s*:/);
+});
+
 test("at desktop the inner content fills original reference width without changing banner or background",()=>{
  const css=read("src/app/heritage-stories.css");
  assert.match(css,/height:260px/);
@@ -113,7 +128,9 @@ test("at desktop the inner content fills original reference width without changi
  assert.doesNotMatch(css,/font:400 clamp\(12px,calc\(100vw \* 13 \/ 1600\),13px\)/);
  const footer=read("src/components/footer-riverscape.tsx");
  assert.match(footer,/stroke="#FBB040" strokeWidth="3"/);
-});\n\ntest("mobile retains original two column banner and content links work",()=>{
+});
+
+test("mobile retains original two column banner and content links work",()=>{
  const css=read("src/app/heritage-stories.css");
  const section=read("src/components/heritage-stories.tsx");
  assert.match(css,/@media\(max-width:1000px\)/);
