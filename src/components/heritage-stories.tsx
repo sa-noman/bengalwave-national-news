@@ -31,7 +31,7 @@ const topics=[
   },
   {
     title:"মাটির মানুষ",
-    description:"কৃষি, কারিগরী আর লোকজ জীবনে বাংলার শক্তি।",
+    description:"কৃষি, কারিগরী আর লোকজ জীবনের বাংলার গল্প।",
     href:"/search?q=লোকজ",
     icon:<svg viewBox="0 0 120 80" aria-hidden="true" focusable="false">
       <g stroke="#3d3228" strokeWidth="2" fill="#d8cdb6">
