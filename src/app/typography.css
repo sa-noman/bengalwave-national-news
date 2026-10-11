@@ -83,3 +83,10 @@ body {
 .bw-section-heading h2 > a:focus-visible {
   color:var(--bw-red);
 }
+
+/* Smaller publication timestamps on both desktop and phone.
+ * Keep the existing text and background colors unchanged. */
+.bw-website .bw-card-meta {
+  font-size:12px;
+  line-height:1.55;
+}
