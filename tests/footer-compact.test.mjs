@@ -22,9 +22,11 @@ test("the gold wave remains and the footer meets the preceding banner",()=>{
  assert.match(css,/\.bw-footer-wave\{[^}]*top:-29px/);
  assert.match(scene,/stroke="#FBB040"/);
 });
-test("social platform icons have no invented official links",()=>{
+test("Facebook icon points to the requested official page; other social icons have no invented links",()=>{
  const footer=read("src/components/site-footer.tsx");
  for(const name of ["facebook","youtube","x","instagram"])assert.match(footer,new RegExp(name));
+ assert.match(footer,/href="https:\/\/www\.facebook\.com\/BengalWaveOfficial"/);
+ assert.match(footer,/Join with Us :/);
  assert.match(footer,/অফিশিয়াল লিংক এখনো যুক্ত হয়নি/);
- assert.doesNotMatch(footer,/https?:\/\/(?:www\.)?(?:facebook|youtube|instagram|x)\.com/);
+ assert.doesNotMatch(footer,/https?:\/\/(?:www\.)?(?:youtube|instagram|x)\.com/);
 });

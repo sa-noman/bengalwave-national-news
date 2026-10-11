@@ -14,7 +14,7 @@ test("heritage section exactly follows the provided Bengali banner structure",()
    "বাংলার গল্প","ইতিহাসের পদচিহ্ন","নদীর দেশ",
    "মাটির মানুষ","সংস্কৃতির মেলবন্ধন",
    "নদী, মাটি, মানুষ আর সংস্কৃতির অসীম যাত্রায়",
-   "কৃষি, কারিগরী আর লোকজ জীবনে বাংলার শক্তি।",
+   "কৃষি, কারিগরী আর লোকজ জীবনের বাংলার গল্প।",
  ]){
    assert.ok(section.includes(term),term);
  }
