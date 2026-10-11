@@ -26,7 +26,7 @@ body{background:var(--bw-bg);color:var(--bw-ink);font-family:var(--bw-sans)}
 .bw-brand-words small{display:block;color:#6b5a2a;font-size:13px;margin-top:3px}
 .bw-brand-actions{display:flex;align-items:center;gap:7px}
 .bw-follow-shell{position:relative}
-.bw-follow-button{background:var(--bw-red);border:0;border-radius:99px;color:white;font:600 14px var(--bw-sans);padding:8px 17px;white-space:nowrap;transition:background .2s,color .2s;cursor:pointer}
+.bw-follow-button{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;background:var(--bw-red);border:0;border-radius:99px;color:white;font:600 14px var(--bw-sans);padding:8px 17px;white-space:nowrap;transition:background .2s,color .2s;cursor:pointer}
 .bw-follow-pop{position:absolute;top:calc(100% + 12px);right:0;background:white;color:#15392d;border:1px solid #e3d3ad;border-radius:10px;padding:13px;width:250px;font-size:13px;line-height:1.6;box-shadow:0 10px 24px #0002;z-index:36}
 .bw-head-icon{display:grid;place-items:center;background:transparent;border:0;color:var(--bw-green);width:42px;height:42px;flex:none;border-radius:50%;cursor:pointer;transition:background .2s}
 .bw-head-icon svg{display:block}
@@ -183,6 +183,7 @@ body{background:var(--bw-bg);color:var(--bw-ink);font-family:var(--bw-sans)}
 .bw-footer-icons{display:flex;align-items:center;gap:22px}
 .bw-social-placeholder{display:inline-flex;align-items:center;justify-content:center;width:25px;height:25px;color:#f4f6f4;cursor:default}
 .bw-social-placeholder svg{display:block;width:24px;height:24px}
+.bw-footer-social a.bw-social-placeholder{cursor:pointer;text-decoration:none}
 @media(max-width:1280px){
  .bw-footer-top{gap:27px}
  .bw-footer-identity{padding-right:27px}

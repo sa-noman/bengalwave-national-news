@@ -41,12 +41,15 @@ export function SiteFooter(){
       <Link href="/contact">যোগাযোগ</Link>
      </div>
      <div className="bw-footer-social">
-      <span>আমাদেরকে অনুসরণ করুন :</span>
+      <span>Join with Us :</span>
       <div className="bw-footer-icons" aria-label="সামাজিক যোগাযোগমাধ্যমের আইকন">
        {(["facebook","youtube","x","instagram"] as const).map(type=>
-        <span key={type} className="bw-social-placeholder"
-         title="অফিশিয়াল লিংক এখনো যুক্ত হয়নি"
-         aria-label={type+"-এর লিংক এখনো যুক্ত হয়নি"}><SocialIcon type={type}/></span>
+        type==="facebook"
+         ? <a key={type} className="bw-social-placeholder" href="https://www.facebook.com/BengalWaveOfficial"
+             target="_blank" rel="noopener noreferrer" aria-label="Bengal Wave Facebook পেজ"><SocialIcon type={type}/></a>
+         : <span key={type} className="bw-social-placeholder"
+             title="অফিশিয়াল লিংক এখনো যুক্ত হয়নি"
+             aria-label={type+"-এর লিংক এখনো যুক্ত হয়নি"}><SocialIcon type={type}/></span>
        )}
       </div>
      </div>
