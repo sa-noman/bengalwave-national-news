@@ -1,187 +1,231 @@
-/*
- * Bengal Wave heritage content plus the background from the user-supplied
- * bangla-banner HTML. The ORIGINAL footer gold wave and its outline/shape
- * remain in FooterRiverscape: no imported clipPath/edge SVG is used here.
- * Other site backgrounds remain untouched.
- */
+@import url("https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;700&display=swap");
 
-/* Exact three-layer gradient from the uploaded reference HTML (.hb). */
-.bw-heritage {
+/*
+ * Exact styling from the user's bangla-banner (3).html, scoped to the
+ * heritage section. EXCEPTION: The uploaded HTML's clipping paths and
+ * gold outline are deliberately NOT applied. Bengal Wave's existing
+ * footer-riverscape.tsx and its original gold/green wave shape stay intact.
+ */
+.bw-heritage{
+  --hb-g:#0b5a40;
+  --hb-r:#c3141a;
+  --hb-ink:#2f3430;
+  --hb-ln:#d9d1bd;
   position:relative;
   isolation:isolate;
+  overflow:hidden;
+  display:block;
+  height:24.2em;
+  min-height:0;
+  font:400 max(12px,calc(100vw * 26 / 2244))/1.55 "Hind Siliguri",sans-serif;
+  color:var(--hb-ink);
   background:
     radial-gradient(60% 70% at 8% 30%,#e3e9d6,#0000),
     radial-gradient(40% 80% at 96% 40%,#fbe3b8,#0000),
     linear-gradient(90deg,#eef0e2,#f8f2e3 30%,#f8f1e0 60%,#f8ecd4);
 }
-.bw-heritage-artwork {
+.bw-heritage-artwork{
   position:absolute;
   inset:0;
-  overflow:hidden;
   pointer-events:none;
   z-index:0;
 }
-.bw-heritage-art {
+.bw-heritage-art{
   position:absolute;
   bottom:0;
   height:100%;
   display:block;
   pointer-events:none;
 }
-.bw-heritage-art-left {
+.bw-heritage-art-left{
   left:0;
   width:29%;
-  -webkit-mask-image:linear-gradient(90deg,#000 48%,#0000);
-  mask-image:linear-gradient(90deg,#000 48%,#0000);
+  opacity:.9;
+  -webkit-mask-image:linear-gradient(90deg,#000 38%,#0000),linear-gradient(180deg,#0000,#000 26%,#000 62%,#0000 97%);
+  -webkit-mask-composite:source-in;
+  mask-image:linear-gradient(90deg,#000 38%,#0000),linear-gradient(180deg,#0000,#000 26%,#000 62%,#0000 97%);
+  mask-composite:intersect;
 }
-.bw-heritage-art-right {
+.bw-heritage-art-right{
   right:0;
   width:25%;
-  -webkit-mask-image:linear-gradient(270deg,#000 52%,#0000);
-  mask-image:linear-gradient(270deg,#000 52%,#0000);
+  opacity:.9;
+  -webkit-mask-image:linear-gradient(270deg,#000 42%,#0000),linear-gradient(180deg,#0000,#000 26%,#000 62%,#0000 97%);
+  -webkit-mask-composite:source-in;
+  mask-image:linear-gradient(270deg,#000 42%,#0000),linear-gradient(180deg,#0000,#000 26%,#000 62%,#0000 97%);
+  mask-composite:intersect;
 }
-.bw-heritage > .bw-heritage-grid {
+
+/* The original HTML .hb-in grid is 17em + four columns of 8.4em. */
+.bw-heritage > .bw-heritage-grid{
   position:relative;
   z-index:1;
-}
-@media(max-width:1000px){
-  .bw-heritage-art {opacity:.22;height:50%}
-  .bw-heritage-art-left {width:60%}
-  .bw-heritage-art-right {width:50%}
-}
-.bw-heritage > .bw-heritage-grid {
   display:grid;
-  grid-template-columns:minmax(265px,1.72fr) minmax(0,3.65fr);
+  grid-template-columns:17em repeat(4,8.4em);
+  width:max-content;
+  max-width:none;
+  margin-left:20.8%;
+  margin-right:0;
+  padding-top:5.2em;
+  padding-bottom:0;
+  gap:0;
   align-items:stretch;
-  gap:clamp(14px,2.2vw,32px);
 }
-.bw-heritage-intro {
-  align-self:center;
+.bw-heritage-intro{
   min-width:0;
-  padding-right:clamp(8px,1.5vw,22px);
+  align-self:auto;
+  padding-right:1.6em;
 }
-.bw-heritage-eyebrow {
+.bw-heritage-eyebrow{
   display:inline-block;
-  font-size:clamp(13px,1.12vw,17px);
-  font-weight:600;
-  line-height:1.4;
-  color:var(--bw-red);
+  color:var(--hb-r);
+  font-weight:500;
+  font-size:1.15em;
+  line-height:1.3;
+  border-bottom:1px solid var(--hb-r);
+  padding-bottom:.1em;
 }
-.bw-heritage .bw-heritage-intro h2 {
-  font-family:var(--bw-serif);
-  font-size:clamp(36px,3.5vw,58px);
-  font-weight:700;
-  line-height:1.35;
-  color:var(--bw-green);
-  margin:8px 0 16px;
-  letter-spacing:-.025em;
+.bw-heritage .bw-heritage-intro h2{
+  white-space:nowrap;
+  font:700 3em/1.12 "Hind Siliguri",sans-serif;
+  color:var(--hb-g);
+  margin:.2em 0 .35em;
+  letter-spacing:normal;
 }
-.bw-heritage .bw-heritage-intro p {
-  max-width:24em;
-  color:#2b3b34;
-  font-size:clamp(14px,1.14vw,17px);
-  font-weight:400;
-  line-height:1.9;
+.bw-heritage .bw-heritage-intro p{
+  color:var(--hb-ink);
+  font-size:.95em;
+  line-height:1.6;
+  max-width:15em;
+  margin:0;
 }
-.bw-heritage-topics {
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  align-items:stretch;
-  min-width:0;
-}
-.bw-heritage .bw-heritage-topic {
+.bw-heritage-topics{display:contents}
+.bw-heritage .bw-heritage-topic{
   display:flex;
   flex-direction:column;
   align-items:flex-start;
   min-width:0;
+  padding:0 .7em;
+  border-left:1px solid var(--hb-ln);
+  height:13.6em;
+  min-height:0;
   margin:0;
-  padding:12px clamp(10px,1.35vw,21px) 5px;
-  border-left:1px solid #d9d1bd;
-  color:var(--bw-green);
+  color:inherit;
   font-size:inherit;
   font-weight:400;
   text-decoration:none;
 }
-.bw-heritage-icon {
-  display:flex;
-  align-items:center;
-  height:76px;
-  width:100%;
-  margin-bottom:8px;
-}
-.bw-heritage-icon > svg {
+.bw-heritage-icon{
   display:block;
-  width:min(100%,106px);
-  height:74px;
+  height:3.5em;
+  width:auto;
+  flex:none;
+  margin:.1em 0 .9em;
+  opacity:.88;
+}
+.bw-heritage-icon>svg{
+  display:block;
+  height:100%;
+  width:auto;
   object-fit:contain;
 }
-.bw-website .bw-heritage-topic h3 {
-  margin:0 0 10px;
-  color:var(--bw-green);
-  font-size:clamp(16px,1.42vw,22px);
-  line-height:1.5;
-  font-weight:700;
+.bw-website .bw-heritage .bw-heritage-topic h3{
+  font:700 1.04em/1.35 "Noto Serif Bengali",serif;
+  letter-spacing:-.01em;
+  color:var(--hb-g);
+  margin:0 0 .45em;
+  white-space:nowrap;
 }
-.bw-heritage .bw-heritage-topic p {
-  max-width:none;
-  margin:0 0 14px;
+.bw-heritage .bw-heritage-topic p{
+  font-size:.88em;
+  line-height:1.55;
   color:#3b403c;
-  font-size:clamp(13px,1.12vw,16px);
-  font-weight:400;
-  line-height:1.8;
+  max-width:none;
+  margin:0;
 }
-.bw-heritage-read {
+.bw-heritage-read{
   margin-top:auto;
-  display:inline-flex;
+  display:flex;
   align-items:center;
-  gap:10px;
-  font-size:clamp(15px,1.25vw,19px);
+  gap:.5em;
+  font-size:inherit;
   font-weight:700;
-  color:var(--bw-green);
+  color:var(--hb-g);
 }
-.bw-heritage-arrow {
-  display:inline-grid;
+.bw-heritage-arrow{
+  display:grid;
   place-items:center;
-  width:36px;
-  height:36px;
-  border-radius:50%;
-  background:var(--bw-green);
-  color:#fff;
+  width:1.6em;
+  height:1.6em;
   flex:none;
-  transition:transform .2s ease;
+  border-radius:50%;
+  background:var(--hb-g);
+  color:#fff;
+  transition:transform .25s,background .25s;
 }
-.bw-heritage-arrow svg {width:18px;height:18px}
-.bw-heritage-topic:hover h3,
-.bw-heritage-topic:focus-visible h3 {
-  text-decoration:underline;
-  text-decoration-color:var(--bw-yellow);
-  text-underline-offset:5px;
+.bw-heritage-arrow svg{
+  width:.75em;
+  height:.75em;
+  margin:0;
+  stroke:#fff;
+  fill:none;
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
 }
 .bw-heritage-topic:hover .bw-heritage-arrow,
-.bw-heritage-topic:focus-visible .bw-heritage-arrow {
-  transform:translateX(4px);
+.bw-heritage-topic:focus-visible .bw-heritage-arrow{
+  transform:translateX(.3em);
+  background:#0f7352;
 }
-@media(max-width:1100px){
-  .bw-heritage > .bw-heritage-grid {
-    grid-template-columns:1fr;
-    gap:24px;
+.bw-heritage-topic:hover h3,
+.bw-heritage-topic:focus-visible h3{
+  text-decoration:underline;
+  text-decoration-color:#e0a63a;
+  text-underline-offset:.2em;
+}
+.bw-heritage .bw-heritage-topic:focus-visible{
+  outline:2px solid var(--hb-g);
+  outline-offset:2px;
+}
+
+/* Same responsive arrangement as the provided HTML; no new wave shape. */
+@media(max-width:1000px){
+  .bw-heritage{
+    height:auto;
+    font-size:16px;
+    padding:36px 18px 70px;
   }
-  .bw-heritage-intro {padding-right:0}
-  .bw-heritage .bw-heritage-intro h2 {font-size:clamp(36px,4.5vw,54px)}
-}
-@media(max-width:700px){
-  .bw-heritage-topics {grid-template-columns:repeat(2,minmax(0,1fr));row-gap:22px}
-  .bw-heritage .bw-heritage-topic {padding:8px 14px 8px 16px}
-  .bw-heritage .bw-heritage-topic:nth-child(odd){border-left:0;padding-left:0}
-  .bw-heritage-icon {height:68px}
-  .bw-heritage-icon > svg {height:65px}
-  .bw-heritage .bw-heritage-topic p {font-size:13px}
-}
-@media(max-width:360px){
-  .bw-heritage .bw-heritage-topic {padding-right:8px;padding-left:10px}
-  .bw-website .bw-heritage-topic h3 {font-size:15px}
-  .bw-heritage-arrow {width:30px;height:30px}
+  .bw-heritage-art{opacity:.22;height:50%}
+  .bw-heritage-art-left{width:60%}
+  .bw-heritage-art-right{width:50%}
+  .bw-heritage > .bw-heritage-grid{
+    display:block;
+    width:auto;
+    max-width:none;
+    margin:0;
+    padding:0;
+  }
+  .bw-heritage-intro{padding:0 0 22px}
+  .bw-heritage .bw-heritage-intro h2{font-size:2.3em}
+  .bw-heritage .bw-heritage-intro p{max-width:30em}
+  .bw-heritage-topics{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px 0;
+  }
+  .bw-heritage .bw-heritage-topic{
+    height:auto;
+    padding:0 14px 6px;
+    min-height:17em;
+  }
+  .bw-heritage-icon{height:3.8em}
+  .bw-website .bw-heritage .bw-heritage-topic h3{white-space:normal}
+  .bw-heritage .bw-heritage-topic:nth-child(odd){
+    border-left:0;
+    padding-left:0;
+  }
 }
 @media(prefers-reduced-motion:reduce){
-  .bw-heritage-arrow {transition:none}
+  .bw-heritage-arrow{transition:none}
 }
