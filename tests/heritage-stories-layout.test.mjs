@@ -52,11 +52,11 @@ test("exact source HTML gradient, font scaling, positioning, mask and desktop pr
  }
  for(const piece of [
   "linear-gradient(90deg,#eef0e2,#f8f2e3 30%,#f8f1e0 60%,#f8ecd4)",
-  "font:400 max(12px,calc(100vw * 26 / 2244))/1.55",
-  "height:24.2em",
+  "font:400 clamp(12px,calc(100vw * 13 / 1600),13px)/1.55",
+  "height:260px",
   "grid-template-columns:17em repeat(4,8.4em)",
-  "margin-left:20.8%",
-  "padding-top:5.2em",
+  "margin-left:calc(50% - 25.3em)",
+  "padding-top:calc((260px - 13.6em)/2)",
   "height:13.6em",
   "mask-composite:intersect",
   "width:29%","width:25%",
@@ -86,6 +86,17 @@ test("legacy watermark background is removed ONLY from heritage, while its origi
  assert.match(css,/\.bw-heritage\s*\{[^}]*background:\s*radial-gradient/s);
  assert.match(css,/height:24\.2em/);
  assert.match(css,/margin-left:20\.8%/);
+});
+
+test("desktop heritage returns to compact pre-HTML height without scaling the site footer",()=>{
+ const css=read("src/app/heritage-stories.css");
+ const footer=read("src/components/footer-riverscape.tsx");
+ assert.match(css,/height:260px/);
+ assert.match(css,/font:400 clamp\(12px,calc\(100vw \* 13 \/ 1600\),13px\)/);
+ assert.match(css,/padding-top:calc\(\(260px - 13\.6em\)\/2\)/);
+ assert.doesNotMatch(css,/height:24\.2em/);
+ assert.match(css,/@media\(max-width:1000px\)\{[\s\S]*?height:auto/);
+ assert.match(footer,/M0 16C180 0 360 0 540 14S900 30 1080 14 1320 2 1440 12/);
 });
 
 test("mobile retains original two column banner and content links work",()=>{
