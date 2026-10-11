@@ -15,9 +15,11 @@
   isolation:isolate;
   overflow:hidden;
   display:block;
-  height:24.2em;
+  /* Restore the site's original compact ~245px heritage strip (with
+     slight breathing room for the four cards). Never scale with 24.2em. */
+  height:260px;
   min-height:0;
-  font:400 max(12px,calc(100vw * 26 / 2244))/1.55 "Hind Siliguri",sans-serif;
+  font:400 clamp(12px,calc(100vw * 13 / 1600),13px)/1.55 "Hind Siliguri",sans-serif;
   color:var(--hb-ink);
   background:
     radial-gradient(60% 70% at 8% 30%,#e3e9d6,#0000),
@@ -56,7 +58,7 @@
   mask-composite:intersect;
 }
 
-/* The original HTML .hb-in grid is 17em + four columns of 8.4em. */
+/* Keep the reference's 17em + four 8.4em columns at the reduced scale. */
 .bw-heritage > .bw-heritage-grid{
   position:relative;
   z-index:1;
@@ -64,9 +66,10 @@
   grid-template-columns:17em repeat(4,8.4em);
   width:max-content;
   max-width:none;
-  margin-left:20.8%;
+  /* Keep the entire smaller reference composition centered in the strip. */
+  margin-left:calc(50% - 25.3em);
   margin-right:0;
-  padding-top:5.2em;
+  padding-top:calc((260px - 13.6em)/2);
   padding-bottom:0;
   gap:0;
   align-items:stretch;
