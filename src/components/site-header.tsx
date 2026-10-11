@@ -19,7 +19,6 @@ export function SiteHeader(){
  const pathname=usePathname();
  const [drawerOpen,setDrawerOpen]=useState(false);
  const [searchOpen,setSearchOpen]=useState(false);
- const [followOpen,setFollowOpen]=useState(false);
  const [headerDates,setHeaderDates]=useState({gregorian:"",bengali:"",hijri:""});
  const today=headerDates.gregorian;
  const closeButton=useRef<HTMLButtonElement>(null);
@@ -40,7 +39,7 @@ export function SiteHeader(){
    closeButton.current?.focus();
    return ()=>{document.removeEventListener("keydown",onKey);document.body.style.overflow=old;};
  },[drawerOpen]);
- useEffect(()=>{setDrawerOpen(false);setSearchOpen(false);setFollowOpen(false);},[pathname]);
+ useEffect(()=>{setDrawerOpen(false);setSearchOpen(false);},[pathname]);
  const openMenu=()=>{setSearchOpen(false);setDrawerOpen(true);};
  return <>
    <div className="bw-topbar"><div className="bw-wrap bw-topbar-inner">
@@ -56,10 +55,9 @@ export function SiteHeader(){
       </Link>
       <div className="bw-brand-actions">
        <div className="bw-follow-shell">
-        <button className="bw-follow-button" type="button" aria-expanded={followOpen} onClick={()=>setFollowOpen(!followOpen)}>ফলো করুন</button>
-        {followOpen&&<div className="bw-follow-pop" role="status">অফিশিয়াল সোশ্যাল পেজের লিংক যুক্ত হলে এখানে পাওয়া যাবে।</div>}
+        <a className="bw-follow-button" href="https://www.facebook.com/BengalWaveOfficial" target="_blank" rel="noopener noreferrer">ফলো করুন</a>
        </div>
-       <button className="bw-head-icon" type="button" aria-label="সংবাদ খুঁজুন" aria-expanded={searchOpen} onClick={()=>{setSearchOpen(!searchOpen);setFollowOpen(false)}}><SearchIcon/></button>
+       <button className="bw-head-icon" type="button" aria-label="সংবাদ খুঁজুন" aria-expanded={searchOpen} onClick={()=>setSearchOpen(!searchOpen)}><SearchIcon/></button>
       </div>
     </div>
     {searchOpen&&<form className="bw-search-popup bw-wrap" role="search" action="/search">
