@@ -201,7 +201,10 @@
 /* Desktop-only spacing adjustment: lift the subtitle and "পড়ুন" links,
    reduce only the circular arrows; preserve the 260px strip, artwork and wave. */
 @media (min-width:1001px){
-  .bw-heritage .bw-heritage-intro h2{margin-bottom:.12em}
+  /* Keep all copy safely above the untouched golden wave/green footer edge. */
+  .bw-heritage > .bw-heritage-grid{padding-top:clamp(14px,1vw,20px)}
+  .bw-heritage .bw-heritage-intro h2{margin-top:.08em;margin-bottom:.02em;line-height:1.05}
+  .bw-heritage .bw-heritage-intro p{max-width:21em;line-height:1.45}
   .bw-heritage-read{transform:translateY(-16px)}
   .bw-heritage-arrow{width:1.25em;height:1.25em}
   .bw-heritage-arrow svg{width:.62em;height:.62em}
