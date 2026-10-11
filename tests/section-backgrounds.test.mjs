@@ -28,7 +28,16 @@ test("section hairlines and responsive content width remain unchanged",()=>{
 });
 test("original header, heritage art and gold footer wave are preserved",()=>{
  const css=read("src/app/newsroom.css");
- assert.match(css,/\.bw-heritage\{[^}]*heritage-banner.webp/);
+ // The old site art remains in the masthead only. Heritage has the
+ // user-approved replacement gradients and SVG artwork without the old watermark.
+ assert.match(css,/\.bw-masthead\{[^}]*heritage-banner.webp/);
+ assert.doesNotMatch(css,/\.bw-heritage\{[^}]*heritage-banner.webp/);
+ const heritage=read("src/app/heritage-stories.css");
+ const svg=read("src/components/heritage-background.tsx");
+ assert.match(heritage,/height:260px/);
+ assert.match(heritage,/linear-gradient\(90deg,#eef0e2,#f8f2e3 30%,#f8f1e0 60%,#f8ecd4\)/);
+ assert.match(svg,/className="bw-heritage-art bw-heritage-art-left"/);
+ assert.match(svg,/className="bw-heritage-art bw-heritage-art-right"/);
  const scene=read("src/components/footer-riverscape.tsx");
  assert.match(css,/\.bw-footer-wave\{[^}]*top:-29px/);
  assert.match(scene,/stroke="#FBB040"/);
