@@ -331,6 +331,26 @@
   }
 }
 
+/* Phone-only: tighter heritage cards, without touching tablet/desktop styles.
+ * Background illustrations already anchor to bottom:0 inside this section,
+ * so shortening its height lifts them by precisely the removed empty space. */
+@media(max-width:760px){
+  .bw-heritage{padding-bottom:12px}
+  .bw-heritage-intro{padding-bottom:14px}
+  .bw-heritage-topics{grid-auto-rows:auto;row-gap:14px}
+  .bw-heritage .bw-heritage-topic{
+    min-height:0;
+    height:100%;
+    grid-template-rows:46px minmax(45px,auto) auto 17px;
+    row-gap:3px;
+    padding-bottom:2px;
+  }
+}
+@media(max-width:360px){
+  /* On very narrow phones longer Bengali titles can occupy three lines. */
+  .bw-heritage .bw-heritage-topic{grid-template-rows:46px minmax(67px,auto) auto 17px}
+}
+
 @media(prefers-reduced-motion:reduce){
   .bw-heritage-arrow{transition:none}
 }
