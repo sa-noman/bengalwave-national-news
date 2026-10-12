@@ -344,7 +344,7 @@
   }
   .bw-heritage-topics{
     grid-auto-rows:auto;
-    row-gap:14px;
+    row-gap:18px;
     align-items:stretch;
   }
   .bw-heritage .bw-heritage-topic{
@@ -354,6 +354,12 @@
     height:100%;
     min-height:0;
     padding-bottom:0;
+  }
+  /* Separate the lower pair by a subtle rule and matched top padding.
+     Both icons begin on exactly the same baseline. */
+  .bw-heritage .bw-heritage-topic:nth-child(n+3){
+    border-top:1px solid var(--hb-ln);
+    padding-top:10px;
   }
   .bw-heritage-icon{
     flex:0 0 44px;
