@@ -2,26 +2,39 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import {readFileSync} from "node:fs";
 
-const css=readFileSync(new URL("../src/app/heritage-stories.css",import.meta.url),"utf8");
+const read=path=>readFileSync(new URL("../"+path,import.meta.url),"utf8");
+const css=read("src/app/heritage-stories.css");
+const mobileMarker="/* Phone-only: compact, evenly aligned two-column heritage grid.";
+const phone=css.slice(css.indexOf(mobileMarker));
 
-test("heritage compacting applies only to phones, with no changes to desktop markup",()=>{
- const start=css.indexOf("/* Phone-only: tighter heritage cards");
- assert.ok(start>0);
- const block=css.slice(start);
- assert.match(block,/@media\(max-width:760px\)\{/);
- assert.match(block,/\.bw-heritage\{padding-bottom:12px\}/);
- assert.match(block,/\.bw-heritage-intro\{padding-bottom:14px\}/);
- assert.match(block,/\.bw-heritage-topics\{grid-auto-rows:auto;row-gap:14px\}/);
- assert.match(block,/min-height:0;/);
- assert.match(block,/grid-template-rows:46px minmax\(45px,auto\) auto 17px/);
- assert.match(css.slice(0,start),/@media \(min-width:1001px\)\{/);
+test("four story cards align in two columns using compact content-height rows",()=>{
+ assert.ok(css.includes(mobileMarker));
+ assert.match(phone,/@media\(max-width:760px\)\{/);
+ assert.match(phone,/grid-auto-rows:auto;/);
+ assert.match(phone,/row-gap:14px;/);
+ assert.match(phone,/display:flex;\s*flex-direction:column;/);
+ assert.match(phone,/min-height:0;/);
+ assert.match(phone,/\.bw-heritage-icon\{\s*flex:0 0 44px/);
+ assert.match(phone,/\.bw-heritage-read\{\s*flex:none;/);
+ assert.match(phone,/align-self:flex-start;/);
+ assert.doesNotMatch(phone,/grid-template-rows:46px/);
 });
 
-test("compact cards keep narrow phone title space and preserve anchored artwork",()=>{
- assert.match(css,/@media\(max-width:360px\)\{[^}]*grid-template-rows:48px 75px/);
- assert.match(css,/grid-template-rows:46px minmax\(67px,auto\) auto 17px/);
- assert.match(css,/\.bw-heritage-art\{[\s\S]*?bottom:0;/);
- assert.match(css,/\.bw-heritage-art-left\{/);
- assert.match(css,/\.bw-heritage-art-right\{/);
- assert.match(css,/\.bw-heritage-art\{opacity:\.22;height:50%;transform:none\}/);
+test("footer's 29px wave has sufficient clearance below every read link",()=>{
+ assert.match(phone,/\.bw-heritage\{padding:27px 18px 48px\}/);
+ assert.match(phone,/\.bw-heritage-read\{[\s\S]*?min-height:18px;/);
+ const newsroom=read("src/app/newsroom.css");
+ assert.match(newsroom,/\.bw-footer-wave\{position:absolute;top:-29px/);
+ const bg=read("src/components/heritage-background.tsx");
+ assert.match(bg,/bw-heritage-art-left/);
+ assert.match(bg,/bw-heritage-art-right/);
+});
+
+test("desktop layout is untouched and narrow phone titles are accommodated",()=>{
+ const prefix=css.slice(0,css.indexOf(mobileMarker));
+ assert.match(prefix,/@media \(min-width:1001px\)\{/);
+ assert.match(phone,/@media\(max-width:360px\)\{/);
+ assert.match(phone,/min-height:45px;/);
+ assert.match(phone,/font-size:2\.04em/);
+ assert.match(phone,/font-size:2\.12em/);
 });
