@@ -361,6 +361,23 @@
     border-top:1px solid var(--hb-ln);
     padding-top:18px;
   }
+  /* Start the lower-right vertical divider slightly below the horizontal
+     rule, matching the small gap above it in the first row. Keep card 4's
+     padding, icon baseline and link position unchanged. */
+  .bw-heritage .bw-heritage-topic:nth-child(4){
+    position:relative;
+    border-left:0;
+  }
+  .bw-heritage .bw-heritage-topic:nth-child(4)::before{
+    content:"";
+    position:absolute;
+    left:0;
+    top:12px;
+    bottom:0;
+    width:1px;
+    background:var(--hb-ln);
+    pointer-events:none;
+  }
   .bw-heritage-icon{
     flex:0 0 44px;
     height:44px;
