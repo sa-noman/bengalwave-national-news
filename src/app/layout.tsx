@@ -1,11 +1,13 @@
 import type {Metadata,Viewport} from "next";
 import {SiteHeader} from "@/components/site-header";
 import {SiteFooter} from "@/components/site-footer";
+import {GoogleAnalytics} from "@/components/google-analytics";
 import "./globals.css";
 import "./newsroom.css";
 import "./typography.css";
 import "./header-calendar.css";
 import "./heritage-stories.css";
+import "./analytics-consent.css";
 export const metadata:Metadata={
  title:{default:"Bengal Wave | বাংলা নিউজ",template:"%s | Bengal Wave"},
  description:"Bengal Wave বাংলা ডিজিটাল নিউজপোর্টালের উন্নয়নাধীন সংস্করণ।",
@@ -13,5 +15,5 @@ export const metadata:Metadata={
 };
 export const viewport:Viewport={width:"device-width",initialScale:1,themeColor:"#053d36"};
 export default function RootLayout({children}:Readonly<{children:React.ReactNode}>){
- return <html lang="bn"><body><SiteHeader/>{children}<SiteFooter/></body></html>;
+ return <html lang="bn"><body><SiteHeader/>{children}<SiteFooter/><GoogleAnalytics/></body></html>;
 }
