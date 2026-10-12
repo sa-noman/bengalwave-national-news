@@ -70,6 +70,8 @@ body {
   .bw-card-lead .bw-card-title {font-size:25px}
   .bw-article h1 {font-size:25px}
   .bw-article-body {font-size:16px}
+  /* Only the small right-side "আরও" / "আরও পড়ুন" action, not section headings. */
+  .bw-home .bw-section-heading > a {font-size:11px}
   .bw-footer-nav a,.bw-footer-legal a {font-size:16px}
 }
 
@@ -82,4 +84,11 @@ body {
 .bw-section-heading h2 > a:hover,
 .bw-section-heading h2 > a:focus-visible {
   color:var(--bw-red);
+}
+
+/* Smaller publication timestamps on both desktop and phone.
+ * Keep the existing text and background colors unchanged. */
+.bw-website .bw-card-meta {
+  font-size:12px;
+  line-height:1.55;
 }

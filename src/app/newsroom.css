@@ -1,4 +1,6 @@
 :root{
+ /* Until users opt into a future website-specific theme, ignore device dark mode. */
+ color-scheme:light;
  --bw-green:#053d36;--bw-red:#cf3a2c;--bw-yellow:#FBB040;
  --bw-bg:#FDFBF6;--bw-soft:#FCF0DA;--bw-ink:#1c1c1c;
  --bw-muted:#6d6d6d;--bw-line:#e6e0d3;--bw-link:#053d36;
@@ -272,6 +274,11 @@ body{background:var(--bw-bg);color:var(--bw-ink);font-family:var(--bw-sans)}
  .bw-grid-four>.bw-card:nth-child(even){padding-right:0}
 }
 @media(max-width:760px){
+ /* Phone only: homepage lead area stays light even when the device uses dark mode.
+    A future site-controlled dark theme can set --bw-mobile-lead-title-color. */
+ .bw-home .bw-lead-band .bw-card-title{
+   color:var(--bw-mobile-lead-title-color,#192820);
+ }
  body{padding-bottom:57px}
  .bw-bottom-nav{display:grid;grid-template-columns:repeat(4,1fr);position:fixed;left:0;right:0;bottom:0;z-index:49;background:var(--bw-green);box-shadow:0 -2px 10px #0003;padding-bottom:env(safe-area-inset-bottom,0px)}
  .bw-bottom-nav>a,.bw-bottom-nav>button{display:grid;justify-items:center;align-content:center;gap:0;background:none;border:0;color:#fff;min-height:54px;padding:6px 0;font:500 12px var(--bw-serif);text-decoration:none;cursor:pointer}
@@ -290,6 +297,9 @@ body{background:var(--bw-bg);color:var(--bw-ink);font-family:var(--bw-sans)}
  .bw-lead-short{grid-template-columns:1fr;gap:13px}
  .bw-lead-short>.bw-card{border:0!important;padding:0!important}
  .bw-latest-list{display:block}
+ /* Phone-only: latest news category labels keep Bengal Wave red; titles stay unchanged. */
+ .bw-home .bw-lead-band .bw-hero-latest .bw-card-latest .bw-tag{color:var(--bw-red)}
+ .bw-home .bw-lead-band .bw-hero-latest .bw-card-latest .bw-tag::before{content:none}
  .bw-hero-label{margin-bottom:13px}
  .bw-card-lead .bw-card-title{font-size:27px}
  .bw-hero-middle .bw-card-title{font-size:21px}
@@ -318,16 +328,6 @@ body{background:var(--bw-bg);color:var(--bw-ink);font-family:var(--bw-sans)}
  .bw-preview-notice>.bw-wrap>span:last-child{flex-basis:100%;padding-left:16px}
  .bw-listing-grid{grid-template-columns:1fr}
  .bw-search-form>div{flex-direction:column}
-}
-@media(prefers-color-scheme:dark){
- :root{--bw-bg:#0d1914;--bw-soft:#12261e;--bw-ink:#eaf0ec;--bw-muted:#a4b6ac;--bw-line:#ffffff23;--bw-link:#7fd1b5}
- .bw-selected-box{border-color:#ffffff23}
- .bw-feature-panel{background:#F4D361;color:#16231e}
- .bw-feature-panel .bw-card-meta,.bw-feature-panel .bw-card-summary{color:#5b4a14}
- .bw-feature-panel .bw-card-link:hover .bw-card-title{color:#053d36}
- .bw-hero,.bw-section{color:var(--bw-ink)}
- .bw-nav-scroll a{color:#053d36}
- .bw-empty{color:#c9d6d0}
 }
 @media(prefers-reduced-motion:reduce){.bw-website *, .bw-drawer,.bw-nav-scroll a,.bw-brand img{animation:none!important;transition:none!important}}
 
