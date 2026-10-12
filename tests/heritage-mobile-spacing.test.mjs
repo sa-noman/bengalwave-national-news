@@ -12,7 +12,7 @@ test("four story cards align in two columns using compact content-height rows",(
  assert.match(phone,/@media\(max-width:760px\)\{/);
  assert.match(phone,/grid-auto-rows:auto;/);
  assert.match(phone,/row-gap:18px;/);
- assert.match(phone,/\.bw-heritage \.bw-heritage-topic:nth-child\(n\+3\)\{[\s\S]*?border-top:1px solid var\(--hb-ln\);[\s\S]*?padding-top:10px;/);
+ assert.match(phone,/\.bw-heritage \.bw-heritage-topic:nth-child\(n\+3\)\{[\s\S]*?border-top:1px solid var\(--hb-ln\);[\s\S]*?padding-top:18px;/);
  assert.match(phone,/display:flex;\s*flex-direction:column;/);
  assert.match(phone,/min-height:0;/);
  assert.match(phone,/\.bw-heritage-icon\{\s*flex:0 0 44px/);
