@@ -21,6 +21,12 @@ test("four story cards align in two columns using compact content-height rows",(
  assert.doesNotMatch(phone,/grid-template-rows:46px/);
 });
 
+test("lower-right divider stops short of the horizontal rule without shifting icons",()=>{
+ assert.match(phone,/\.bw-heritage \.bw-heritage-topic:nth-child\(4\)\{\s*position:relative;\s*border-left:0;/);
+ assert.match(phone,/\.bw-heritage \.bw-heritage-topic:nth-child\(4\)::before\{[\s\S]*?top:12px;[\s\S]*?bottom:0;[\s\S]*?width:1px;[\s\S]*?background:var\(--hb-ln\);/);
+ assert.match(phone,/\.bw-heritage \.bw-heritage-topic:nth-child\(n\+3\)\{[\s\S]*?padding-top:18px;/);
+});
+
 test("footer's 29px wave has sufficient clearance below every read link",()=>{
  assert.match(phone,/\.bw-heritage\{padding:27px 18px 48px\}/);
  assert.match(phone,/\.bw-heritage-read\{[\s\S]*?min-height:18px;/);
