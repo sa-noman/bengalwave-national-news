@@ -48,7 +48,6 @@ export default async function Home(){
   <>
    <section className="bw-lead-band"><div className="bw-wrap bw-hero">
     <div className="bw-hero-lead">
-      <div className="bw-hero-label">প্রধান প্রতিবেদন / ০১</div>
       <NewsCard item={lead} variant="lead"/>
       <div className="bw-lead-short">{rest.slice(0,2).map(item=><NewsCard key={item.id} item={item} variant="text"/>)}</div>
     </div>
