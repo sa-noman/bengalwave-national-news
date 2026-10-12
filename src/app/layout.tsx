@@ -1,6 +1,7 @@
 import type {Metadata,Viewport} from "next";
 import {SiteHeader} from "@/components/site-header";
 import {SiteFooter} from "@/components/site-footer";
+import {GoogleAnalytics} from "@/components/google-analytics";
 import "./globals.css";
 import "./newsroom.css";
 import "./typography.css";
@@ -13,5 +14,5 @@ export const metadata:Metadata={
 };
 export const viewport:Viewport={width:"device-width",initialScale:1,themeColor:"#053d36"};
 export default function RootLayout({children}:Readonly<{children:React.ReactNode}>){
- return <html lang="bn"><body><SiteHeader/>{children}<SiteFooter/></body></html>;
+ return <html lang="bn"><body><SiteHeader/>{children}<SiteFooter/><GoogleAnalytics/></body></html>;
 }
