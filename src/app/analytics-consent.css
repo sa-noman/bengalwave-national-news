@@ -12,7 +12,7 @@
 .bw-analytics-consent-actions{display:flex;gap:8px;justify-content:flex-end}
 .bw-analytics-consent-actions button,.bw-analytics-preferences-button{
  border:1px solid #053d36;border-radius:6px;padding:6px 12px;
- background:transparent;color:#053d36;font:600 12px/1.6 inherit;
+ background:transparent;color:#053d36;font-family:inherit;font-weight:600;font-size:12px;line-height:1.6;
  cursor:pointer;
 }
 .bw-analytics-consent-actions button:last-child{background:#053d36;color:#fff}
