@@ -359,7 +359,7 @@
      Both icons begin on exactly the same baseline. */
   .bw-heritage .bw-heritage-topic:nth-child(n+3){
     border-top:1px solid var(--hb-ln);
-    padding-top:10px;
+    padding-top:18px;
   }
   .bw-heritage-icon{
     flex:0 0 44px;
