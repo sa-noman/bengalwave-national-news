@@ -1,5 +1,8 @@
 import type {Metadata,Viewport} from "next";
-import {Noto_Serif_Bengali} from "next/font/google";
+import "@fontsource/noto-serif-bengali/400.css";
+import "@fontsource/noto-serif-bengali/500.css";
+import "@fontsource/noto-serif-bengali/600.css";
+import "@fontsource/noto-serif-bengali/700.css";
 import {SiteHeader} from "@/components/site-header";
 import {SiteFooter} from "@/components/site-footer";
 import {GoogleAnalytics} from "@/components/google-analytics";
@@ -9,7 +12,6 @@ import "./typography.css";
 import "./header-calendar.css";
 import "./heritage-stories.css";
 import "./dark-theme.css";
-const bengaliFont=Noto_Serif_Bengali({subsets:["bengali","latin"],weight:["400","500","600","700"],display:"swap",variable:"--bw-local-font"});
 export const metadata:Metadata={
  title:{default:"Bengal Wave | বাংলা নিউজ",template:"%s | Bengal Wave"},
  description:"Bengal Wave | ইতিহাস, সংবাদ ও সংস্কৃতির প্রতিচ্ছবি",
