@@ -40,5 +40,7 @@ test("prototype typography and carousel cards remain present",()=>{
 test("news routing and published-only data constraints remain intact",()=>{
  assert.match(read("src/components/news-card.tsx"),/const href="\/news\/"/);
  assert.match(read("src/lib/news-feed.ts"),/\.eq\("status","published"\)/);
- assert.match(read("src/app/robots.ts"),/disallow:"\/"/);
+ const robots=read("src/app/robots.ts");
+ assert.match(robots,/disallow: "\/"/);
+ assert.match(robots,/allow: "\/"/);
 });

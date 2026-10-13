@@ -22,11 +22,15 @@ test("draft creation enforces author and cannot directly publish",()=>{
  assert.match(a,/existing\.status==="approved"/);
  assert.match(a,/revalidatePath\("\/"\)/);
 });
-test("published-only query and indexing disabled until launch",()=>{
+test("published-only queries and production-only indexing",()=>{
  const publicCode=read("src/lib/news-feed.ts");
  assert.match(publicCode,/\.eq\("status","published"\)/);
  assert.match(publicCode,/\.lte\("published_at"/);
- assert.match(read("src/app/robots.ts"),/disallow:"\/"/);
+ const robots=read("src/app/robots.ts");
+ assert.match(robots,/VERCEL_ENV !== "production"/);
+ assert.match(robots,/disallow: "\/"/);
+ assert.match(robots,/allow: "\/"/);
+ assert.match(read("src/app/layout.tsx"),/robots:\{index:process\.env\.VERCEL_ENV==="production"/);
 });
 test("Supabase config uses a publishable key and no service-role key",()=>{
  const config=read("src/lib/supabase/config.ts");
