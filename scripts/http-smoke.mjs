@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 const base=process.env.SMOKE_BASE_URL||"http://127.0.0.1:3100";
+const mode=process.env.SMOKE_MODE||"preview";
 async function get(path){
  let last;
  for(let i=0;i<40;i++){
@@ -19,8 +20,14 @@ for(const header of ["content-security-policy","strict-transport-security","x-co
 const csp=homepage.response.headers.get("content-security-policy")||"";
 assert.ok(csp.includes("frame-ancestors 'none'"),"iframe protection");
 assert.ok(csp.includes("font-src 'self'"),"self hosted fonts allowed");
-assert.match(homepage.text,/<meta name="robots" content="noindex, nofollow"/i);
-console.log("PASS /: 200, preview noindex and required security response headers");
+if(mode==="production"){
+ assert.match(homepage.text,/<meta name="robots" content="index, follow"/i);
+ assert.doesNotMatch(homepage.text,/<meta name="robots" content="noindex/i);
+ console.log("PASS /: 200, production index/follow and required security response headers");
+}else{
+ assert.match(homepage.text,/<meta name="robots" content="noindex, nofollow"/i);
+ console.log("PASS /: 200, preview noindex and required security response headers");
+}
 
 const robots=await get("/robots.txt");
 ok(robots.response.status,200,"/robots.txt");
