@@ -16,3 +16,9 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      - name: Local HTTP smoke checks (preview mode)
+        run: |
+          VERCEL_ENV=preview npm run start -- -p 3100 > /tmp/bengalwave-smoke.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          node scripts/http-smoke.mjs
