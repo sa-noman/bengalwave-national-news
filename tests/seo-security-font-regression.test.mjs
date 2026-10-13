@@ -65,3 +65,13 @@ test("rate limiting RPC requires a server-only secret and retires unguarded RPC"
  assert.match(sql,/p_secret text/);
  assert.doesNotMatch(read("src/app/admin/login/page.tsx"),/EDITOR_LOGIN_RATE_LIMIT_SECRET/);
 });
+
+test("heritage section preserves Hind Siliguri without remote Google Fonts CSS",()=>{
+ const css=read("src/app/heritage-stories.css");
+ const layout=read("src/app/layout.tsx");
+ assert.doesNotMatch(css,/@import\s+url\(["']?https:\/\/fonts\.googleapis\.com/);
+ assert.match(css,/"Hind Siliguri"/);
+ for(const weight of [400,500,700]){
+   assert.ok(layout.includes("@fontsource/hind-siliguri/"+weight+".css"),"Missing locally bundled Hind Siliguri "+weight);
+ }
+});
