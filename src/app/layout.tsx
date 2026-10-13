@@ -7,6 +7,7 @@ import {SiteHeader} from "@/components/site-header";
 import {SiteFooter} from "@/components/site-footer";
 import {GoogleAnalytics} from "@/components/google-analytics";
 import "./globals.css";
+import "./font-local.css";
 import "./newsroom.css";
 import "./typography.css";
 import "./header-calendar.css";
