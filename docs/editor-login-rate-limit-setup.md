@@ -1,58 +1,56 @@
-# Editorial login throttling deployment checklist
+# BengalWave editor authentication rollout checks
 
-This is security-sensitive configuration, not a UI change.
+## Configuration completed
 
-## Current architecture
+- The current sign-in action requires a server-only Vercel environment variable
+  `EDITOR_LOGIN_RATE_LIMIT_SECRET` (Preview / Production / Development).
+- A matching **SHA-256 digest** of that value has now been provisioned into
+  `private.editor_login_rate_limit_guard` using the Vercel integration and
+  Supabase SQL tool. The secret itself was **not** copied to GitHub, chat,
+  logs or a client bundle.
+- The guard table is private (anonymous and authenticated roles cannot
+  SELECT it), and the old unguarded two-argument RPC has been removed.
+- The secured three-argument RPC rejects missing or incorrect secrets without
+  incrementing the account/IP attempt counters.
+- Limits: 8 sign-in attempts per account key or 20 per IP key per 15 minutes.
 
-- POST/Next Server Action for editor sign-in calls the three-argument
-  `public.check_editor_login_rate_limit(ip_hash, account_hash, secret)` RPC.
-- The RPC performs an atomic 15-minute count: 8 requests per account key or
-  20 per IP key. Invalid or missing capability secrets receive `false`.
-- The previous unguarded two-argument RPC was removed from Supabase.
-- The secret is stored **only** as Vercel encrypted server environment variable
-  `EDITOR_LOGIN_RATE_LIMIT_SECRET` and its SHA-256 digest in
-  `private.editor_login_rate_limit_guard`. Never commit the value to GitHub.
+## Passing checks
 
-## REQUIRED before releasing PR #20
+- CI TypeScript checks, unit tests, Next.js builds and local HTTP smoke tests
+  for both Preview and Production.
+- Preview denies crawlers while Production offers public sitemap/robots.
+- Security response headers validated locally in the Next.js HTTP runtime.
+- Headless Chromium baseline-vs-candidate Desktop/Mobile layout comparisons.
+- Supabase function/grant/guard configuration verified.
 
-The private guard must be provisioned so that the Vercel capability and
-the digest in Supabase are the same. If the guard has no row (or the values
-do not match), all editor login attempts return the existing limited error
-and sign-in cannot succeed. This is intentional fail-closed behavior.
+## Remaining release blockers
 
-One-time setup by a trusted project administrator (do not send the secret
-through ChatGPT or store it in GitHub):
+1. **Protected Vercel Preview E2E:** The installed integration can list the
+   Deployment but receives HTTP 403 on the deployment protection bypass,
+   runtime logs and share-link management under the Team scope. A Project
+   owner must authorize the integration's Team scope or provide a temporary
+   Vercel share link through an approved secure channel.
+2. **Real editor login/session renewal:** No password, MFA or active editor
+   session is available to the test runner, and it must not guess or reset
+   anyone's credentials. The end-to-end test requires an explicitly authorized
+   dedicated temporary CMS test user and a secure credential-delivery method.
 
-1. Open Vercel Project > Settings > Environment Variables. Confirm
-   `EDITOR_LOGIN_RATE_LIMIT_SECRET` exists for Production and Preview.
-2. Safely retrieve the secret through an approved secrets-management method.
-3. In a controlled privileged Supabase SQL session, provision ONLY the digest.
-   The following SQL is a TEMPLATE; replace the placeholder locally and do
-   not save its plaintext version in public logs or the repository:
+Never copy an Editor password, share bypass secret or server-side rate-limit
+secret into a public GitHub commit or a chat message.
 
-   ```sql
-   insert into private.editor_login_rate_limit_guard(id, secret_digest)
-   values (1, encode(sha256(convert_to('<private secret>', 'UTF8')), 'hex'))
-   on conflict(id) do update set secret_digest=excluded.secret_digest;
-   ```
+### Safe end-to-end checklist
 
-4. Redeploy the Preview (so the server runtime inherits the new variable).
-5. Use an approved temporary editor account to test successful login, session
-   renewal, denied access for unauthorized roles, logout, and 429/limited
-   behavior. Remove the temporary account after tests.
-6. Do not merge until the full authenticated smoke test and Vercel-hosted
-   security header verification have succeeded.
+- With an approved throwaway staff test account on a protected preview, log in
+  with valid credentials; expect /admin and a secure session.
+- Navigate between protected pages; allow the access token to refresh and
+  verify the session persists.
+- Log out; /admin must redirect to /admin/login.
+- Verify wrong passwords, disabled profiles, invalid roles, and attempt
+  throttling; delete the test account and clean up test counters.
+- Verify response CSP/HSTS/nosniff at the actual Vercel CDN edge using a
+  temporally scoped protected Preview access grant.
 
-## Verified automatically
+## Deployment
 
-The GitHub CI builds Preview and Production mode, checks SEO and headers via
-locally started Next.js HTTP server, and runs browser comparisons against main.
-The SQL RPC rejects untrusted secrets, and old unguarded signature is absent.
-
-## Remaining safeguards
-
-- The public RPC still costs a small amount of database work per invalid
-  attempt. Consider additional edge-level abuse controls for excessive calls.
-- The Vercel Preview is behind Vercel Authentication. If the connector lacks
-  protected-deployment scope, project owners can grant suitable read access
-  or use a time-limited Vercel Share link without disabling protection.
+The branch is intentionally a **Draft PR**. Do not merge it into main before
+the remaining live session and Vercel edge tests have passed.
