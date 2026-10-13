@@ -331,6 +331,86 @@
   }
 }
 
+/* Phone-only: compact, evenly aligned two-column heritage grid.
+ * Keep the footer's original wave, and reserve space for its 29px overlay.
+ * Content determines row height; never clip or overlap the read links. */
+@media(max-width:760px){
+  .bw-heritage{padding:27px 18px 48px}
+  .bw-heritage-intro{padding-bottom:12px}
+  .bw-heritage .bw-heritage-intro h2{
+    font-size:2.12em;
+    line-height:1.12;
+    margin:.14em 0 .22em;
+  }
+  .bw-heritage-topics{
+    grid-auto-rows:auto;
+    row-gap:18px;
+    align-items:stretch;
+  }
+  .bw-heritage .bw-heritage-topic{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    height:100%;
+    min-height:0;
+    padding-bottom:0;
+  }
+  /* Separate the lower pair by a subtle rule and matched top padding.
+     Both icons begin on exactly the same baseline. */
+  .bw-heritage .bw-heritage-topic:nth-child(n+3){
+    border-top:1px solid var(--hb-ln);
+    padding-top:18px;
+  }
+  /* Start the lower-right vertical divider slightly below the horizontal
+     rule, matching the small gap above it in the first row. Keep card 4's
+     padding, icon baseline and link position unchanged. */
+  .bw-heritage .bw-heritage-topic:nth-child(4){
+    position:relative;
+    border-left:0;
+  }
+  .bw-heritage .bw-heritage-topic:nth-child(4)::before{
+    content:"";
+    position:absolute;
+    left:0;
+    top:12px;
+    bottom:0;
+    width:1px;
+    background:var(--hb-ln);
+    pointer-events:none;
+  }
+  .bw-heritage-icon{
+    flex:0 0 44px;
+    height:44px;
+  }
+  .bw-heritage-icon>svg{height:44px}
+  .bw-website .bw-heritage .bw-heritage-topic h3{
+    min-height:34px;
+    font-size:.99em;
+    line-height:1.25;
+    margin:0;
+  }
+  .bw-heritage .bw-heritage-topic p{
+    margin:0;
+    flex:1 1 auto;
+  }
+  .bw-heritage-read{
+    flex:none;
+    align-self:flex-start;
+    margin-top:8px;
+    min-height:18px;
+    line-height:1.3;
+  }
+}
+@media(max-width:360px){
+  /* Give wrapped titles the same two/three-line space in both columns. */
+  .bw-website .bw-heritage .bw-heritage-topic h3{
+    min-height:45px;
+    font-size:.94em;
+    line-height:1.2;
+  }
+  .bw-heritage .bw-heritage-intro h2{font-size:2.04em}
+}
+
 @media(prefers-reduced-motion:reduce){
   .bw-heritage-arrow{transition:none}
 }
