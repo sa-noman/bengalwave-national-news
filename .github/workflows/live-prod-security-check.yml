@@ -1,0 +1,18 @@
+name: Check live production security headers
+on:
+  push:
+    branches: ["test/live-headers-and-session-expiry-20261013"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live-headers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test actual public production HTTP responses (no credentials)
+        run: node scripts/check-live-security-headers.mjs
