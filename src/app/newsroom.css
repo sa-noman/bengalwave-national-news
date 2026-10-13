@@ -4,8 +4,8 @@
  --bw-green:#053d36;--bw-red:#cf3a2c;--bw-yellow:#FBB040;
  --bw-bg:#FDFBF6;--bw-soft:#FCF0DA;--bw-ink:#1c1c1c;
  --bw-muted:#6d6d6d;--bw-line:#e6e0d3;--bw-link:#053d36;
- --bw-dark:#06231b;--bw-serif:"Noto Serif Bengali",serif;
- --bw-sans:"Noto Serif Bengali",serif;
+ --bw-dark:#06231b;--bw-serif:var(--bw-local-font),"Noto Serif Bengali",serif;
+ --bw-sans:var(--bw-local-font),"Noto Serif Bengali",serif;
 }
 body{background:var(--bw-bg);color:var(--bw-ink);font-family:var(--bw-sans)}
 .bw-wrap{width:min(1180px,calc(100% - 32px));margin-inline:auto}
