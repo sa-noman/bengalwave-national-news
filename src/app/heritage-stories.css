@@ -200,9 +200,9 @@
 /* Desktop-only spacing adjustment: lift the subtitle and "পড়ুন" links,
    reduce only the circular arrows; preserve the 260px strip, artwork and wave. */
 @media (min-width:1001px){
-  /* Remove the old 35px white gap above the gold panel. Extend only upward:
-     260px + 35px = 295px, so the lower wave stays at the exact same Y. */
-  .bw-heritage{margin-top:0;height:295px}
+  /* Preserve the original rendered 35px desktop separation from the prior
+     deployment. Bundling Hind Siliguri locally must not move the footer. */
+  .bw-heritage{margin-top:35px;height:295px}
   /* Keep the river/village illustration's original scale and bottom position. */
   .bw-heritage-art{height:260px}
   /* Keep all copy safely above the untouched golden wave/green footer edge. */
