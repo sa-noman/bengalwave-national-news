@@ -36,6 +36,8 @@ test("editorial authentication uses a shared database-backed throttle",()=>{
  const auth=read("src/app/admin/login/actions.ts");
  assert.match(auth,/check_editor_login_rate_limit/);
  assert.match(auth,/limitError \|\| allowed!==true/);
+ assert.match(auth,/p_secret:attestation/);
+ assert.match(auth,/EDITOR_LOGIN_RATE_LIMIT_SECRET/);
  assert.match(auth,/signInWithPassword/);
  assert.doesNotMatch(auth,/console\.log\(password\)/);
  const sql=read("supabase/migrations/202610130001_editor_login_rate_limit.sql");
@@ -52,4 +54,14 @@ test("self-hosted Bengali font is used without runtime Google CSS import",()=>{
  assert.ok(read("src/app/font-local.css").includes("--bw-local-font"));
  assert.match(css,/var\(--bw-local-font\)/);
  assert.match(read("src/app/newsroom.css"),/--bw-serif:var\(--bw-local-font\)/);
+});
+
+test("rate limiting RPC requires a server-only secret and retires unguarded RPC",()=>{
+ const sql=read("supabase/migrations/202610130002_secure_editor_login_rate_limit.sql");
+ assert.match(sql,/secret_digest/);
+ assert.match(sql,/security definer/);
+ assert.match(sql,/drop function if exists public\.check_editor_login_rate_limit\(text,text\)/);
+ assert.match(sql,/revoke all on private\.editor_login_rate_limit_guard/);
+ assert.match(sql,/p_secret text/);
+ assert.doesNotMatch(read("src/app/admin/login/page.tsx"),/EDITOR_LOGIN_RATE_LIMIT_SECRET/);
 });
