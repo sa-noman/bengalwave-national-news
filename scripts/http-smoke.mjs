@@ -31,12 +31,23 @@ if(mode==="production"){
 
 const robots=await get("/robots.txt");
 ok(robots.response.status,200,"/robots.txt");
-assert.match(robots.text,/Disallow: \//);
-console.log("PASS /robots.txt: preview blocked");
 const sitemap=await get("/sitemap.xml");
 ok(sitemap.response.status,200,"/sitemap.xml");
-assert.doesNotMatch(sitemap.text,/<loc>https:\/\/bengalwave\.news\/news\//);
-console.log("PASS /sitemap.xml: no preview/sample article URLs");
+if(mode==="production"){
+ assert.match(robots.text,/^Allow: \/$/m);
+ assert.doesNotMatch(robots.text,/^Disallow: \/$/m);
+ assert.match(robots.text,/^Disallow: \/admin\//m);
+ assert.match(robots.text,/^Sitemap: https:\/\/bengalwave.news\/sitemap.xml$/m);
+ console.log("PASS /robots.txt: production public crawl allowed and admin excluded");
+ assert.match(sitemap.text,/<loc>https:\/\/bengalwave.news\/?<\/loc>/);
+ assert.match(sitemap.text,/category\/national/);
+ console.log("PASS /sitemap.xml: production homepage and categories present");
+}else{
+ assert.match(robots.text,/^Disallow: \/$/m);
+ console.log("PASS /robots.txt: preview blocked");
+ assert.doesNotMatch(sitemap.text,/<loc>https:\/\/bengalwave.news\/news\//);
+ console.log("PASS /sitemap.xml: preview stories excluded");
+}
 const login=await get("/admin/login");
 ok(login.response.status,200,"/admin/login");
 assert.match(login.text,/noindex/);
