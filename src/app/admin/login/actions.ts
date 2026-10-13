@@ -10,6 +10,10 @@ export async function signIn(formData:FormData) {
   const email=String(formData.get("email")||"").trim();
   const password=String(formData.get("password")||"");
   if(!email || !password) redirect("/admin/login?error=credentials");
+  const attestation=process.env.EDITOR_LOGIN_RATE_LIMIT_SECRET;
+  // Fail closed if the private DB guard and server-only capability are not configured.
+  if(!attestation || !/^[a-f0-9]{64}$/.test(attestation))
+    redirect("/admin/login?error=limited");
   const supabase=await createSupabaseServerClient();
   // Atomic, database-backed counters work across all serverless instances.
   // Hash identifiers before storing them; never store passwords or raw IPs.
@@ -19,6 +23,7 @@ export async function signIn(formData:FormData) {
   const {data:allowed,error:limitError}=await supabase.rpc("check_editor_login_rate_limit",{
     p_ip_key:digest("ip:"+ip),
     p_account_key:digest("account:"+email.toLowerCase()),
+    p_secret:attestation,
   });
   // Fail closed if the migration isn't installed or database is unavailable.
   if(limitError || allowed!==true) redirect("/admin/login?error=limited");
