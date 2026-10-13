@@ -75,3 +75,12 @@ test("heritage section preserves Hind Siliguri without remote Google Fonts CSS",
    assert.ok(layout.includes("@fontsource/hind-siliguri/"+weight+".css"),"Missing locally bundled Hind Siliguri "+weight);
  }
 });
+
+test("CMS middleware is positioned alongside src/app and refreshes sessions",()=>{
+ const middleware=read("src/middleware.ts");
+ assert.match(middleware,/refreshSupabaseSession/);
+ assert.match(middleware,/matcher:\s*\["\/admin\/:path\*"\]/);
+ const session=read("src/lib/supabase/middleware.ts");
+ assert.match(session,/supabase\.auth\.getUser\(\)/);
+ assert.match(session,/NextResponse\.redirect/);
+});
