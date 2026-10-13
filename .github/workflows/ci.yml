@@ -22,3 +22,11 @@ jobs:
           SERVER_PID=$!
           trap 'kill $SERVER_PID || true' EXIT
           node scripts/http-smoke.mjs
+      - name: Production-mode indexing HTTP smoke checks
+        run: |
+          rm -rf .next
+          VERCEL_ENV=production npm run build
+          VERCEL_ENV=production npm run start -- -p 3101 > /tmp/bengalwave-production-smoke.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID || true' EXIT
+          SMOKE_MODE=production SMOKE_BASE_URL=http://127.0.0.1:3101 node scripts/http-smoke.mjs
