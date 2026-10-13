@@ -1,0 +1,38 @@
+name: Temporary editor authentication E2E
+on:
+  push:
+    branches: ["test/editor-session-e2e-20261013"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  editor-auth:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      BW_TEST_EMAIL: abdullah.omar0025@gmail.com
+      BW_TEST_PASSWORD: ${{ secrets.BW_TEST_PASSWORD }}
+      BW_TEST_SITE_URL: https://bengalwave.news
+      BW_SUPABASE_URL: https://lkleykmjphmliqybmwff.supabase.co
+      BW_SUPABASE_PUBLISHABLE_KEY: sb_publishable_8n2AX0exzXwy1bOhsmxFQQ_LHauTFIQ
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate secure test credential availability
+        shell: bash
+        run: |
+          if [ -z "$BW_TEST_PASSWORD" ]; then
+            echo "::error::BW_TEST_PASSWORD is not configured. Add this GitHub Actions repository secret before testing."
+            exit 2
+          fi
+      - name: Install test dependencies
+        run: |
+          npm install --no-audit --no-fund
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Test login, immediate token renewal, logout and CMS access
+        run: node scripts/editor-session-e2e.mjs
