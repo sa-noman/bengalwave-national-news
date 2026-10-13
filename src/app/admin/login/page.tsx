@@ -5,6 +5,7 @@ export const metadata:Metadata={title:"অ্যাডমিন লগইন",ro
 const errors:Record<string,string>={
   setup:"Supabase-এর নিরাপদ Environment Variables এখনো যুক্ত করা হয়নি।",
   credentials:"ইমেইল বা পাসওয়ার্ড সঠিক হয়নি।",
+  limited:"অল্প সময়ে অনেকবার লগইন চেষ্টা হয়েছে। ১৫ মিনিট পর আবার চেষ্টা করুন।",
   access:"আপনার অ্যাকাউন্টে সম্পাদকীয় অনুমতি নেই।",
   invite:"আমন্ত্রণের লিংকটি অবৈধ বা মেয়াদোত্তীর্ণ। নতুন আমন্ত্রণ নিতে হবে।",
 };
