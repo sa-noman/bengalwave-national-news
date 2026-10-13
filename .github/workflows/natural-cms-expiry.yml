@@ -1,0 +1,34 @@
+name: Real natural CMS session expiry test
+on:
+  push:
+    branches: ["test/live-headers-and-session-expiry-20261013"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  natural-expiry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 95
+    env:
+      BW_TEST_PASSWORD: ${{ secrets.BW_TEST_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Confirm temporary test credentials are configured
+        shell: bash
+        run: |
+          if [ -z "$BW_TEST_PASSWORD" ]; then
+            echo "::error::Missing BW_TEST_PASSWORD secret."
+            exit 2
+          fi
+      - name: Install browser test runtime
+        run: |
+          npm install --no-audit --no-fund
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Test live CMS after natural access-token expiry
+        run: node scripts/natural-cms-expiry-e2e.mjs
