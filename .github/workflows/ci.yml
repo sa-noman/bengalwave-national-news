@@ -30,3 +30,42 @@ jobs:
           SERVER_PID=$!
           trap 'kill $SERVER_PID || true' EXIT
           SMOKE_MODE=production SMOKE_BASE_URL=http://127.0.0.1:3101 node scripts/http-smoke.mjs
+
+  visual_regression:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install browser tooling
+        run: |
+          npm install --no-audit --no-fund
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Build baseline main branch
+        run: |
+          git worktree add /tmp/bw-ui-baseline "${{ github.event.pull_request.base.sha }}"
+          cd /tmp/bw-ui-baseline
+          npm install --no-audit --no-fund
+          VERCEL_ENV=preview npm run build
+      - name: Build PR version
+        run: VERCEL_ENV=preview npm run build
+      - name: Compare desktop and mobile layouts
+        run: |
+          (cd /tmp/bw-ui-baseline && VERCEL_ENV=preview npm run start -- -p 3200) > /tmp/bw-base.log 2>&1 &
+          BASE_PID=$!
+          VERCEL_ENV=preview npm run start -- -p 3201 > /tmp/bw-candidate.log 2>&1 &
+          CANDIDATE_PID=$!
+          trap 'kill $BASE_PID $CANDIDATE_PID || true' EXIT
+          sleep 8
+          node scripts/visual-compare.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ui-before-after-screenshots
+          path: visual-artifacts/*.png
+          retention-days: 7
