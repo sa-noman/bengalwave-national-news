@@ -47,7 +47,7 @@ test("self-hosted Bengali font is used without runtime Google CSS import",()=>{
  const css=read("src/app/globals.css");
  const layout=read("src/app/layout.tsx");
  assert.doesNotMatch(css,/@import\s+url\(["']?https:\/\/fonts\.googleapis\.com/);
- assert.match(layout,/Noto_Serif_Bengali/);
+ assert.ok(layout.includes("@fontsource/noto-serif-bengali/400.css"));
  assert.match(layout,/display:"swap",variable:"--bw-local-font"/);
  assert.match(css,/var\(--bw-local-font\)/);
  assert.match(read("src/app/newsroom.css"),/--bw-serif:var\(--bw-local-font\)/);
