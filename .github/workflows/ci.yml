@@ -63,6 +63,7 @@ jobs:
           trap 'kill $BASE_PID $CANDIDATE_PID || true' EXIT
           sleep 8
           node scripts/visual-compare.mjs
+          BROWSER_SMOKE_URL=http://127.0.0.1:3201 node scripts/browser-security-check.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
