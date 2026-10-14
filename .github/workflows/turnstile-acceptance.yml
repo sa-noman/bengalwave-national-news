@@ -1,0 +1,45 @@
+name: Turnstile login and MFA acceptance
+on:
+  push:
+    branches: [security/turnstile-login-20261014]
+permissions:
+  contents: read
+jobs:
+  turnstile-acceptance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Install locked application and browser tooling
+        run: |
+          npm ci --no-audit --no-fund
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Prepare disposable provider CAPTCHA, MFA and email service
+        run: node scripts/isolated-security/prepare-turnstile.mjs
+      - name: Start isolated services without hosted credentials
+        working-directory: ${{ env.BW_ISOLATED_ROOT }}
+        run: |
+          umask 077
+          npx --yes supabase@2.54.11 start -x studio,imgproxy,edge-runtime,logflare,vector,supavisor > start.log 2>&1
+          npx --yes supabase@2.54.11 status -o json > status.json
+      - name: Verify relevant CAPTCHA failure cases
+        run: node --test tests/turnstile-behavior.test.mjs
+      - name: Verify real Cloudflare test fixtures, Admin Login, MFA and recovery
+        run: node scripts/isolated-security/turnstile-acceptance.mjs
+      - name: Sanitized acceptance results only
+        if: success()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: turnstile-acceptance-results
+          path: ${{ env.BW_CAPTCHA_RESULTS }}
+          retention-days: 7
+      - name: Stop disposable services
+        if: always()
+        working-directory: ${{ env.BW_ISOLATED_ROOT }}
+        run: npx --yes supabase@2.54.11 stop --no-backup > /dev/null 2>&1 || true
