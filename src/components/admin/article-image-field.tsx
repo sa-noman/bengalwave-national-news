@@ -81,7 +81,7 @@ export function ArticleImageField({
             }}
           />
         </label>
-        <p className="admin-image-hint">JPG, PNG, WebP, AVIF · সর্বোচ্চ ৪ MB · ন্যূনতম 640 × 360 (অথবা 360 × 640) পিক্সেল</p>
+        <p className="admin-image-hint">JPG, PNG, WebP, AVIF · সর্বোচ্চ ৪ MB · ছোট-বড় সব রেজল্যুশনের বৈধ ছবি গ্রহণযোগ্য। ওয়েবসাইটে ছবির ফ্রেমের সাইজ অপরিবর্তিত থাকবে।</p>
         {file && <p className="admin-image-selected">নির্বাচিত: {file.name} ({(file.size/1048576).toFixed(1)} MB)</p>}
         {error&&<p className="admin-alert" role="alert">{error}</p>}
         {hasCurrentImage&&<label className="admin-image-remove">

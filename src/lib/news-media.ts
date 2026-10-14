@@ -30,7 +30,7 @@ export async function uploadNewsImage(
 ):Promise<NewsMediaResult>{
   if(!isMediaUploadEnabled())return {ok:false,error:"not_ready"};
   if(file.size>MAX_IMAGE_BYTES)return {ok:false,error:"too_large"};
-  if(file.size<100 || !["image/jpeg","image/png","image/webp","image/avif"].includes(file.type))
+  if(file.size===0 || !["image/jpeg","image/png","image/webp","image/avif"].includes(file.type))
     return {ok:false,error:"invalid_file"};
 
   let storage;
@@ -46,9 +46,12 @@ export async function uploadNewsImage(
     const expectedFormats:Record<string,string>={
       "image/jpeg":"jpeg","image/png":"png","image/webp":"webp","image/avif":"heif"
     };
+    // Any valid image resolution is accepted, even below 640 x 360.
+    // Keep file decoding, frame count and 25 MP safety limits. The website's
+    // existing fixed-aspect-ratio frames control how each photo is displayed.
     if((file.type==="image/avif"? !["heif","avif"].includes(info.format):info.format!==expectedFormats[file.type]) || (info.pages||1)!==1 ||
-       Math.max(info.width||0,info.height||0)<640 || Math.min(info.width||0,info.height||0)<360 ||
-       (info.width||0)*(info.height||0)>25000000)
+       !info.width || !info.height ||
+       info.width*info.height>25000000)
       return {ok:false,error:"invalid_image"};
     // Two COMPLETE WebP files, stripping EXIF and never enlarging the source.
     full=await sharp(bytes,{failOn:"error",limitInputPixels:25000000})

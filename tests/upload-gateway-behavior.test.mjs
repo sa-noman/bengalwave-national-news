@@ -69,14 +69,24 @@ test('actual file bytes are checked and only valid re-encoded WebP reaches stora
   try{
     const png=await sharp({create:{width:800,height:600,channels:3,background:'#00ff00'}}).png().toBuffer();
     const tiny=await sharp({create:{width:64,height:64,channels:3,background:'#00ff00'}}).png().toBuffer();
-    for(const file of [new File([png],'fake.jpg',{type:'image/jpeg'}),new File(['<svg>'+ 'x'.repeat(200)+'</svg>'],'fake.png',{type:'image/png'}),new File([tiny],'tiny.png',{type:'image/png'}),new File([Buffer.alloc(4*1024*1024+1)],'big.png',{type:'image/png'})]){
+    for(const file of [new File([png],'fake.jpg',{type:'image/jpeg'}),new File(['<svg>'+ 'x'.repeat(200)+'</svg>'],'fake.png',{type:'image/png'}),new File([Buffer.alloc(4*1024*1024+1)],'big.png',{type:'image/png'})]){
       assert.equal((await uploadNewsImage(file,fields,userId,scoped)).ok,false);
     }
     assert.equal(uploads.length,0);
+    // Small but complete news photos are now accepted. Keep their source
+    // pixels; the existing CSS controls how they appear in article frames.
+    assert.deepEqual(await uploadNewsImage(new File([tiny],'tiny.png',{type:'image/png'}),fields,userId,scoped),{ok:true,mediaId:'media-id'});
+    assert.equal(uploads.length,2);
+    for(const output of uploads){
+      const info=await sharp(output.data).metadata();
+      assert.equal(info.format,'webp');
+      assert.equal(info.width,64);
+      assert.equal(info.height,64);
+    }
     const file=new File([png],'valid.png',{type:'image/png'});
     assert.deepEqual(await uploadNewsImage(file,fields,userId,scoped),{ok:true,mediaId:'media-id'});
-    assert.equal(uploads.length,2);
-    for(const upload of uploads){assert.equal((await sharp(upload.data).metadata()).format,'webp');assert.match(upload.path,/^00000000-0000-0000-0000-000000000001\/[a-f0-9-]{36}\/(full|thumb)\.webp$/);}
+    assert.equal(uploads.length,4);
+    for(const output of uploads){assert.equal((await sharp(output.data).metadata()).format,'webp');assert.match(output.path,/^00000000-0000-0000-0000-000000000001\/[a-f0-9-]{36}\/(full|thumb)\.webp$/);}
     metadataFails=true;
     assert.deepEqual(await uploadNewsImage(file,fields,userId,scoped),{ok:false,error:'metadata'});
     assert.equal(removals.length,1);assert.equal(removals[0].length,2);
