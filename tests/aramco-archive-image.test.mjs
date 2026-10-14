@@ -8,13 +8,13 @@ const image=readFileSync("src/components/news-image.tsx","utf8");
 
 test("Aramco report uses a public-domain headquarters archive photograph",()=>{
  assert.match(feed,/houthi-missile-strike-saudi-aramco-hq-dhahran-oct-2026/);
- assert.match(feed,/https:\/\/upload\.wikimedia\.org\/wikipedia\/commons\/7\/7e\/AramcoCoreArea\.jpg/);
+ assert.ok(feed.includes("https://upload.wikimedia.org/wikipedia/commons/7/7e/AramcoCoreArea.jpg"));
  assert.match(feed,/ফাইল ছবি, হামলার দৃশ্য নয়/);
  assert.match(feed,/Eagleamn \/ Wikimedia Commons/);
 });
 
 test("production image policy narrowly allows Wikimedia Commons while keeping other CSP rules",()=>{
- assert.match(middleware,/"img-src 'self' data: blob: "\+supabaseOrigin\+" https:\/\/upload\.wikimedia\.org "/);
+ assert.ok(middleware.includes(`? "img-src 'self' data: blob: "+supabaseOrigin+" https://upload.wikimedia.org "+analyticsOrigins`));
  assert.match(middleware,/"default-src 'self'"/);
  assert.match(middleware,/"object-src 'none'"/);
  assert.match(image,/unoptimized=\{useOriginal \|\| \/\^https:/);
