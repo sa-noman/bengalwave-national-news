@@ -1,0 +1,29 @@
+name: Final production security and image CSP browser check
+on:
+  push:
+    branches: [test/final-production-security-20261014]
+    paths: [.github/workflows/final-live-browser-security-once.yml]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Browser setup
+        run: |
+          npm ci --no-audit --no-fund
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Live CSP, font, theme, search XSS, and anonymous-admin security checks
+        env:
+          BROWSER_SMOKE_URL: https://bengalwave.news
+        run: node scripts/browser-security-check.mjs
+      - name: Public URL security header / recovery checks
+        run: node scripts/security-boundary-probe.mjs
+      - name: Production dependency audit
+        run: npm audit --omit=dev --audit-level=high
