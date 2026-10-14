@@ -14,7 +14,7 @@ test("Aramco report uses a public-domain headquarters archive photograph",()=>{
 });
 
 test("production image policy narrowly allows Wikimedia Commons while keeping other CSP rules",()=>{
- assert.match(middleware,/"img-src 'self' data: blob: https:\/\/upload\.wikimedia\.org "/);
+ assert.match(middleware,/"img-src 'self' data: blob: "\+supabaseOrigin\+" https:\/\/upload\.wikimedia\.org "/);
  assert.match(middleware,/"default-src 'self'"/);
  assert.match(middleware,/"object-src 'none'"/);
  assert.match(image,/unoptimized=\{useOriginal \|\| \/\^https:/);
