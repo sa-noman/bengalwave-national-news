@@ -2,6 +2,7 @@
 import {redirect} from "next/navigation";
 import {createSupabaseServerClient} from "@/lib/supabase/server";
 import {isSupabaseConfigured} from "@/lib/supabase/config";
+import {isKnownCompromisedPassword} from "@/lib/auth/password-leak-check";
 
 export async function setInvitedPassword(formData:FormData) {
   if(!isSupabaseConfigured()) redirect("/admin/login?error=setup");
@@ -15,6 +16,8 @@ export async function setInvitedPassword(formData:FormData) {
   if(password.length<12 || password.length>128 || password!==repeated)
     redirect("/admin/set-password?error=password");
 
+  const compromised=await isKnownCompromisedPassword(password);
+  if(compromised===true)redirect("/admin/set-password?error=compromised");
   const {error:changeError}=await supabase.auth.updateUser({password});
   if(changeError) redirect("/admin/set-password?error=update");
   // The dashboard separately enforces the user's active editorial role.
