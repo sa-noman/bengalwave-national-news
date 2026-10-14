@@ -1,0 +1,26 @@
+name: Public OWASP ZAP passive security scan
+on:
+  pull_request:
+    branches: [main]
+    paths: [.github/workflows/public-zap-baseline.yml]
+  schedule:
+    - cron: '15 4 1 * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  passive-zap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: No-credentials GET-only passive scan of public BengalWave pages
+        uses: zaproxy/action-baseline@de8ad967d3548d44ef623df22cf95c3b0baf8b25
+        with:
+          target: 'https://bengalwave.news'
+          cmd_options: '-m 1 -T 3'
+          allow_issue_writing: false
+          fail_action: false
+          artifact_name: bengalwave-public-zap-report
