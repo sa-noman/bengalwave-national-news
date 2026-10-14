@@ -18,7 +18,12 @@ export async function signIn(formData:FormData) {
   // Atomic, database-backed counters work across all serverless instances.
   // Hash identifiers before storing them; never store passwords or raw IPs.
   const requestHeaders=await headers();
-  const ip=(requestHeaders.get("x-real-ip")||requestHeaders.get("x-forwarded-for")?.split(",")[0]||"unknown").trim();
+  // Trust Vercel's platform-provided IP header, never arbitrary forwarded
+  // headers on another host where a client could spoof the rate-limit bucket.
+  const platformIp=process.env.VERCEL
+    ? requestHeaders.get("x-vercel-forwarded-for")||requestHeaders.get("x-real-ip")
+    : requestHeaders.get("x-real-ip");
+  const ip=(platformIp?.split(",")[0]||"unknown").trim();
   const digest=(value:string)=>createHash("sha256").update(value).digest("hex");
   const {data:allowed,error:limitError}=await supabase.rpc("check_editor_login_rate_limit",{
     p_ip_key:digest("ip:"+ip),
@@ -36,6 +41,13 @@ export async function signIn(formData:FormData) {
   if(!profile?.is_active || !["owner","editor","contributor"].includes(profile.role)){
     await supabase.auth.signOut();
     redirect("/admin/login?error=access");
+  }
+  if(profile.role==="owner"||profile.role==="editor"){
+    const {data:aal,error:aalError}=await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if(!aalError && (aal.nextLevel==="aal2"&&aal.currentLevel!=="aal2" ||
+       process.env.BW_MFA_REQUIRED==="true"&&aal.currentLevel!=="aal2")){
+      redirect("/admin/mfa");
+    }
   }
   redirect("/admin");
 }

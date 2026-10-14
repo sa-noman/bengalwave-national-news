@@ -5,7 +5,8 @@ import {PreviewNotice} from "@/components/preview-notice";
 import {getDisplayNews,isDesignPreview} from "@/lib/news-display";
 export const metadata:Metadata={title:"সংবাদ খুঁজুন"};
 export default async function SearchPage({searchParams}:{searchParams:Promise<{q?:string}>}){
- const {q=""}=await searchParams;
+ const {q:rawQuery=""}=await searchParams;
+ const q=typeof rawQuery==="string"?rawQuery:"";
  const search=q.trim().toLocaleLowerCase("bn").slice(0,120);
  const {items,showingSamples}=await getDisplayNews(100);
  const found=search?items.filter(item=>[item.title,item.summary,item.category].join(" ").toLocaleLowerCase("bn").includes(search)):[];
