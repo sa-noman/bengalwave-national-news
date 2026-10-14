@@ -67,14 +67,14 @@ const after=check(await admin.storage.from(bucket).list(user.id),'list after cle
 assert.equal(after.length,before.length);pass('Actual metadata failure removes newly uploaded full and thumbnail objects');
 // Actual recovery email delivered to the local SMTP capture service.
 check(await anon.auth.resetPasswordForEmail(email),'send isolated recovery email');
-let mail;
+ let mail;
 for(let i=0;i<30;i++){
- const messages=await (await fetch('http://127.0.0.1:54324/api/v1/mailbox/'+email.split('@')[0])).json();
- if(messages.length){mail=await (await fetch('http://127.0.0.1:54324/api/v1/mailbox/'+email.split('@')[0]+'/'+messages.at(-1).id)).json();break;}
+ const response=await fetch('http://127.0.0.1:54324/view/latest.html?query='+encodeURIComponent('to:'+email));
+ if(response.ok){mail=await response.text();break;}
  await new Promise(r=>setTimeout(r,300));
 }
 assert.ok(mail,'Recovery SMTP delivery');
-const body=mail.body.html||mail.body.text;const hash=body.match(/token_hash=([^&"\s<]+)/)?.[1];assert.ok(hash,'Real configured token-hash template');
+const body=mail;const hash=body.match(/token_hash=([^&"\s<]+)/)?.[1];assert.ok(hash,'Real configured token-hash template');
 const recovered=createClient(url,key,options);
 assert.ok((await recovered.auth.verifyOtp({token_hash:hash.slice(0,-1)+'z',type:'recovery'})).error);
 check(await recovered.auth.verifyOtp({token_hash:hash,type:'recovery'}),'verify fresh recovery');
