@@ -1,4 +1,5 @@
 "use server";
+import { loginCaptcha } from "@/lib/auth/turnstile";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { createHash } from "node:crypto";
@@ -32,7 +33,11 @@ export async function signIn(formData:FormData) {
   });
   // Fail closed if the migration isn't installed or database is unavailable.
   if(limitError || allowed!==true) redirect("/admin/login?error=limited");
-  const {error}=await supabase.auth.signInWithPassword({email,password});
+  const captcha=await loginCaptcha(formData.get("cf-turnstile-response"));
+  if(!captcha.ok) redirect("/admin/login?error=captcha");
+  const {error}=await supabase.auth.signInWithPassword({email,password,
+    ...(captcha.captchaToken ? {options:{captchaToken:captcha.captchaToken}} : {}),
+  });
   if(error) redirect("/admin/login?error=credentials");
   const {data:{user}}=await supabase.auth.getUser();
   if(!user) redirect("/admin/login?error=credentials");

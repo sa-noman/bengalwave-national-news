@@ -9,7 +9,8 @@ import { refreshSupabaseSession } from "./lib/supabase/middleware";
  * this nonce. Neither unsafe-inline nor insecure hard-coded hashes are used
  * on these routes. Keep the rest of the site's design entirely unchanged.
  */
-function strictContentSecurityPolicy(nonce:string) {
+function strictContentSecurityPolicy(nonce:string, loginCaptcha=false) {
+  const challengeOrigin=loginCaptcha ? " https://challenges.cloudflare.com" : "";
   // Bind all external image/API destinations to this environment's own
   // Supabase project. The same code works in isolated staging later.
   let supabaseOrigin="";
@@ -26,7 +27,7 @@ function strictContentSecurityPolicy(nonce:string) {
     "object-src 'none'",
     "frame-ancestors 'none'",
     "form-action 'self'",
-    "script-src 'self' 'nonce-"+nonce+"' 'strict-dynamic' https://www.googletagmanager.com https://www.google-analytics.com",
+    "script-src 'self' 'nonce-"+nonce+"' 'strict-dynamic' https://www.googletagmanager.com https://www.google-analytics.com"+challengeOrigin,
     "script-src-attr 'none'",
     "style-src 'self' 'unsafe-inline'",
     process.env.VERCEL_ENV==="production"
@@ -34,18 +35,19 @@ function strictContentSecurityPolicy(nonce:string) {
       : "img-src 'self' data: blob: https:",
     "font-src 'self' data:",
     process.env.VERCEL_ENV==="production"
-      ? "connect-src 'self' "+supabaseOrigin+" "+realtimeOrigin+" "+analyticsOrigins
+      ? "connect-src 'self' "+supabaseOrigin+" "+realtimeOrigin+" "+analyticsOrigins+challengeOrigin
       : "connect-src 'self' https: wss:",
     "worker-src 'self' blob:",
     "manifest-src 'self'",
-    "frame-src 'none'",
+    loginCaptcha ? "frame-src https://challenges.cloudflare.com" : "frame-src 'none'",
     "upgrade-insecure-requests",
   ].join("; ");
 }
 
 export async function middleware(request:NextRequest) {
   const nonce=crypto.randomUUID().replace(/-/g,"");
-  const csp=strictContentSecurityPolicy(nonce);
+  const csp=strictContentSecurityPolicy(nonce,request.nextUrl.pathname==="/admin/login" &&
+    !!process.env.BW_LOGIN_CAPTCHA_MODE && process.env.BW_LOGIN_CAPTCHA_MODE!=="off");
   const requestHeaders=new Headers(request.headers);
   requestHeaders.set("x-nonce",nonce);
   requestHeaders.set("Content-Security-Policy",csp);
