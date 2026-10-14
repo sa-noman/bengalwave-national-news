@@ -35,7 +35,11 @@ test("MFA cannot lock out owner before explicit rollout and includes DB enforcem
   assert.match(mfa,/auth\.jwt\(\)->>'aal'/);
   assert.match(mfa,/= 'aal2'/);
   const auth=read("src/lib/auth/require-staff.ts");
-  assert.match(auth,/process\.env\.BW_MFA_REQUIRED==="true"/);
+  assert.doesNotMatch(auth,/process\.env\.BW_MFA_REQUIRED/);
+  assert.match(auth,/if\(profile\.role==="owner"\|\|profile\.role==="editor"\)/);
+  assert.match(auth,/aalError\|\|aal\.currentLevel!=="aal2"/);
+  const login=read("src/app/admin/login/actions.ts");
+  assert.match(login,/if\(aalError\|\|aal\.currentLevel!=="aal2"\)redirect\("\/admin\/mfa"\)/);
   assert.match(auth,/redirect\("\/admin\/mfa"\)/);
   const form=read("src/app/admin/mfa/mfa-challenge.tsx");
   assert.match(form,/supabase\.auth\.mfa\.enroll/);
