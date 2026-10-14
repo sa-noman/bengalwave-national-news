@@ -22,7 +22,7 @@ test("Nonce CSP is unique per request and carried into Next hydration and theme"
 
 test("Anonymous attackers cannot lock a target CMS account by email",()=>{
  const sql=read("supabase/migrations/202610140004_avoid_account_lockout_dos.sql");
- assert.match(sql,/"?ip:"?\|\|p_ip_key/);
+ assert.match(sql,/\x27ip:\x27\|\|p_ip_key/);
  assert.doesNotMatch(sql,/['"]account:['"]\s*\|\|\s*p_account_key/);
  assert.match(sql,/attempt_count<=20/);
  assert.match(sql,/interval '15 minutes'/);
