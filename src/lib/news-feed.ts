@@ -22,7 +22,8 @@ const articlePhotos:Record<string,string>={
  "pm-mental-health-stigma-awareness-oct-2026":"/news/pm-mental-health-2026.png",
  "bobby-hajjaj-drug-control-social-change-oct-2026":"/news/bobby-hajjaj-drug-control-2026.png",
  "charmonai-pir-local-election-shariah-oct-2026":"/news/charmonai-council-2026.webp",
- "us-sanctions-icc-after-navi-pillay-nobel-2026":"/news/icc-us-sanctions-2026.webp"
+ "us-sanctions-icc-after-navi-pillay-nobel-2026":"/news/icc-us-sanctions-2026.webp",
+ "cumilla-jamaat-factional-clash-office-car-vandalism-oct-2026":"/news/cumilla-jamaat-2026.webp"
 };
 
 
@@ -46,7 +47,8 @@ const fullPhotoNativeWidths:Record<string,number>={
  "pm-mental-health-stigma-awareness-oct-2026":995,
  "bobby-hajjaj-drug-control-social-change-oct-2026":995,
  "charmonai-pir-local-election-shariah-oct-2026":1200,
- "us-sanctions-icc-after-navi-pillay-nobel-2026":640
+ "us-sanctions-icc-after-navi-pillay-nobel-2026":640,
+ "cumilla-jamaat-factional-clash-office-car-vandalism-oct-2026":300
 };
 
 const fallbackImages:Record<string,string>={
@@ -130,9 +132,9 @@ function asNewsItem(row:DatabaseArticle,media:AttachedMedia|undefined,supabase:P
     image:thumb||articlePhotos[row.slug]||fallbackImages[category?.slug||""]||"/illustrations/river.svg",
     fullImage:full||articleFullPhotos[row.slug],
     fullImageWidth:full?940:fullPhotoNativeWidths[row.slug],
-    imageAlt:media?.alt_text||undefined,
-    imageCaption:media?.caption||undefined,
-    imageCredit:media?.credit||undefined,
+    imageAlt:media?.alt_text||(row.slug==="cumilla-jamaat-factional-clash-office-car-vandalism-oct-2026"?"কুমিল্লা মহানগর জামায়াতের কার্যালয়ের সামনে জড়ো হওয়া লোকজন":undefined),
+    imageCaption:media?.caption||(row.slug==="cumilla-jamaat-factional-clash-office-car-vandalism-oct-2026"?"কুমিল্লা মহানগর জামায়াতের কার্যালয়ের সামনে জড়ো হওয়া লোকজন":undefined),
+    imageCredit:media?.credit||(row.slug==="cumilla-jamaat-factional-clash-office-car-vandalism-oct-2026"?"সংগৃহীত":undefined),
   };
 }
 export async function getPublishedNews(limit=60):Promise<NewsItem[]> {
