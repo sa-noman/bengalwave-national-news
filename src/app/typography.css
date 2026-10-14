@@ -111,11 +111,9 @@ body {
   line-height:1.7;
   margin-top:9px;
 }
+/* The request concerns the desktop three-column editorial grid.
+   Keep the existing compact, stacked mobile cards exactly as before. */
 @media(max-width:760px){
-  .bw-home .bw-lead-short .bw-card-text .bw-card-title{font-size:18px}
-  .bw-home .bw-lead-short .bw-card-text .bw-card-summary{
-    font-size:14px;
-    -webkit-line-clamp:4;
-    line-clamp:4;
-  }
+  .bw-home .bw-lead-short .bw-card-text .bw-card-title{font-size:16px}
+  .bw-home .bw-lead-short .bw-card-text .bw-card-summary{display:none}
 }
