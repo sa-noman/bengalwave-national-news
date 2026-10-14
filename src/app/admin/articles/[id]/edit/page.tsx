@@ -53,7 +53,7 @@ export default async function EditArticle({params,searchParams}:{
         <p className="admin-note" role="note">প্রকাশের আগে সংক্ষিপ্ত বিবরণে অন্তত ১০ অক্ষর লিখতে হবে। অনুমোদন ও প্রকাশ দুটি আলাদা ধাপ।</p>}
       {query.image_error && <p className="admin-alert" role="alert">{({
         invalid_file:"JPG, PNG, WebP অথবা AVIF ছবি দিন।",
-        invalid_image:"ছবি অসম্পূর্ণ, নষ্ট অথবা রেজোলিউশন কম। অন্তত 640 × 360 পিক্সেলের সম্পূর্ণ ছবি দিন।",
+        invalid_image:"ছবিটি পড়া যাচ্ছে না অথবা ফাইলটি অসম্পূর্ণ। সঠিক JPG, PNG, WebP বা AVIF ছবি নির্বাচন করুন।",
         too_large:"ছবি সর্বোচ্চ ৪ MB হতে পারবে।",
         missing_bucket:"Image Storage পাওয়া যায়নি। Supabase Storage সেটআপ পরীক্ষা করুন।",
         storage:"ছবি আপলোড করা যায়নি। আবার চেষ্টা করুন।",
