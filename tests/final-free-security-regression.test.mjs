@@ -42,3 +42,12 @@ test("Free breached-password check sends only k-anonymous hash prefix",()=>{
  assert.match(action,/if\(compromised===true\)redirect/);
  assert.match(read("src/app/admin/set-password/page.tsx"),/formError==="compromised"/);
 });
+
+test("Production CSP restricts image and API origins to configured Supabase project",()=>{
+ const middleware=read("src/middleware.ts");
+ assert.match(middleware,/parsed\.hostname\.endsWith\("\.supabase\.co"\)/);
+ assert.match(middleware,/realtimeOrigin=supabaseOrigin\.replace/);
+ assert.match(middleware,/img-src 'self' data: blob: "\+supabaseOrigin/);
+ assert.match(middleware,/connect-src 'self' "\+supabaseOrigin\+" "\+realtimeOrigin/);
+ assert.doesNotMatch(middleware,/connect-src 'self' https:\/\/\*\.supabase\.co/);
+});
