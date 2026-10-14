@@ -265,7 +265,7 @@ body{background:var(--bw-bg);color:var(--bw-ink);font-family:var(--bw-sans)}
 .bw-article h1{font-size:clamp(27px,4.2vw,42px);margin:8px 0 15px;line-height:1.55}
 .bw-article-deck{font-size:18px;color:var(--bw-muted);margin:0 0 15px;line-height:1.8}
 .bw-article-byline{border-top:1px solid var(--bw-line);padding-top:12px;color:var(--bw-muted);font-size:13px}
-.bw-article figure{margin:24px 0}
+.bw-article figure{margin:24px 0;width:100%;max-width:780px}
 .bw-article figure img{width:100%;max-height:540px;aspect-ratio:3/2;object-fit:cover;border-radius:6px}
 .bw-article figcaption{color:var(--bw-muted);font-size:12px;margin-top:7px}
 .bw-article-body{font-size:19px;line-height:2;max-width:780px}
@@ -365,10 +365,8 @@ body{background:var(--bw-bg);color:var(--bw-ink);font-family:var(--bw-sans)}
 .bw-img-frame:has(.bw-image-ready) .bw-image-placeholder{display:none}
 .bw-card-link:hover .bw-img-frame .bw-image-pending{transform:none}
 
-/* Keep article hero images decoded, cropped and responsive as well. */
-.bw-article .bw-article-image-frame{width:100%;aspect-ratio:3/2;max-height:540px;margin-bottom:0}
-.bw-article .bw-article-image-frame > img{position:absolute;inset:0;width:100%;height:100%;max-height:none;object-fit:cover}
-
-/* Article reading view: show the complete photograph, never crop or stretch it. */
-.bw-article .bw-article-image-frame{aspect-ratio:16/9;max-height:none;margin-inline:auto;background:#f4f3ee}
-.bw-article .bw-article-image-frame > img{object-fit:contain;object-position:center;max-height:none}
+/* News article hero: match the 780px reading column regardless of photo
+   pixel dimensions. Keep a consistent 3:2 frame while showing the entire
+   original photograph without stretching or cropping it. */
+.bw-article .bw-article-image-frame{width:100%;aspect-ratio:3/2;max-height:none;margin:0;background:#f4f3ee}
+.bw-article .bw-article-image-frame > img{position:absolute;inset:0;width:100%;height:100%;max-height:none;object-fit:contain;object-position:center}
