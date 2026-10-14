@@ -48,5 +48,10 @@ test("news cards use relative timestamps while preserving demo and article date 
   assert.match(card,/<time dateTime=\{item\.publishedAt\} title=\{formatFullNewsDate\(item\.publishedAt\)\}>/);
   assert.match(card,/নমুনা প্রতিবেদন · প্রকাশিত নয়/);
   assert.match(css,/\.bw-website \.bw-card-meta\s*\{[^}]*font-size:12px/s);
-  assert.match(read("src/app/news/[slug]/page.tsx"),/timeStyle:"short"/);
+  const article=read("src/app/news/[slug]/page.tsx");
+  assert.match(article,/formatFullNewsDate\(item\.publishedAt\)/);
+  assert.match(article,/new Intl\.DateTimeFormat\("bn-BD"/);
+  assert.match(article,/timeZone:"Asia\/Dhaka"/);
+  assert.match(article,/hourCycle:"h23"/);
+  assert.match(article,/<time dateTime=\{item\.publishedAt\}>প্রকাশ: \{publishedLabel\}<\/time>/);
 });
