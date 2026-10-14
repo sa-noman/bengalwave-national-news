@@ -19,7 +19,7 @@ export function NewsCard({item,compact=false,hero=false,variant}:{
     <span className="bw-card-copy">
       <span className="bw-tag">{item.category}</span>
       <h3 className="bw-card-title"><span className="bw-title-underline">{item.title}</span></h3>
-      {["lead","middle","feature"].includes(kind)&&item.summary&&<span className="bw-card-summary">{item.summary}</span>}
+      {["lead","middle","feature","text"].includes(kind)&&item.summary&&<span className="bw-card-summary">{item.summary}</span>}
       {kind!=="latest"&&<span className="bw-card-meta">{item.publishedAt&&!item.isDemo?
         <time dateTime={item.publishedAt} title={formatFullNewsDate(item.publishedAt)}>{time}</time>:time}</span>}
     </span>
