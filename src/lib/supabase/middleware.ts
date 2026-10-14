@@ -1,8 +1,9 @@
 import {createServerClient} from "@supabase/ssr";
 import {NextRequest,NextResponse} from "next/server";
 
-export async function refreshSupabaseSession(request:NextRequest) {
-  let response=NextResponse.next({request});
+export async function refreshSupabaseSession(request:NextRequest,requestHeaders?:Headers) {
+  const forwardedHeaders=requestHeaders||new Headers(request.headers);
+  let response=NextResponse.next({request:{headers:forwardedHeaders}});
   const url=process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key=process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   const inAdmin=request.nextUrl.pathname.startsWith("/admin") &&
@@ -19,7 +20,8 @@ export async function refreshSupabaseSession(request:NextRequest) {
       getAll(){return request.cookies.getAll();},
       setAll(toSet){
         toSet.forEach(({name,value})=>request.cookies.set(name,value));
-        response=NextResponse.next({request});
+        forwardedHeaders.set("cookie",request.headers.get("cookie")||"");
+        response=NextResponse.next({request:{headers:forwardedHeaders}});
         toSet.forEach(({name,value,options})=>response.cookies.set(name,value,options));
       },
     },
