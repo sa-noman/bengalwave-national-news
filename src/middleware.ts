@@ -31,7 +31,7 @@ function strictContentSecurityPolicy(nonce:string, loginCaptcha=false) {
     "script-src-attr 'none'",
     "style-src 'self' 'unsafe-inline'",
     process.env.VERCEL_ENV==="production"
-      ? "img-src 'self' data: blob: "+supabaseOrigin+" "+analyticsOrigins
+      ? "img-src 'self' data: blob: "+supabaseOrigin+" https://upload.wikimedia.org "+analyticsOrigins
       : "img-src 'self' data: blob: https:",
     "font-src 'self' data:",
     process.env.VERCEL_ENV==="production"

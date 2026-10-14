@@ -23,7 +23,8 @@ const articlePhotos:Record<string,string>={
  "bobby-hajjaj-drug-control-social-change-oct-2026":"/news/bobby-hajjaj-drug-control-2026.png",
  "charmonai-pir-local-election-shariah-oct-2026":"/news/charmonai-council-2026.webp",
  "us-sanctions-icc-after-navi-pillay-nobel-2026":"/news/icc-us-sanctions-2026.webp",
- "cumilla-jamaat-factional-clash-office-car-vandalism-oct-2026":"/news/cumilla-jamaat-2026.webp"
+ "cumilla-jamaat-factional-clash-office-car-vandalism-oct-2026":"/news/cumilla-jamaat-2026.webp",
+ "houthi-missile-strike-saudi-aramco-hq-dhahran-oct-2026":"https://upload.wikimedia.org/wikipedia/commons/7/7e/AramcoCoreArea.jpg"
 };
 
 
@@ -50,6 +51,9 @@ const fullPhotoNativeWidths:Record<string,number>={
  "us-sanctions-icc-after-navi-pillay-nobel-2026":640,
  "cumilla-jamaat-factional-clash-office-car-vandalism-oct-2026":300
 };
+
+// Public-domain archive photograph. NOT a photograph of the 2026 strike.
+const aramcoArchivePhotoSlug="houthi-missile-strike-saudi-aramco-hq-dhahran-oct-2026";
 
 const fallbackImages:Record<string,string>={
  national:"/illustrations/river.svg",international:"/illustrations/world.svg",
@@ -132,9 +136,9 @@ function asNewsItem(row:DatabaseArticle,media:AttachedMedia|undefined,supabase:P
     image:thumb||articlePhotos[row.slug]||fallbackImages[category?.slug||""]||"/illustrations/river.svg",
     fullImage:full||articleFullPhotos[row.slug],
     fullImageWidth:full?940:fullPhotoNativeWidths[row.slug],
-    imageAlt:media?.alt_text||(row.slug==="cumilla-jamaat-factional-clash-office-car-vandalism-oct-2026"?"কুমিল্লা মহানগর জামায়াতের কার্যালয়ের সামনে জড়ো হওয়া লোকজন":undefined),
-    imageCaption:media?.caption||(row.slug==="cumilla-jamaat-factional-clash-office-car-vandalism-oct-2026"?"কুমিল্লা মহানগর জামায়াতের কার্যালয়ের সামনে জড়ো হওয়া লোকজন":undefined),
-    imageCredit:media?.credit||(row.slug==="cumilla-jamaat-factional-clash-office-car-vandalism-oct-2026"?"সংগৃহীত":undefined),
+    imageAlt:media?.alt_text||(row.slug===aramcoArchivePhotoSlug?"ধাহরানে সৌদি আরামকোর সদর দপ্তর কমপ্লেক্সের পুরোনো ছবি":row.slug==="cumilla-jamaat-factional-clash-office-car-vandalism-oct-2026"?"কুমিল্লা মহানগর জামায়াতের কার্যালয়ের সামনে জড়ো হওয়া লোকজন":undefined),
+    imageCaption:media?.caption||(row.slug===aramcoArchivePhotoSlug?"ধাহরানে সৌদি আরামকোর সদর দপ্তর কমপ্লেক্স। ফাইল ছবি, হামলার দৃশ্য নয়।":row.slug==="cumilla-jamaat-factional-clash-office-car-vandalism-oct-2026"?"কুমিল্লা মহানগর জামায়াতের কার্যালয়ের সামনে জড়ো হওয়া লোকজন":undefined),
+    imageCredit:media?.credit||(row.slug===aramcoArchivePhotoSlug?"Eagleamn / Wikimedia Commons (পাবলিক ডোমেইন)":row.slug==="cumilla-jamaat-factional-clash-office-car-vandalism-oct-2026"?"সংগৃহীত":undefined),
   };
 }
 export async function getPublishedNews(limit=60):Promise<NewsItem[]> {
