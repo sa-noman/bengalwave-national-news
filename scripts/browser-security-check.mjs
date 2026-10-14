@@ -40,7 +40,7 @@ try {
    assert.match(scriptDirective,/nonce-[a-f0-9]{32}/);
    assert.doesNotMatch(scriptDirective,/unsafe-inline/);
    const nonceMatch=scriptDirective.match(/nonce-([a-f0-9]{32})/);
-   const themeNonce=await page.locator("head script[nonce]").first().getAttribute("nonce");
+   const themeNonce=await page.locator("head script[nonce]").first().evaluate(el=>el.nonce);
    assert.equal(themeNonce,nonceMatch?.[1],route+": theme boot script nonce must match CSP");
    assert.ok(await page.evaluate(()=>["light","dark"].includes(document.documentElement.dataset.theme||"")),
      route+": theme initialization must execute before hydration");
