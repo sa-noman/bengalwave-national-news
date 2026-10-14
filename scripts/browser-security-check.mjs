@@ -68,6 +68,21 @@ try {
    count++;
    await page.close();
   }
+  // Verify React escapes attacker-controlled search text in a live browser.
+  // The payload writes only to a harmless in-memory marker if mishandled.
+  const xssPage=await context.newPage();
+  const injection='"><img src=x onerror="window.__bw_search_xss=1">';
+  const searchResponse=await xssPage.goto(origin+"/search?q="+encodeURIComponent(injection),{
+    waitUntil:"networkidle",timeout:60000,
+  });
+  assert.equal(searchResponse?.status(),200,"Search injection check must load");
+  assert.equal(await xssPage.locator("#bw-search-input").inputValue(),injection);
+  assert.equal(await xssPage.evaluate(()=>(window).__bw_search_xss),undefined,
+    "React must never execute injected HTML or event attributes");
+  assert.equal(await xssPage.locator(".bw-search-form img").count(),0,
+    "Injected <img> must stay plain input text");
+  await xssPage.close();
+  console.log("PASS",viewport.name,"search escaping prevents reflected HTML event execution");
   // A fresh browser with no cookies must be rejected by all CMS pages.
   for(const protectedPath of ["/admin","/admin/articles/new"]){
    const response=await context.request.get(origin+protectedPath,{maxRedirects:0});

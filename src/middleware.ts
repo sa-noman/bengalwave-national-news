@@ -10,6 +10,16 @@ import { refreshSupabaseSession } from "./lib/supabase/middleware";
  * on these routes. Keep the rest of the site's design entirely unchanged.
  */
 function strictContentSecurityPolicy(nonce:string) {
+  // Bind all external image/API destinations to this environment's own
+  // Supabase project. The same code works in isolated staging later.
+  let supabaseOrigin="";
+  try {
+    const parsed=new URL(process.env.NEXT_PUBLIC_SUPABASE_URL||"");
+    if(parsed.protocol==="https:" && parsed.hostname.endsWith(".supabase.co"))
+      supabaseOrigin=parsed.origin;
+  }catch{/* No external Supabase origin unless configured. */}
+  const realtimeOrigin=supabaseOrigin.replace(/^https:/,"wss:");
+  const analyticsOrigins="https://www.google-analytics.com https://region1.google-analytics.com https://www.googletagmanager.com https://stats.g.doubleclick.net";
   return [
     "default-src 'self'",
     "base-uri 'self'",
@@ -19,10 +29,12 @@ function strictContentSecurityPolicy(nonce:string) {
     "script-src 'self' 'nonce-"+nonce+"' 'strict-dynamic' https://www.googletagmanager.com https://www.google-analytics.com",
     "script-src-attr 'none'",
     "style-src 'self' 'unsafe-inline'",
-    "img-src 'self' data: blob: https:",
+    process.env.VERCEL_ENV==="production"
+      ? "img-src 'self' data: blob: "+supabaseOrigin+" "+analyticsOrigins
+      : "img-src 'self' data: blob: https:",
     "font-src 'self' data:",
     process.env.VERCEL_ENV==="production"
-      ? "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.google-analytics.com https://www.google-analytics.com https://*.googletagmanager.com https://*.doubleclick.net"
+      ? "connect-src 'self' "+supabaseOrigin+" "+realtimeOrigin+" "+analyticsOrigins
       : "connect-src 'self' https: wss:",
     "worker-src 'self' blob:",
     "manifest-src 'self'",
