@@ -15,8 +15,9 @@ Do not conduct destructive testing, brute-force password attempts, or database w
 
 - CI typechecking, tests, build, browser CSP/access controls, and desktop/mobile visual regression.
 - MFA AAL2 enforcement for CMS Owner and Editor, including database authorization.
-- Weekly CodeQL JavaScript/TypeScript security analysis, dependency audit, and credential-free live security boundary checks.
-- Monthly OWASP ZAP passive scan of public routes; warnings require human triage and do not necessarily indicate exploitable bugs.
+- Independent weekly CodeQL JavaScript/TypeScript security analysis, full dependency audit, and credential-free live security boundary checks. A live-site or dependency failure cannot skip static analysis.
+- Production probes run only from main; pull requests run static checks and local browser tests.
+- Monthly OWASP ZAP passive scan of public routes; missing/malformed reports and high-risk alerts fail the workflow. Medium/low/informational warnings remain in artifacts and require human triage; they do not necessarily indicate exploitable bugs.
 - Dependabot dependency and GitHub Action update PRs, reviewed before merging.
 - Supabase row-level security and server-only CMS login rate limiting.
 
