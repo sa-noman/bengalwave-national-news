@@ -48,10 +48,11 @@ pass('Real password login and mandatory owner TOTP/AAL2');
 // Activate only inside this disposable local database, after an actual gateway upload.
 assert.equal((await uploadNewsImage(new File([photo],'before.png',{type:'image/png'}),fields,user.id,client)).ok,true);
 sql(readFileSync('supabase/manual/strict-upload-gateway.sql','utf8'));
-const bucket='bengalwave-preview-news-images';let media;
+const bucket='bengalwave-preview-news-images';let media;const mediaIds=[];
 for(const [format,mime] of [['jpeg','image/jpeg'],['png','image/png'],['webp','image/webp'],['avif','image/avif']]){
  const bytes=await sharp(photo).toFormat(format).toBuffer();
  const result=await uploadNewsImage(new File([bytes],'photo.'+format,{type:mime}),fields,user.id,client);assert.equal(result.ok,true,format);
+ mediaIds.push(result.mediaId);
  media=check(await client.from('media_assets').select('*').eq('id',result.mediaId).single(),'read media');
  for(const [name,width,height] of [['full',1600,1000],['thumb',760,475]]){
   const path=media.storage_path.slice(bucket.length+1).replace('full.webp',name+'.webp');
@@ -65,8 +66,10 @@ assert.ok((await client.storage.from(bucket).upload(direct,await sharp(photo).we
 assert.ok((await client.storage.from(bucket).upload(direct,await sharp(photo).webp().toBuffer(),{contentType:'image/webp',upsert:true})).error);
 pass('Authenticated direct Storage INSERT and upsert denied after restrictive policies');
 const article=check(await client.from('articles').insert({slug:'isolated-'+randomUUID(),headline:'Isolated test article',author_id:user.id,hero_media_id:media.id}).select('id').single(),'create isolated draft');
-check(await client.from('articles').update({headline:'Edited isolated article',hero_media_id:media.id}).eq('id',article.id),'edit image association');
-pass('Real RLS-scoped draft creation and image edit');
+check(await client.from('articles').update({headline:'Edited isolated article',hero_media_id:mediaIds[0]}).eq('id',article.id),'edit image association');
+check(await client.from('articles').update({status:'published',published_at:new Date().toISOString()}).eq('id',article.id),'publish isolated article');
+assert.equal(check(await anon.from('articles').select('id,hero_media_id').eq('id',article.id).single(),'anonymous published article').hero_media_id,mediaIds[0]);
+pass('Real RLS-scoped creation, replacement image edit, publication and anonymous article read');
 sql("create function public.ci_reject_media() returns trigger language plpgsql as $$ begin if new.alt_text='CI_FORCE_FAILURE' then raise exception 'isolated failure'; end if; return new; end $$; create trigger ci_reject_media before insert on public.media_assets for each row execute function public.ci_reject_media();");
 const before=check(await admin.storage.from(bucket).list(user.id),'list before cleanup');
 assert.deepEqual(await uploadNewsImage(new File([photo],'cleanup.png',{type:'image/png'}),{...fields,alt:'CI_FORCE_FAILURE'},user.id,client),{ok:false,error:'metadata'});
@@ -116,6 +119,12 @@ const outsiderUser=check(await outsider.auth.verifyOtp({type:'recovery',token_ha
 assert.equal((await uploadNewsImage(new File([photo],'outsider.png',{type:'image/png'}),fields,outsiderUser.id,outsider)).ok,false);
 assert.ok((await outsider.from('articles').insert({slug:'outsider-'+randomUUID(),headline:'Unauthorized isolated draft',author_id:outsiderUser.id})).error);
 pass('Recovered no-role account cannot upload or create CMS articles');
+sql('drop policy bw_media_gateway_insert_only on storage.objects; drop policy bw_media_gateway_update_only on storage.objects;');
+check(await recovered.storage.from(bucket).upload(direct,await sharp(photo).webp().toBuffer(),{contentType:'image/webp'}),'isolated policy rollback restores original permitted upload');
+check(await admin.storage.from(bucket).remove([direct]),'remove rollback test object');
+sql(readFileSync('supabase/manual/strict-upload-gateway.sql','utf8'));
+assert.ok((await recovered.storage.from(bucket).upload(direct,await sharp(photo).webp().toBuffer(),{contentType:'image/webp'})).error);
+pass('Restrictive policy rollback and reactivation tested in isolation');
 const results=join(mkdtempSync(join(tmpdir(),'bw-security-results-')),'results.json');
 appendFileSync(process.env.GITHUB_ENV,'BW_RESULTS_PATH='+results+'\n');
 writeFileSync(results,JSON.stringify({target:'loopback disposable Supabase',passed:report},null,2));
