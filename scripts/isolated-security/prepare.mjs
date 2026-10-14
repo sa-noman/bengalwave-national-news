@@ -13,5 +13,9 @@ config=config.replace(/^project_id = .*$/m,'project_id = "bw-security-ci"')
  .replace(/^site_url = .*$/m,'site_url = "http://127.0.0.1:3300"')
  .replace(/^additional_redirect_urls = .*$/m,'additional_redirect_urls = ["http://127.0.0.1:3300/auth/recovery"]');
 config+='\n[auth.email.template.recovery]\nsubject = "BengalWave isolated recovery"\ncontent_path = "./supabase/templates/recovery.html"\n';
+if(!config.includes('[auth.mfa.totp]'))throw new Error('Missing local TOTP configuration');
+config=config.replace(/(\[auth\.mfa\.totp\][\s\S]*?)(?=\n\[|$)/,section=>section
+ .replace(/enroll_enabled = false/,'enroll_enabled = true')
+ .replace(/verify_enabled = false/,'verify_enabled = true'));
 writeFileSync(root+'/supabase/config.toml',config);
 console.log('Prepared isolated Auth, Storage, database and mail capture; no hosted project linked.');
