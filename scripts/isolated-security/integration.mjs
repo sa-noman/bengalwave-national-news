@@ -17,6 +17,7 @@ process.env.NEXT_PUBLIC_SUPABASE_URL=url;
 process.env.SUPABASE_UPLOAD_SECRET_KEY=secret;
 process.env.BW_STRICT_UPLOAD_GATEWAY='true';process.env.VERCEL_ENV='preview';
 const app=spawn(process.execPath,['node_modules/next/dist/bin/next','dev','-p','3300'],{env:{...process.env,NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:key,BW_LOGIN_CAPTCHA_MODE:'off'},stdio:'ignore'});
+app.unref();
 process.on('exit',()=>app.kill());
 for(let i=0;i<90;i++){try{if((await fetch('http://127.0.0.1:3300/admin/login')).ok)break;}catch{}if(i===89)throw new Error('Local application unavailable');await new Promise(r=>setTimeout(r,500));}
 const options={auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}};
@@ -104,4 +105,12 @@ const generated=check(await admin.auth.admin.generateLink({type:'recovery',email
 sql("update auth.users set recovery_sent_at=now()-interval '2 hours' where id='"+user.id+"';");
 assert.ok((await createClient(url,key,options).auth.verifyOtp({token_hash:generated.properties.hashed_token,type:'recovery'})).error);
 pass('Actual expired recovery token rejected');
+const outsiderEmail='bw-outsider-'+randomUUID()+'@example.test';
+check(await admin.auth.admin.createUser({email:outsiderEmail,password:randomBytes(24).toString('hex'),email_confirm:true}),'create no-role test account');
+const outsiderLink=check(await admin.auth.admin.generateLink({type:'recovery',email:outsiderEmail}),'no-role recovery');
+const outsider=createClient(url,key,options);
+const outsiderUser=check(await outsider.auth.verifyOtp({type:'recovery',token_hash:outsiderLink.properties.hashed_token}),'no-role recovery verification').user;
+assert.equal((await uploadNewsImage(new File([photo],'outsider.png',{type:'image/png'}),fields,outsiderUser.id,outsider)).ok,false);
+assert.ok((await outsider.from('articles').insert({slug:'outsider-'+randomUUID(),headline:'Unauthorized isolated draft',author_id:outsiderUser.id})).error);
+pass('Recovered no-role account cannot upload or create CMS articles');
 writeFileSync('/tmp/bw-isolated-results.json',JSON.stringify({target:'loopback disposable Supabase',passed:report},null,2));
