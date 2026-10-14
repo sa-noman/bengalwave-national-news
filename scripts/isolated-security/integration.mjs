@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync,writeFileSync} from 'node:fs';
-import {execFileSync} from 'node:child_process';
+import {execFileSync,spawn} from 'node:child_process';
+import {createServerClient} from '@supabase/ssr';
 import {createRequire} from 'node:module';
 import {randomBytes,randomUUID,createHmac} from 'node:crypto';
 import {createClient} from '@supabase/supabase-js';
@@ -15,6 +16,9 @@ for(const value of [key,secret])console.log('::add-mask::'+value);
 process.env.NEXT_PUBLIC_SUPABASE_URL=url;
 process.env.SUPABASE_UPLOAD_SECRET_KEY=secret;
 process.env.BW_STRICT_UPLOAD_GATEWAY='true';process.env.VERCEL_ENV='preview';
+const app=spawn(process.execPath,['node_modules/next/dist/bin/next','dev','-p','3300'],{env:{...process.env,NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:key,BW_LOGIN_CAPTCHA_MODE:'off'},stdio:'ignore'});
+process.on('exit',()=>app.kill());
+for(let i=0;i<90;i++){try{if((await fetch('http://127.0.0.1:3300/admin/login')).ok)break;}catch{}if(i===89)throw new Error('Local application unavailable');await new Promise(r=>setTimeout(r,500));}
 const options={auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}};
 const admin=createClient(url,secret,options),anon=createClient(url,key,options);
 const check=(r,label)=>{assert.equal(r.error,null,label);return r.data;};
@@ -75,9 +79,14 @@ for(let i=0;i<30;i++){
 }
 assert.ok(mail,'Recovery SMTP delivery');
 const body=mail;const hash=body.match(/token_hash=([^&"\s<]+)/)?.[1];assert.ok(hash,'Real configured token-hash template');
-const recovered=createClient(url,key,options);
-assert.ok((await recovered.auth.verifyOtp({token_hash:hash.slice(0,-1)+'z',type:'recovery'})).error);
-check(await recovered.auth.verifyOtp({token_hash:hash,type:'recovery'}),'verify fresh recovery');
+assert.ok((await createClient(url,key,options).auth.verifyOtp({token_hash:hash.slice(0,-1)+'z',type:'recovery'})).error);
+const callback=await fetch('http://127.0.0.1:3300/auth/confirm?type=recovery&token_hash='+encodeURIComponent(hash),{redirect:'manual'});
+assert.equal(callback.status,307);assert.equal(new URL(callback.headers.get('location')).pathname,'/admin/set-password');
+assert.ok(!callback.headers.get('location').includes('token_hash'));
+const jar=new Map(callback.headers.getSetCookie().map(c=>{const pair=c.split(';')[0];const at=pair.indexOf('=');return [pair.slice(0,at),decodeURIComponent(pair.slice(at+1))];}));
+const recovered=createServerClient(url,key,{cookies:{getAll:()=>Array.from(jar,([name,value])=>({name,value})),setAll:cs=>cs.forEach(c=>jar.set(c.name,c.value))}});
+check(await recovered.auth.getUser(),'real recovery callback establishes SSR session');
+pass('Actual Next.js token-hash callback and clean fixed redirect');
 assert.ok((await createClient(url,key,options).auth.verifyOtp({token_hash:hash,type:'recovery'})).error);
 assert.ok(check(await recovered.auth.mfa.listFactors(),'preserved factors').totp.some(f=>f.id===factor.id&&f.status==='verified'));
 assert.equal((await uploadNewsImage(new File([photo],'aal1.png',{type:'image/png'}),fields,user.id,recovered)).ok,false);
