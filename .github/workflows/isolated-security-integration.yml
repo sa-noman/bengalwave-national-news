@@ -1,13 +1,15 @@
 name: Isolated remaining-security integration
 on:
   push:
-    branches: [main, security/isolated-integration-ci-final-20261014]
+    branches: [main, fix/isolated-ci-migration-diagnostics-20261014]
 permissions:
   contents: read
 jobs:
   isolated-supabase:
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    env:
+      SUPABASE_INTERNAL_IMAGE_REGISTRY: ghcr.io
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
@@ -24,7 +26,11 @@ jobs:
       - name: Start disposable Supabase, never link a hosted project
         working-directory: ${{ env.BW_ISOLATED_ROOT }}
         run: |
-          npx --yes supabase@2.54.11 start -x studio,imgproxy,edge-runtime,logflare,vector,supavisor > /tmp/bw-local-start.log 2>&1
+          if ! npx --yes supabase@2.54.11 start -x studio,imgproxy,edge-runtime,logflare,vector,supavisor > /tmp/bw-local-start.log 2>&1; then
+            echo "::error::Isolated local Supabase startup failed"
+            node "${GITHUB_WORKSPACE}/scripts/isolated-security/safe-startup-diagnostics.mjs" /tmp/bw-local-start.log
+            exit 1
+          fi
           umask 077
           npx --yes supabase@2.54.11 status -o json > status.json
       - name: Real MFA, upload, RLS and email recovery integration
