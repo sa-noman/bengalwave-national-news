@@ -56,6 +56,16 @@ const fallbackImages:Record<string,string>={
  features:"/illustrations/heritage.svg",sports:"/illustrations/world.svg",
  entertainment:"/illustrations/heritage.svg"
 };
+/** Always re-validate database-provided href values before public rendering. */
+function safePublishedSourceUrl(value:string|null):string|null {
+  if(!value)return null;
+  try {
+    const url=new URL(value);
+    return url.protocol==="https:"||url.protocol==="http:" ? url.href : null;
+  } catch {
+    return null;
+  }
+}
 function normalizeCategory(value:DatabaseArticle["categories"]):CategoryRef|null {
   return Array.isArray(value) ? value[0]||null : value;
 }
@@ -147,5 +157,5 @@ export async function getPublishedArticle(slug:string) {
   if(error || !data)return null;
   const row=data as unknown as DatabaseArticle;
   const media=await loadAttachedMedia(supabase,[row]);
-  return {...asNewsItem(row,media.get(row.id),supabase),body:row.body,sourceName:row.source_name,sourceUrl:row.source_url};
+  return {...asNewsItem(row,media.get(row.id),supabase),body:row.body,sourceName:row.source_name,sourceUrl:safePublishedSourceUrl(row.source_url)};
 }
