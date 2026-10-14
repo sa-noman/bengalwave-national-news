@@ -17,10 +17,10 @@ The database migrations are additive and preserve current articles.
 1. Merge and deploy the MFA enrollment route `/admin/mfa` without enabling enforcement.
 2. Owner signs in, manually opens `https://bengalwave.news/admin/mfa`, scans a QR code in an authenticator app (e.g. Microsoft or Google Authenticator) and successfully verifies a six-digit code.
 3. Create a second backup TOTP factor when supported, or verify a secure account-recovery procedure.
-4. Only **after** successful enrollment set Vercel environment variable `BW_MFA_REQUIRED=true` for Production and set `private.cms_mfa_policy.require_editor_aal2 = true` in Supabase, with a verified owner login as the final check. Both gates are initially disabled. Keep test scripts and preview accounts separate.
+4. Owner TOTP was verified on 2026-10-14. A separate code release now enforces `aal2` for all Owner/Editor CMS pages and login flow without a Vercel environment variable (Vercel env-management API is currently 403). After that deployment is READY, switch `private.cms_mfa_policy.require_editor_aal2 = true` to enforce the same rule at the direct Supabase REST/RLS boundary. Keep test scripts and preview accounts separate.
 5. DB enforcement is essential: application-level MFA alone cannot prevent direct Supabase REST calls.
 
-**Never enable mandatory MFA before successful owner enrollment**; otherwise an owner may be locked out. When the database flag is false, previous authenticated roles continue to work normally.
+**Mandatory Owner/Editor MFA is enabled only after verified owner enrollment.** Keep the /admin/mfa challenge route reachable with an aal1 session, so ordinary password login can complete MFA before accessing any privileged CMS view or Supabase REST write.
 
 ## Separate staging (M3): requires explicit user cost confirmation
 The Preview environment is already Vercel SSO-protected, but Preview currently connects to the production database.
