@@ -1,5 +1,7 @@
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
 import assert from 'node:assert/strict';
-import {readFileSync,writeFileSync} from 'node:fs';
+import {readFileSync,writeFileSync,mkdtempSync,appendFileSync} from 'node:fs';
 import {execFileSync,spawn} from 'node:child_process';
 import {createServerClient} from '@supabase/ssr';
 import {createRequire} from 'node:module';
@@ -8,8 +10,9 @@ import {createClient} from '@supabase/supabase-js';
 import sharp from 'sharp';
 import ts from 'typescript';
 const nativeRequire=createRequire(import.meta.url);
-const status=JSON.parse(readFileSync('/tmp/bw-local-status.json','utf8'));
-const url=status.API_URL, key=status.ANON_KEY, secret=status.SERVICE_ROLE_KEY;
+const status=JSON.parse(readFileSync(join(process.env.BW_ISOLATED_ROOT,'status.json'),'utf8'));
+const url='http://127.0.0.1:54321', key=status.ANON_KEY, secret=status.SERVICE_ROLE_KEY;
+assert.equal(status.API_URL,url,'Only fixed local API origin accepted');
 assert.equal(new URL(url).hostname,'127.0.0.1','Tests accept only runner-loopback services');
 assert.ok(key&&secret,'Local credentials required');
 for(const value of [key,secret])console.log('::add-mask::'+value);
@@ -113,4 +116,6 @@ const outsiderUser=check(await outsider.auth.verifyOtp({type:'recovery',token_ha
 assert.equal((await uploadNewsImage(new File([photo],'outsider.png',{type:'image/png'}),fields,outsiderUser.id,outsider)).ok,false);
 assert.ok((await outsider.from('articles').insert({slug:'outsider-'+randomUUID(),headline:'Unauthorized isolated draft',author_id:outsiderUser.id})).error);
 pass('Recovered no-role account cannot upload or create CMS articles');
-writeFileSync('/tmp/bw-isolated-results.json',JSON.stringify({target:'loopback disposable Supabase',passed:report},null,2));
+const results=join(mkdtempSync(join(tmpdir(),'bw-security-results-')),'results.json');
+appendFileSync(process.env.GITHUB_ENV,'BW_RESULTS_PATH='+results+'\n');
+writeFileSync(results,JSON.stringify({target:'loopback disposable Supabase',passed:report},null,2));

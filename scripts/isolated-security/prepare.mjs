@@ -1,6 +1,9 @@
-import {mkdirSync,copyFileSync,readdirSync,readFileSync,writeFileSync} from 'node:fs';
+import {mkdirSync,copyFileSync,readdirSync,readFileSync,writeFileSync,mkdtempSync,appendFileSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
 import {execFileSync} from 'node:child_process';
-const root='/tmp/bw-security-supabase';
+const root=mkdtempSync(join(tmpdir(),'bw-security-supabase-'));
+appendFileSync(process.env.GITHUB_ENV,'BW_ISOLATED_ROOT='+root+'\n');
 mkdirSync(root,{recursive:true});
 execFileSync('npx',['--yes','supabase@2.54.11','init'],{cwd:root,stdio:'pipe'});
 mkdirSync(root+'/supabase/migrations',{recursive:true});
