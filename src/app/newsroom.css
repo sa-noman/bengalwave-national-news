@@ -10,6 +10,25 @@
 body{background:var(--bw-bg);color:var(--bw-ink);font-family:var(--bw-sans)}
 .bw-wrap{width:min(1180px,calc(100% - 32px));margin-inline:auto}
 .bw-website{background:var(--bw-bg);color:var(--bw-ink);min-height:40vh}
+
+/* Desktop only: short inner pages should keep the shared green footer at the
+   bottom of the viewport, with no exposed body background underneath it.
+   Exclude the homepage to preserve its heritage banner/footer composition;
+   avoid touching phone layouts and existing footer artwork or dimensions. */
+@media(min-width:761px){
+  body:has(> main.bw-website:not(.bw-home)){
+    display:flex;
+    flex-direction:column;
+    min-height:100vh;
+    min-height:100dvh;
+  }
+  body:has(> main.bw-website:not(.bw-home)) > main.bw-website{
+    flex:1 0 auto;
+  }
+  body:has(> main.bw-website:not(.bw-home)) > footer.bw-footer{
+    flex-shrink:0;
+  }
+}
 .bw-website h1,.bw-website h2,.bw-website h3{font-family:var(--bw-serif);line-height:1.54;font-weight:700}
 .bw-website a:focus-visible,.bw-navbar a:focus-visible,.bw-footer a:focus-visible,.bw-website button:focus-visible,.bw-head-icon:focus-visible,.bw-bottom-nav a:focus-visible,.bw-bottom-nav button:focus-visible{outline:3px solid var(--bw-yellow);outline-offset:3px}
 .bw-topbar{background:#f1e6cb;color:#4a4a2a;border-top:4px solid var(--bw-green);border-bottom:1px solid #e3d3ad;font-size:12.5px}
