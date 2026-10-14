@@ -1,0 +1,42 @@
+name: Isolated remaining-security integration
+on:
+  push:
+    branches: [main, security/isolated-integration-ci-final-20261014]
+permissions:
+  contents: read
+jobs:
+  isolated-supabase:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Install locked app and official Supabase CLI
+        run: |
+          npm ci --no-audit --no-fund
+          npx --yes supabase@2.54.11 --help > /dev/null
+      - name: Prepare separate database, Auth, Storage and SMTP capture
+        run: node scripts/isolated-security/prepare.mjs
+      - name: Start disposable Supabase, never link a hosted project
+        working-directory: ${{ env.BW_ISOLATED_ROOT }}
+        run: |
+          npx --yes supabase@2.54.11 start -x studio,imgproxy,edge-runtime,logflare,vector,supavisor > /tmp/bw-local-start.log 2>&1
+          umask 077
+          npx --yes supabase@2.54.11 status -o json > status.json
+      - name: Real MFA, upload, RLS and email recovery integration
+        run: node scripts/isolated-security/integration.mjs
+      - name: Sanitized results
+        if: success()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: isolated-security-results
+          path: ${{ env.BW_RESULTS_PATH }}
+          retention-days: 7
+      - name: Stop disposable containers
+        if: always()
+        working-directory: ${{ env.BW_ISOLATED_ROOT }}
+        run: npx --yes supabase@2.54.11 stop --no-backup > /dev/null 2>&1 || true
