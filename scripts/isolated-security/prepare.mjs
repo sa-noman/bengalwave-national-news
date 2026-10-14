@@ -1,8 +1,11 @@
-import {mkdirSync,copyFileSync,readdirSync,readFileSync,writeFileSync,mkdtempSync,appendFileSync} from 'node:fs';
+import {mkdirSync,copyFileSync,readdirSync,readFileSync,writeFileSync,mkdtempSync,appendFileSync,chmodSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {execFileSync} from 'node:child_process';
 const root=mkdtempSync(join(tmpdir(),'bw-security-supabase-'));
+// Containers need traverse/read access to mounted templates. Only the runner
+// owns writes; status.json is created later with umask 077.
+chmodSync(root,0o755);
 appendFileSync(process.env.GITHUB_ENV,'BW_ISOLATED_ROOT='+root+'\n');
 mkdirSync(root,{recursive:true});
 execFileSync('npx',['--yes','supabase@2.54.11','init'],{cwd:root,stdio:'pipe'});
