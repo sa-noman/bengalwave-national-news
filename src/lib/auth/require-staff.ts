@@ -16,10 +16,10 @@ export async function requireStaff() {
      !["owner","editor","contributor"].includes(profile.role)) {
     redirect("/admin/access-denied");
   }
-  // Safe rollout: DB AAL2 policy and this gate stay inactive until the owner
-  // has verified TOTP enrollment and both sides are explicitly enabled.
-  if(process.env.BW_MFA_REQUIRED==="true" &&
-     (profile.role==="owner"||profile.role==="editor")){
+  // Enforce a verified second factor on every privileged CMS request.
+  // Keep /admin/mfa reachable at aal1 so editors can enroll and recover.
+  // The database applies the same aal2 requirement to direct PostgREST calls.
+  if(profile.role==="owner"||profile.role==="editor"){
     const {data:aal,error:aalError}=await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
     if(aalError||aal.currentLevel!=="aal2")redirect("/admin/mfa");
   }
