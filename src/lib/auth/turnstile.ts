@@ -1,7 +1,7 @@
 import 'server-only';
 
 export function loginCaptchaMode(): 'off' | 'gateway' | 'supabase' | 'invalid' {
-  const mode = process.env.BW_LOGIN_CAPTCHA_MODE || 'off';
+  const mode = process.env.BW_LOGIN_CAPTCHA_MODE ?? 'off';
   return mode === 'off' || mode === 'gateway' || mode === 'supabase' ? mode : 'invalid';
 }
 

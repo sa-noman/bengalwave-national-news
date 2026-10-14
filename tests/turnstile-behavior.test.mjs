@@ -19,7 +19,7 @@ test('CAPTCHA modes fail closed, validate provider claims and consume tokens onl
   try{
     delete process.env.BW_LOGIN_CAPTCHA_MODE;
     assert.deepEqual(await loginCaptcha(null),{ok:true});assert.equal(calls,0);
-    process.env.BW_LOGIN_CAPTCHA_MODE='typo';assert.deepEqual(await loginCaptcha('token'),{ok:false});
+    for(const mode of ['typo','', 'GATEWAY']){process.env.BW_LOGIN_CAPTCHA_MODE=mode;assert.deepEqual(await loginCaptcha('token'),{ok:false});}
     process.env.BW_LOGIN_CAPTCHA_MODE='gateway';
     process.env.TURNSTILE_SITE_KEY='test-site';process.env.TURNSTILE_SECRET_KEY='test-secret';
     process.env.TURNSTILE_ALLOWED_HOSTNAMES='isolated.example';
@@ -28,6 +28,9 @@ test('CAPTCHA modes fail closed, validate provider claims and consume tokens onl
     assert.deepEqual(await loginCaptcha('token'),{ok:true});assert.equal(calls,1);
     for(const wrong of [{success:false,hostname:'isolated.example',action:'admin_login'},{success:true,hostname:'evil.example',action:'admin_login'},{success:true,hostname:'isolated.example',action:'other'},null]){
       payload=wrong;assert.deepEqual(await loginCaptcha('token'),{ok:false});
+    }
+    for(const reason of ['invalid-input-response','timeout-or-duplicate','internal-error']){
+      payload={success:false,'error-codes':[reason]};assert.deepEqual(await loginCaptcha('token'),{ok:false});
     }
     global.fetch=async()=>({ok:false});assert.deepEqual(await loginCaptcha('token'),{ok:false});
     global.fetch=async()=>{throw new DOMException('timeout','TimeoutError');};assert.deepEqual(await loginCaptcha('token'),{ok:false});
