@@ -55,9 +55,50 @@ body {
 .bw-article .bw-tag {font-size:16px;font-weight:500}
 .bw-article h1 {font-size:36px;font-weight:700}
 .bw-article-deck {font-size:16px;font-weight:500}
-.bw-article-byline {font-size:16px;font-weight:400}
-.bw-article-byline strong {font-size:16px;font-weight:700}
-.bw-article-byline time {font-size:20px;font-weight:400}
+/* Article publisher block: small Bengali text beside the existing brand mark. */
+.bw-article .bw-article-byline {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  border-top:0;
+  padding-top:0;
+  margin-top:8px;
+  font-size:12px;
+  font-weight:400;
+  line-height:1.55;
+}
+.bw-article .bw-article-byline-avatar {
+  display:block;
+  width:42px;
+  height:42px;
+  flex:0 0 42px;
+  object-fit:contain;
+  border-radius:9px;
+  background:#fff;
+  border:1px solid #e6e0d3;
+}
+.bw-article .bw-article-byline-copy {
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  gap:2px;
+}
+.bw-article .bw-article-byline strong {
+  display:block;
+  color:inherit;
+  font-size:13px;
+  line-height:1.45;
+  font-weight:700;
+}
+.bw-article .bw-article-byline time,
+.bw-article .bw-article-byline-copy > span {
+  display:block;
+  font-size:11px;
+  font-weight:400;
+  line-height:1.55;
+  overflow-wrap:anywhere;
+}
 .bw-article-body {font-size:18px;font-weight:400}
 .bw-article-body h2 {font-size:32px;font-weight:700}
 .bw-article-body h3 {font-size:24px;font-weight:700}
@@ -137,4 +178,13 @@ body {
   .bw-home .bw-lead-short .bw-card-text .bw-card-title{font-size:21px}
   .bw-home .bw-hero-middle .bw-card-middle .bw-card-title{font-size:22px}
   .bw-home .bw-hero-latest .bw-card-latest .bw-card-title{font-size:17px}
+}
+
+/* Phone-sized publisher line: remain compact while allowing long dates to wrap. */
+@media(max-width:760px){
+  .bw-article .bw-article-byline{gap:9px;margin-top:6px}
+  .bw-article .bw-article-byline-avatar{width:38px;height:38px;flex-basis:38px;border-radius:8px}
+  .bw-article .bw-article-byline strong{font-size:12px}
+  .bw-article .bw-article-byline time,
+  .bw-article .bw-article-byline-copy > span{font-size:11px}
 }
