@@ -92,3 +92,30 @@ body {
   font-size:12px;
   line-height:1.55;
 }
+
+
+/* Homepage hero: keep the two text-only stories in proportion with the
+   adjoining image columns. Titles are a touch larger, followed by the
+   existing editorial summary, without changing other card variants. */
+.bw-home .bw-lead-short .bw-card-text .bw-card-title{
+  font-size:19px;
+  line-height:1.52;
+}
+.bw-home .bw-lead-short .bw-card-text .bw-card-summary{
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:5;
+  line-clamp:5;
+  overflow:hidden;
+  font-size:14px;
+  line-height:1.7;
+  margin-top:9px;
+}
+@media(max-width:760px){
+  .bw-home .bw-lead-short .bw-card-text .bw-card-title{font-size:18px}
+  .bw-home .bw-lead-short .bw-card-text .bw-card-summary{
+    font-size:14px;
+    -webkit-line-clamp:4;
+    line-clamp:4;
+  }
+}
