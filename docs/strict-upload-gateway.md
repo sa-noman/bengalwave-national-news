@@ -5,6 +5,18 @@ uploads continue with the caller's authenticated Storage client. Filename/MIME
 policies alone do not stop authenticated callers bypassing Sharp with direct
 Storage requests. The strict gateway closes that gap only after policy activation.
 
+Configuration accepts an unset flag or explicit `false` for the legacy path,
+and exactly `true` for the privileged gateway. Any other value fails closed.
+Focused follow-up verification covered actual JPEG, PNG, WebP and AVIF inputs,
+WebP full/thumbnail dimensions, stripped EXIF, malformed/type-mismatched/oversize
+inputs, authorization failures, missing credentials and metadata-failure cleanup.
+Storage and identity calls in these tests are mocked: hosted upload/edit/public
+delivery and direct-write denial remain unverified until isolated staging exists.
+
+Access update: Vercel environment metadata is readable again. The connected
+Supabase API exposes one project and the Noman Free organization; this does not
+prove account-wide free-project capacity. No isolated database has been created.
+
 1. Use a separate isolated Supabase project for testing, with both Preview public
    variables and its server-only `SUPABASE_UPLOAD_SECRET_KEY` pointing to that
    project. The secret is a Supabase secret API key (or legacy service-role key).

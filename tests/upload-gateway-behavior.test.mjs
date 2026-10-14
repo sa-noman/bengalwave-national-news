@@ -29,6 +29,13 @@ test('strict gateway verifies identity/role/MFA and fails closed without credent
   try{
     delete process.env.BW_STRICT_UPLOAD_GATEWAY;
     assert.deepEqual(await uploadStorage(client(),userId),{legacy:true});
+    process.env.BW_STRICT_UPLOAD_GATEWAY='false';
+    assert.deepEqual(await uploadStorage(client(),userId),{legacy:true});
+    for(const mode of ['', 'TRUE', 'tru', '1']){
+      process.env.BW_STRICT_UPLOAD_GATEWAY=mode;
+      await assert.rejects(uploadStorage(client(),userId),/unavailable/);
+    }
+    assert.equal(privilegedCalls,0);
     process.env.BW_STRICT_UPLOAD_GATEWAY='true';
     process.env.NEXT_PUBLIC_SUPABASE_URL='https://isolated.example';
     process.env.SUPABASE_UPLOAD_SECRET_KEY='test-only';
@@ -73,5 +80,18 @@ test('actual file bytes are checked and only valid re-encoded WebP reaches stora
     metadataFails=true;
     assert.deepEqual(await uploadNewsImage(file,fields,userId,scoped),{ok:false,error:'metadata'});
     assert.equal(removals.length,1);assert.equal(removals[0].length,2);
+    metadataFails=false;
+    for(const [format,mime] of [['jpeg','image/jpeg'],['png','image/png'],['webp','image/webp'],['avif','image/avif']]){
+      const bytes=await sharp({create:{width:1600,height:1000,channels:3,background:'#286340'}})
+        .toFormat(format).toBuffer();
+      const start=uploads.length;
+      assert.equal((await uploadNewsImage(new File([bytes],'photo.'+format,{type:mime}),fields,userId,scoped)).ok,true,format);
+      const full=await sharp(uploads[start].data).metadata();
+      const thumb=await sharp(uploads[start+1].data).metadata();
+      assert.equal(full.format,'webp');assert.equal(thumb.format,'webp');
+      assert.equal(full.width,1600);assert.equal(full.height,1000);
+      assert.equal(thumb.width,760);assert.equal(thumb.height,475);
+      assert.equal(full.exif,undefined);assert.equal(thumb.exif,undefined);
+    }
   }finally{if(old===undefined)delete process.env.VERCEL_ENV;else process.env.VERCEL_ENV=old;}
 });

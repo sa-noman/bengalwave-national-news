@@ -4,7 +4,9 @@ import type {SupabaseClient} from "@supabase/supabase-js";
 
 /** Opt-in until isolated upload tests and the matching Storage policies pass. */
 export async function uploadStorage(client:SupabaseClient,userId:string){
-  if(process.env.BW_STRICT_UPLOAD_GATEWAY!=="true")return client.storage;
+  const mode=process.env.BW_STRICT_UPLOAD_GATEWAY;
+  if(mode===undefined||mode==="false")return client.storage;
+  if(mode!=="true")throw new Error("Upload gateway unavailable");
   const {data:{user},error}=await client.auth.getUser();
   if(error||!user||user.id!==userId)throw new Error("Upload unauthorized");
   const {data:profile,error:profileError}=await client.from("profiles")
