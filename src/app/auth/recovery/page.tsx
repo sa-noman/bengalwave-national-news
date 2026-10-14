@@ -23,6 +23,14 @@ export default function RecoveryPage(){
       const accessToken=hash.get("access_token");
       const refreshToken=hash.get("refresh_token");
       const kind=hash.get("type")||query.get("type");
+      // Capture the one-time credentials and clear the browser address bar
+      // before awaiting any network call, including failed recovery attempts.
+      // A fragment is not transmitted to the server, but can remain visible
+      // in browser history and be accidentally copied or screen-shared.
+      if(window.location.hash || query.has("code") ||
+         query.has("access_token") || query.has("refresh_token")){
+        window.history.replaceState(null,"",window.location.pathname);
+      }
       if(failure||(!code&&(!accessToken||!refreshToken))||(!code&&kind!=="recovery")){
         if(active){setFailed(true);setMessage("পাসওয়ার্ড রিসেটের লিংকটি অবৈধ বা মেয়াদ শেষ। Supabase থেকে নতুন Recovery Email পাঠান।");}
         window.history.replaceState(null,"",window.location.pathname);
