@@ -1,8 +1,12 @@
+import { headers } from "next/headers";
+import { loginCaptchaMode } from "@/lib/auth/turnstile";
+import { LoginTurnstile } from "./turnstile";
 import type {Metadata} from "next";
 import { isSupabaseConfigured } from "@/lib/supabase/config";
 import { signIn } from "./actions";
 export const metadata:Metadata={title:"অ্যাডমিন লগইন",robots:{index:false,follow:false}};
 const errors:Record<string,string>={
+  captcha:"নিরাপত্তা যাচাই সফল হয়নি। পৃষ্ঠাটি রিফ্রেশ করে আবার চেষ্টা করুন।",
   setup:"Supabase-এর নিরাপদ Environment Variables এখনো যুক্ত করা হয়নি।",
   credentials:"ইমেইল বা পাসওয়ার্ড সঠিক হয়নি।",
   limited:"অল্প সময়ে অনেকবার লগইন চেষ্টা হয়েছে। ১৫ মিনিট পর আবার চেষ্টা করুন।",
@@ -12,6 +16,8 @@ const errors:Record<string,string>={
 export default async function LoginPage({searchParams}:{searchParams:Promise<{error?:string}>}) {
   const {error}=await searchParams;
   const ready=isSupabaseConfigured();
+  const captchaEnabled=loginCaptchaMode()!=="off";
+  const nonce=captchaEnabled ? (await headers()).get("x-nonce")||"" : "";
   return <main className="container admin-surface">
     <div className="admin-panel auth-panel">
       <span className="category">BENGAL WAVE CMS</span>
@@ -20,6 +26,7 @@ export default async function LoginPage({searchParams}:{searchParams:Promise<{er
       {!ready && <p className="admin-alert" role="status">{errors.setup}</p>}
       {error && errors[error] && <p className="admin-alert" role="alert">{errors[error]}</p>}
       <form action={signIn} className="admin-form">
+        {captchaEnabled && <LoginTurnstile siteKey={process.env.TURNSTILE_SITE_KEY||""} nonce={nonce}/>}
         <label htmlFor="email">ইমেইল</label>
         <input id="email" name="email" type="email" autoComplete="username" required disabled={!ready}/>
         <label htmlFor="password">পাসওয়ার্ড</label>

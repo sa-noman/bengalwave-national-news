@@ -2,6 +2,7 @@ import "server-only";
 import sharp from "sharp";
 import {randomUUID} from "node:crypto";
 import {createSupabaseServerClient} from "@/lib/supabase/server";
+import {uploadStorage} from "@/lib/supabase/upload-storage";
 
 import {NEWS_MEDIA_BUCKET} from "@/lib/news-media-paths";
 export const MAX_IMAGE_BYTES=4*1024*1024;
@@ -31,6 +32,10 @@ export async function uploadNewsImage(
   if(file.size>MAX_IMAGE_BYTES)return {ok:false,error:"too_large"};
   if(file.size<100 || !["image/jpeg","image/png","image/webp","image/avif"].includes(file.type))
     return {ok:false,error:"invalid_file"};
+
+  let storage;
+  try{storage=await uploadStorage(supabase,userId);}
+  catch{return {ok:false,error:"storage"};}
 
   let full:Buffer;
   let thumb:Buffer;
@@ -67,7 +72,7 @@ export async function uploadNewsImage(
   const base=userId+"/"+randomUUID();
   const fullPath=base+"/full.webp";
   const thumbPath=base+"/thumb.webp";
-  const bucket=supabase.storage.from(NEWS_MEDIA_BUCKET);
+  const bucket=storage.from(NEWS_MEDIA_BUCKET);
 
   const fullUpload=await bucket.upload(fullPath,full,{
     contentType:"image/webp",cacheControl:"31536000",upsert:false,
