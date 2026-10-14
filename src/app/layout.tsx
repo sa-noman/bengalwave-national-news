@@ -1,4 +1,5 @@
 import type {Metadata,Viewport} from "next";
+import {headers} from "next/headers";
 import "@fontsource/noto-serif-bengali/400.css";
 import "@fontsource/noto-serif-bengali/500.css";
 import "@fontsource/noto-serif-bengali/600.css";
@@ -34,6 +35,7 @@ const themeInitScript=`(function(){
   document.documentElement.dataset.theme=window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";
  }
 })();`;
-export default function RootLayout({children}:Readonly<{children:React.ReactNode}>){
- return <html lang="bn" suppressHydrationWarning><head><script dangerouslySetInnerHTML={{__html:themeInitScript}}/></head><body><SiteHeader/>{children}<SiteFooter/><GoogleAnalytics/></body></html>;
+export default async function RootLayout({children}:Readonly<{children:React.ReactNode}>){
+ const nonce=(await headers()).get("x-nonce")||undefined;
+ return <html lang="bn" suppressHydrationWarning><head><script nonce={nonce} dangerouslySetInnerHTML={{__html:themeInitScript}}/></head><body><SiteHeader/>{children}<SiteFooter/><GoogleAnalytics/></body></html>;
 }

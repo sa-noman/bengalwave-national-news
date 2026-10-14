@@ -79,7 +79,9 @@ test("heritage section preserves Hind Siliguri without remote Google Fonts CSS",
 test("CMS middleware is positioned alongside src/app and refreshes sessions",()=>{
  const middleware=read("src/middleware.ts");
  assert.match(middleware,/refreshSupabaseSession/);
- assert.match(middleware,/matcher:\s*\["\/admin\/:path\*"\]/);
+ assert.match(middleware,/matcher:\s*\["\/\(\(\?!_next\/static/);
+ assert.match(middleware,/strictContentSecurityPolicy/);
+ assert.match(middleware,/crypto\.randomUUID\(\)/);
  const session=read("src/lib/supabase/middleware.ts");
  assert.match(session,/supabase\.auth\.getUser\(\)/);
  assert.match(session,/NextResponse\.redirect/);

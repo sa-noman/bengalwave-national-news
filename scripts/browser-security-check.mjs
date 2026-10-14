@@ -35,6 +35,22 @@ try {
     assert.ok(h[name],route+" missing "+name);
    }
    assert.match(h["content-security-policy"],/frame-ancestors 'none'/);
+   // Nonce CSP must be effective, unique, and preserve browser hydration.
+   const scriptDirective=h["content-security-policy"].split(";").find(x=>x.trim().startsWith("script-src "))||"";
+   assert.match(scriptDirective,/nonce-[a-f0-9]{32}/);
+   assert.doesNotMatch(scriptDirective,/unsafe-inline/);
+   const nonceMatch=scriptDirective.match(/nonce-([a-f0-9]{32})/);
+   const themeNonce=await page.locator("head script[nonce]").first().evaluate(el=>el.nonce);
+   assert.equal(themeNonce,nonceMatch?.[1],route+": theme boot script nonce must match CSP");
+   assert.ok(await page.evaluate(()=>["light","dark"].includes(document.documentElement.dataset.theme||"")),
+     route+": theme initialization must execute before hydration");
+   if(route==="/"){
+     const toggle=page.locator(".bw-theme-nav-toggle, .bw-theme-mobile-toggle").filter({visible:true}).first();
+     await toggle.click();
+     const applied=await page.evaluate(()=>document.documentElement.dataset.theme);
+     assert.ok(["light","dark"].includes(applied||""),route+": hydrated theme toggle must work");
+   }
+
    assert.equal(h["x-content-type-options"],"nosniff");
    await page.evaluate(()=>document.fonts.ready);
    const matchingFonts=await page.evaluate(()=>{

@@ -11,7 +11,7 @@ test("dark preference defaults to device setting, but saved manual preference wi
  assert.match(layout,/localStorage\.getItem\("bw-theme-preference"\)/);
  assert.match(layout,/saved==="dark"\|\|\(saved!=="light"&&window\.matchMedia/);
  assert.match(layout,/document\.documentElement\.dataset\.theme=isDark\?"dark":"light"/);
- assert.match(layout,/<head><script dangerouslySetInnerHTML=\{\{__html:themeInitScript\}\}\/>/);
+ assert.match(layout,/<head><script nonce=\{nonce\} dangerouslySetInnerHTML=\{\{__html:themeInitScript\}\}\/>/);
  assert.match(layout,/suppressHydrationWarning/);
  assert.match(layout,/import "\.\/dark-theme\.css"/);
 });

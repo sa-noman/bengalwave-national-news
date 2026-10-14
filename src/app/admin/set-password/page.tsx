@@ -21,6 +21,8 @@ export default async function SetPassword({searchParams}:{
     {formError && <p className="admin-alert" role="alert">
       {formError==="password"?
         "১২ থেকে ১২৮ অক্ষরের একই পাসওয়ার্ড দুবার দিন।":
+        formError==="compromised"?
+        "এই পাসওয়ার্ডটি আগে তথ্য ফাঁসে পাওয়া গেছে। আরও শক্তিশালী ও নতুন একটি পাসওয়ার্ড দিন।":
         "পাসওয়ার্ড পরিবর্তন করা যায়নি। আবার চেষ্টা করুন।"}
     </p>}
     <form action={setInvitedPassword} className="admin-form">
