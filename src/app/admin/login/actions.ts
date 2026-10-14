@@ -42,6 +42,13 @@ export async function signIn(formData:FormData) {
     await supabase.auth.signOut();
     redirect("/admin/login?error=access");
   }
+  if(profile.role==="owner"||profile.role==="editor"){
+    const {data:aal,error:aalError}=await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if(!aalError && (aal.nextLevel==="aal2"&&aal.currentLevel!=="aal2" ||
+       process.env.BW_MFA_REQUIRED==="true"&&aal.currentLevel!=="aal2")){
+      redirect("/admin/mfa");
+    }
+  }
   redirect("/admin");
 }
 
