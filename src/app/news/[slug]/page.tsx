@@ -44,7 +44,6 @@ export default async function ArticlePage({params}:{params:Promise<{slug:string}
     <div className="bw-article-body">{item.body.split(/\n\s*\n/).filter(Boolean).map((paragraph,i)=><p key={i}>{paragraph}</p>)}</div>
     {item.sourceUrl&&!item.isDemo&&<div className="bw-article-source">সূত্র: <a href={item.sourceUrl} target="_blank" rel="noopener noreferrer nofollow">{item.sourceName||"মূল উৎস"}</a></div>}
    </article>
-   <Link href="/latest" className="bw-article-back">← সর্বশেষ সংবাদে ফিরুন</Link>
   </div>
  </main>;
 }

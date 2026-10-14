@@ -51,6 +51,28 @@ body {
 .bw-footer-nav a,.bw-footer-legal a {font:700 17px/1.65 var(--bw-serif)}
 .bw-footer-wordmark {font-family:var(--bw-serif)}
 
+/* News article source credit: quiet, readable grey on desktop and phone.
+   Keep the original external link and source attribution intact. */
+.bw-article .bw-article-source {
+  font-size:12px;
+  line-height:1.6;
+  font-weight:400;
+  color:#7d7d7d;
+}
+.bw-article .bw-article-source a {
+  color:inherit;
+  font-weight:400;
+}
+html[data-theme="dark"] .bw-article .bw-article-source {
+  color:#b0b0b0;
+}
+html[data-theme="dark"] .bw-article .bw-article-source a {
+  color:inherit;
+}
+@media(max-width:760px){
+  .bw-article .bw-article-source {font-size:11px}
+}
+
 /* Full news article */
 .bw-article .bw-tag {font-size:16px;font-weight:500}
 .bw-article h1 {font-size:36px;font-weight:700}
