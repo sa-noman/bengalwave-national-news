@@ -128,3 +128,13 @@ body {
     margin-top:6px;
   }
 }
+
+
+/* Desktop-only refinement for the three marked homepage story groups:
+   lower-left text pair, center column, and latest-news list. Keep all
+   mobile/tablet typography, body summaries and spacing untouched. */
+@media(min-width:1001px){
+  .bw-home .bw-lead-short .bw-card-text .bw-card-title{font-size:21px}
+  .bw-home .bw-hero-middle .bw-card-middle .bw-card-title{font-size:22px}
+  .bw-home .bw-hero-latest .bw-card-latest .bw-card-title{font-size:17px}
+}
