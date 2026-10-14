@@ -1,11 +1,6 @@
 name: Manual production security boundary probes
 on:
   workflow_dispatch:
-  push:
-    branches: [security/remaining-hardening-20261014]
-    paths:
-      - scripts/security-boundary-probe.mjs
-      - .github/workflows/safe-security-probe.yml
 permissions:
   contents: read
 jobs:
