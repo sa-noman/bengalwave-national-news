@@ -7,6 +7,7 @@ import {getHeaderDates} from "@/lib/header-calendar-dates";
 
 const topLinks=[
  {label:"প্রচ্ছদ",href:"/"},{label:"সর্বশেষ",href:"/latest"},
+ {label:"এক্সক্লুসিভ",href:"/category/exclusive"},
  {label:"জাতীয়",href:"/category/national"},{label:"আন্তর্জাতিক",href:"/category/international"},
  {label:"খেলাধুলা",href:"/category/sports"},{label:"অর্থনীতি",href:"/category/economy"},
  {label:"প্রযুক্তি",href:"/category/technology"},{label:"বিনোদন",href:"/category/entertainment"}
