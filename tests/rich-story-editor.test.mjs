@@ -64,3 +64,10 @@ test("Mobile and desktop paragraph gaps use controlled spacing",()=>{
  assert.match(css,/\.bw-newsroom-published-body>p/);
  assert.match(css,/@media\(max-width:760px\)/);
 });
+
+test("Tiptap dependencies are pinned to patched releases",()=>{
+ const pkg=JSON.parse(read("package.json"));
+ for(const [name,version] of Object.entries(pkg.dependencies)){
+  if(name.startsWith("@tiptap/"))assert.equal(version,"3.32.0");
+ }
+});
