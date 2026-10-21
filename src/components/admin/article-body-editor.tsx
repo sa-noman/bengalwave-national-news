@@ -46,6 +46,7 @@ function makeFigure(src:string,id:string,caption="",alt="",credit=""){
  else image.dataset.awaitingUpload="true";
  figure.append(image);
  const cap=el("figcaption");cap.contentEditable="true";cap.dataset.placeholder="ছবির ক্যাপশন লিখুন (ঐচ্ছিক)";cap.textContent=caption;
+ cap.setAttribute("role","textbox");cap.setAttribute("aria-label","ছবির ক্যাপশন");
  figure.append(cap);
  if(credit){const cred=el("small","bw-doc-credit");cred.contentEditable="true";cred.textContent=credit;figure.append(cred);}
  return figure;
@@ -215,6 +216,7 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
  const [imageCount,setImageCount]=useState(0);
  const [selectedImage,setSelectedImage]=useState<string|null>(null);
  const [selectedSlider,setSelectedSlider]=useState<string|null>(null);
+ const [captionFigure,setCaptionFigure]=useState<string|null>(null);
  const [selectedCallout,setSelectedCallout]=useState<string|null>(null);
  const [message,setMessage]=useState("");
  const [paintActive,setPaintActive]=useState(false);
@@ -533,6 +535,15 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
   div.append(makeFigure(url,crypto.randomUUID()));insertNode(div);
  };
  const addDivider=()=>insertNode(el("hr"));
+ const focusCaption=()=>{
+  const root=rootRef.current;if(!root||!captionFigure)return;
+  const figure=Array.from(root.querySelectorAll("figure[data-block-id]"))
+    .find(e=>(e as HTMLElement).dataset.blockId===captionFigure);
+  const caption=figure?.querySelector("figcaption") as HTMLElement|null;
+  if(!caption)return;
+  if(!caption.textContent?.trim())caption.replaceChildren();
+  caption.focus();caption.scrollIntoView({block:"nearest",behavior:"smooth"});
+ };
  const changeCalloutBorder=(hex:string)=>{
   const root=rootRef.current;
   if(!root||!selectedCallout||!/^#[0-9a-fA-F]{6}$/.test(hex))return;
@@ -593,6 +604,10 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
      aria-pressed={paintActive} title="পেইন্ট ফরম্যাট: উৎস লেখায় কার্সর রেখে চাপুন, তারপর অন্য লেখা সিলেক্ট করুন">🖌 ফরম্যাট</button>
    <button type="button" className="bw-doc-preview-action" onMouseDown={e=>e.preventDefault()} onClick={openDraftPreview}>◉ প্রকাশের আগে প্রিভিউ</button>
   </div>
+  {captionFigure&&<div className="bw-doc-caption-controls">
+    <button type="button" onClick={focusCaption}>✎ ছবির ক্যাপশন লিখুন / ফিরিয়ে আনুন</button>
+    <button type="button" onClick={()=>setCaptionFigure(null)} aria-label="ক্যাপশন টুল বন্ধ করুন">✕</button>
+   </div>}
   {selectedCallout&&<div className="bw-doc-highlight-controls" aria-label="হাইলাইট বক্সের বর্ডারের রং">
     <strong>বাম রেখার রং</strong>
     <button type="button" onClick={()=>changeCalloutBorder("#0b4838")}>সবুজ</button>
@@ -634,6 +649,8 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
       const wrap=target.closest(".bw-doc-image-block");
       const figure=wrap?.querySelector("figure[data-block-id]");
       setSelectedImage(figure?.getAttribute("data-block-id")||null);
+      const clickedFigure=target.closest("figure[data-block-id]") as HTMLElement|null;
+      setCaptionFigure(clickedFigure?.dataset.blockId||null);
       const group=target.closest(".bw-doc-slider-editor") as HTMLElement|null;
       setSelectedSlider(group?.dataset.sliderId||null);
       const callout=target.closest(".bw-doc-highlight") as HTMLElement|null;
