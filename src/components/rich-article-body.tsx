@@ -2,6 +2,8 @@ import React from "react";
 import {legacyStoryBlocks,parseRichBody,safeStoryImageUrl} from "@/lib/rich-article";
 import type {StoryBlock} from "@/lib/rich-article";
 import {ArticleSlideshow} from "@/components/article-slideshow";
+import {NEWSROOM_PREFIX} from "@/lib/newsroom-document";
+import {NewsroomArticleBody} from "@/components/newsroom-article-body";
 
 function renderInline(value:string):React.ReactNode{
  // Limited font-size markup emitted by the authenticated editor.
@@ -62,6 +64,7 @@ function RichBlock({block,allowLocalImages=false}: {block:StoryBlock;allowLocalI
 }
 
 export function RichArticleBody({body,allowLocalImages=false}:{body:string;allowLocalImages?:boolean}){
+ if(body.startsWith(NEWSROOM_PREFIX))return <NewsroomArticleBody body={body} allowLocalImages={allowLocalImages}/>;
  const blocks=parseRichBody(body)||legacyStoryBlocks(body);
  return <div className="bw-article-body bw-rich-article-body">{blocks.map((block,i)=><RichBlock key={block.id+"-"+i} block={block} allowLocalImages={allowLocalImages}/>)}</div>;
 }
