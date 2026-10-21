@@ -335,21 +335,25 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
    </div>
    <button type="button" className="bw-nr-primary bw-nr-preview-action" onClick={showPreview}>◉ প্রকাশের আগে প্রিভিউ</button>
   </div>
-  {linkOpen&&<form className="bw-nr-link-panel" onSubmit={event=>{event.preventDefault();saveHyperlink();}}
-    aria-label="হাইপারলিংক যুক্ত বা সম্পাদনা করুন">
+  {linkOpen&&<div className="bw-nr-link-panel" role="group"
+    aria-label="হাইপারলিংক যুক্ত বা সম্পাদনা করুন"
+    onKeyDown={event=>{
+     if(event.key==="Enter"){event.preventDefault();saveHyperlink();}
+     if(event.key==="Escape"){event.preventDefault();cancelHyperlink();}
+    }}>
    <label>লিংকে যে লেখা দেখাবে
     <input autoFocus value={linkText} onChange={e=>setLinkText(e.target.value)}
      placeholder="লিংকের লেখা" maxLength={400}/>
    </label>
    <label>ওয়েবসাইটের লিংক (HTTPS)
-    <input type="url" value={linkUrl} onChange={e=>setLinkUrl(e.target.value)}
+    <input type="text" inputMode="url" value={linkUrl} onChange={e=>setLinkUrl(e.target.value)}
      placeholder="https://example.com/news" maxLength={1200}/>
    </label>
-   <button type="submit" className="bw-nr-link-save">লিংক যুক্ত / আপডেট</button>
+   <button type="button" className="bw-nr-link-save" onClick={saveHyperlink}>লিংক যুক্ত / আপডেট</button>
    {linkRange.current?.href&&<button type="button" onClick={removeHyperlink}>লিংক সরান</button>}
    <button type="button" onClick={cancelHyperlink}>বাতিল</button>
    {linkError&&<p className="bw-nr-link-error" role="alert">{linkError}</p>}
-  </form>}
+  </div>}
   <div className="bw-nr-main"
    onKeyDown={event=>{
     if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==="k"){
