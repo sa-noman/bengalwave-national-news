@@ -5,6 +5,7 @@ import {NewsCard} from "@/components/news-card";
 import {PreviewNotice} from "@/components/preview-notice";
 import {categories,getCategory} from "@/lib/demo-news";
 import {getDisplayNews,isDesignPreview} from "@/lib/news-display";
+import {getPublishedNewsByCategory} from "@/lib/news-feed";
 export function generateStaticParams(){return categories.map(c=>({slug:c.slug}));}
 export async function generateMetadata({params}:{params:Promise<{slug:string}>}):Promise<Metadata>{
  const {slug}=await params;
@@ -14,7 +15,9 @@ export default async function CategoryPage({params}:{params:Promise<{slug:string
  const {slug}=await params;
  const category=getCategory(slug);
  if(!category)notFound();
- const {items,showingSamples}=await getDisplayNews(100);
+ const {items,showingSamples}=slug==="exclusive"
+   ?{items:await getPublishedNewsByCategory(slug,100),showingSamples:false}
+   :await getDisplayNews(100);
  const list=items.filter(item=>item.categorySlug===slug);
  return <main className="bw-website">{(isDesignPreview()||showingSamples)&&<PreviewNotice samples={showingSamples}/>}
   <section className="bw-wrap bw-listing">
