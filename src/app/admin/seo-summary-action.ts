@@ -2,11 +2,12 @@
 
 import {requireStaff} from "@/lib/auth/require-staff";
 import {parseRichBody} from "@/lib/rich-article";
+import {parseNewsroomBody,textContent} from "@/lib/newsroom-document";
 
 type SeoResult={ok:true;summary:string}|{ok:false;reason:"missing_key"|"invalid"|"provider"|"empty"};
 function textFromBody(body:string):string{
- const blocks=parseRichBody(body);
- const text=blocks ? blocks.map(block=>block.text).filter(Boolean).join("\n") : body;
+ const blocks=parseRichBody(body),doc=parseNewsroomBody(body);
+ const text=doc?textContent(doc):blocks ? blocks.map(block=>block.text).filter(Boolean).join("\n") : body;
  return text.replace(/\[\[fs:(?:14|16|18|20|22|24|28|32)\]\]/g,"")
   .replace(/\[\[\/fs\]\]/g,"").replace(/\*\*/g,"").replace(/\[(.*?)\]\(https:\/\/[^)]+\)/g,"$1")
   .replace(/\s+/g," ").trim().slice(0,12000);
