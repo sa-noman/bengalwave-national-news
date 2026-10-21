@@ -269,7 +269,10 @@ export function ArticleBodyEditor({initialBody=""}:{initialBody?:string}){
   const id=crypto.randomUUID();
   const url=URL.createObjectURL(file);blobUrls.current.push(url);
   registerFile(file,id);
-  return makeFigure("",id,"","", "");
+  const figure=makeFigure("",id,"","", "");
+  const image=figure.querySelector("img");
+  if(image){image.src=url;delete image.dataset.awaitingUpload;}
+  return figure;
  };
  const handleFiles=(files:FileList|null)=>{
   if(!files?.length)return;
@@ -281,18 +284,20 @@ export function ArticleBodyEditor({initialBody=""}:{initialBody?:string}){
   const selected=Array.from(files).slice(0,mode==="gallery"?2:1);
   const queued=uploadsRef.current?.querySelectorAll('input[type="file"]').length||0;
   if(queued+selected.length>6){setMessage("একবারে সর্বোচ্চ ৬টি নতুন ছবি আপলোড করা যায়। আগে খসড়া সংরক্ষণ করে তারপর আরও ছবি যোগ করুন।");return;}
-  const figures=selected.map(f=>{
-   const figure=attachFile(f);
-   if(figure){const img=figure.querySelector("img");if(img){const obj=blobUrls.current[blobUrls.current.length-1];img.src=obj;delete img.dataset.awaitingUpload;}}
-   return figure;
-  }).filter((x):x is HTMLElement=>Boolean(x));
+  const figures=selected.map(attachFile).filter((x):x is HTMLElement=>Boolean(x));
   if(!figures.length)return;
   let wrap:HTMLElement;
   if(mode==="split"){
    wrap=el("section","bw-doc-split");wrap.dataset.layout="image-left";wrap.append(figures[0]);
    const copy=el("div","bw-doc-split-text");const p=el("p");p.textContent="ছবির পাশে এখানে লিখুন";copy.append(p);wrap.append(copy);
   }else if(mode==="gallery"){
-   wrap=el("section","bw-doc-gallery");wrap.dataset.galleryId=figures[0].dataset.blockId;figures.forEach(f=>wrap.append(f));
+   const firstId=figures[0].dataset.blockId||crypto.randomUUID();
+   const secondOldId=figures[1].dataset.blockId||"";
+   const secondInput=Array.from(uploadsRef.current?.querySelectorAll('input[type="file"]')||[])
+    .find(input=>(input as HTMLInputElement).dataset.blockId===secondOldId) as HTMLInputElement|undefined;
+   if(secondInput){secondInput.name="inline_image_"+firstId+"_second";secondInput.dataset.blockId=firstId+"-second";}
+   figures[1].dataset.blockId=firstId+"-second";
+   wrap=el("section","bw-doc-gallery");wrap.dataset.galleryId=firstId;figures.forEach(f=>wrap.append(f));
   }else{
    wrap=el("div","bw-doc-image-block");wrap.dataset.width="full";wrap.dataset.align="center";wrap.append(figures[0]);
   }
