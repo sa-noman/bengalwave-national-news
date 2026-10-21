@@ -4,7 +4,7 @@ import {redirect} from "next/navigation";
 import {requireStaff} from "@/lib/auth/require-staff";
 import {parseArticleInput} from "@/lib/validation/article";
 import {resolveStoryInlineImages} from "@/lib/story-inline-images";
-import {hasPublishableStoryText} from "@/lib/rich-article";
+import {newsroomPublishableText} from "@/lib/newsroom-document";
 import {isPreviewMediaEnabled,isMediaUploadEnabled,uploadNewsImage} from "@/lib/news-media";
 
 function isUuid(s:string) {return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);}
@@ -76,7 +76,7 @@ export async function createAndPublishArticle(formData:FormData){
     redirect("/admin/articles/new?error=permission");
 
   const input=parseArticleInput(formData);
-  if(!input||input.body.length<30||!hasPublishableStoryText(input.body)||input.summary.length<10||!input.category_id)
+  if(!input||input.body.length<30||!newsroomPublishableText(input.body)||input.summary.length<10||!input.category_id)
     redirect("/admin/articles/new?error=publish-validation");
 
   const file=getImageFile(formData);
@@ -179,7 +179,7 @@ async function changeArticle(formData:FormData,intent:EditorialIntent){
   else if(intent==="approve" && canEdit &&
           ["draft","in_review"].includes(existing.status)) status="approved";
   else if(intent==="publish" && canEdit && existing.status==="approved") {
-    if(input.body.length<30 || !hasPublishableStoryText(input.body) || input.summary.length<10 || !input.category_id)
+    if(input.body.length<30 || !newsroomPublishableText(input.body) || input.summary.length<10 || !input.category_id)
       redirect("/admin/articles/"+id+"/edit?error=publish");
     status="published";
     publishedAt=new Date().toISOString();
