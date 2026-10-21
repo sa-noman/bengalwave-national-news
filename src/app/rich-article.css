@@ -101,3 +101,9 @@ html[data-theme="dark"] .bw-rich-article-body .bw-rich-tone-red{color:#edf2eb;ba
 .bw-rich-editor-live-preview .bw-rich-editor-preview-hint{font-size:12px;line-height:1.65;color:#587465;border-bottom:1px solid #e3eae4;padding-bottom:8px;margin-bottom:18px}
 .bw-rich-editor-live-preview .bw-rich-article-body{max-width:100%;font-size:16px;line-height:1.85}
 .bw-rich-editor-live-preview.bw-article .bw-rich-article-body .bw-rich-figure img{width:100%;height:auto;aspect-ratio:auto;max-height:none;object-fit:contain}
+
+/* Never expose serialized article data: previous textarea was overridden by admin CSS. */
+.admin-form input[type="hidden"],.bw-rich-editor input[type="hidden"]{display:none!important}
+.bw-rich-quick-add{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 17px}
+.bw-rich-quick-add .admin-secondary{font-size:13px;padding:8px 12px;min-height:38px;border-radius:7px}
+.bw-rich-editor-actions button span{font-size:12px;margin-left:2px}
