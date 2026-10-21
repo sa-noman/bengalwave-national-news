@@ -70,12 +70,28 @@ export function validateNewsJSON(n:unknown,depth=0):n is NewsJSON{
  return true;
 }
 export function parseNewsroomBody(raw:string):NewsJSON|null{
- if(!isNewsroomBody(raw)||raw.length>80000)return null;
- try{
-  const prefixLength=raw.startsWith(NEWSROOM_PREFIX)?NEWSROOM_PREFIX.length:NEWSROOM_CRLF_PREFIX.length;
-  const doc=JSON.parse(raw.slice(prefixLength)) as NewsJSON;
-  return doc.type==="doc"&&validateNewsJSON(doc)?doc:null;
- }catch{return null;}
+ // Some early editor saves placed an entire versioned article into a single
+ // paragraph instead of decoding it. Safely unwrap those documents while
+ // preserving the original story nodes, without interpreting arbitrary HTML.
+ let body=raw;
+ for(let depth=0;depth<3;depth++){
+  if(!isNewsroomBody(body)||body.length>80000)return null;
+  try{
+   const prefixLength=body.startsWith(NEWSROOM_PREFIX)?NEWSROOM_PREFIX.length:NEWSROOM_CRLF_PREFIX.length;
+   const doc=JSON.parse(body.slice(prefixLength)) as NewsJSON;
+   if(doc.type!=="doc"||!validateNewsJSON(doc))return null;
+   const outer=doc.content?.length===1?doc.content[0]:null;
+   const soleText=outer?.type==="paragraph"&&outer.content?.length===1?outer.content[0]:null;
+   if(soleText?.type==="text"&&typeof soleText.text==="string"&&
+      soleText.text.startsWith("BW_NEWSROOM_V2")){
+    // A broken nested marker must never be silently displayed as source JSON.
+    body=soleText.text;
+    continue;
+   }
+   return doc;
+  }catch{return null;}
+ }
+ return null;
 }
 export function serializeNewsroomBody(doc:NewsJSON):string{
  return NEWSROOM_PREFIX+JSON.stringify(doc);

@@ -49,3 +49,21 @@ test("public article viewer chooses structured renderer for a CRLF body",()=>{
  assert.match(writer,/if\(isNewsroomBody\(body\)\)/);
  assert.match(validator,/isNewsroomBody\(body\)\?validateNewsroomBody/);
 });
+
+test("nested V2 documents are decoded instead of printed as JSON",()=>{
+ const reader=loadNewsroomParser();
+ const inner={type:"doc",content:[
+  {type:"paragraph",content:[{type:"text",text:"প্রথম অনুচ্ছেদে সংবাদ।"}]},
+  {type:"paragraph",content:[{type:"text",text:"দ্বিতীয় অনুচ্ছেদে বিবরণ।"}]}
+ ]};
+ const encoded="BW_NEWSROOM_V2\n"+JSON.stringify(inner);
+ const double={type:"doc",content:[{type:"paragraph",content:[{type:"text",text:encoded}]}]};
+ const outer="BW_NEWSROOM_V2\r\n"+JSON.stringify(double);
+ assert.deepEqual(reader.parseNewsroomBody(outer),inner);
+ assert.deepEqual(reader.existingBodyToNewsJSON(outer),inner);
+ assert.equal(reader.newsroomPublishableText(outer),true);
+ const triple={type:"doc",content:[{type:"paragraph",content:[{type:"text",text:outer}]}]};
+ assert.deepEqual(reader.parseNewsroomBody("BW_NEWSROOM_V2\n"+JSON.stringify(triple)),inner);
+ const malformed={type:"doc",content:[{type:"paragraph",content:[{type:"text",text:"BW_NEWSROOM_V2\n{bad-json"}]}]};
+ assert.equal(reader.parseNewsroomBody("BW_NEWSROOM_V2\n"+JSON.stringify(malformed)),null);
+});
