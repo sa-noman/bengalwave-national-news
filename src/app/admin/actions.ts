@@ -3,6 +3,8 @@ import {revalidatePath} from "next/cache";
 import {redirect} from "next/navigation";
 import {requireStaff} from "@/lib/auth/require-staff";
 import {parseArticleInput} from "@/lib/validation/article";
+import {resolveStoryInlineImages} from "@/lib/story-inline-images";
+import {hasPublishableStoryText} from "@/lib/rich-article";
 import {isPreviewMediaEnabled,isMediaUploadEnabled,uploadNewsImage} from "@/lib/news-media";
 
 function isUuid(s:string) {return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);}
@@ -34,8 +36,10 @@ export async function createDraft(formData:FormData) {
   const file=getImageFile(formData);
   if(file&&!isMediaUploadEnabled())
     redirect("/admin/articles/new?error=images-disabled");
+  const rich=await resolveStoryInlineImages(input.body,formData,user.id,supabase);
+  if(!rich.ok)redirect("/admin/articles/new?error=inline-image");
   const {data,error}=await supabase.from("articles")
-    .insert({...input,author_id:user.id,status:"draft",
+    .insert({...input,body:rich.body,author_id:user.id,status:"draft",
       is_featured:editor(role)&&formData.get("is_featured")==="on"})
     .select("id").single();
   if(error || !data) redirect("/admin/articles/new?error=save");
@@ -72,16 +76,18 @@ export async function createAndPublishArticle(formData:FormData){
     redirect("/admin/articles/new?error=permission");
 
   const input=parseArticleInput(formData);
-  if(!input||input.body.length<30||input.summary.length<10||!input.category_id)
+  if(!input||input.body.length<30||!hasPublishableStoryText(input.body)||input.summary.length<10||!input.category_id)
     redirect("/admin/articles/new?error=publish-validation");
 
   const file=getImageFile(formData);
   if(file&&!isMediaUploadEnabled())
     redirect("/admin/articles/new?error=images-disabled");
 
+  const rich=await resolveStoryInlineImages(input.body,formData,user.id,supabase);
+  if(!rich.ok)redirect("/admin/articles/new?error=inline-image");
   const {data:created,error:createError}=await supabase.from("articles")
     .insert({
-      ...input,author_id:user.id,status:"draft",
+      ...input,body:rich.body,author_id:user.id,status:"draft",
       is_featured:formData.get("is_featured")==="on",
     })
     .select("id").single();
@@ -173,7 +179,7 @@ async function changeArticle(formData:FormData,intent:EditorialIntent){
   else if(intent==="approve" && canEdit &&
           ["draft","in_review"].includes(existing.status)) status="approved";
   else if(intent==="publish" && canEdit && existing.status==="approved") {
-    if(input.body.length<30 || input.summary.length<10 || !input.category_id)
+    if(input.body.length<30 || !hasPublishableStoryText(input.body) || input.summary.length<10 || !input.category_id)
       redirect("/admin/articles/"+id+"/edit?error=publish");
     status="published";
     publishedAt=new Date().toISOString();
@@ -197,8 +203,11 @@ async function changeArticle(formData:FormData,intent:EditorialIntent){
     mediaId=null;
   }
 
+  const rich=await resolveStoryInlineImages(input.body,formData,user.id,supabase);
+  if(!rich.ok)redirect("/admin/articles/"+id+"/edit?error=inline-image");
   const payload={
     ...input,
+    body:rich.body,
     status,
     published_at:publishedAt,
     hero_media_id:mediaId,
