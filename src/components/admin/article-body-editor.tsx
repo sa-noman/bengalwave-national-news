@@ -215,8 +215,8 @@ export function ArticleBodyEditor({initialBody=""}:{initialBody?:string}){
   let block:Node|null=range.startContainer;
   while(block&&block.parentNode!==root)block=block.parentNode;
   if(block&&block.parentNode===root){
-   if(range.collapsed){block.after(node);}
-   else{range.deleteContents();block.after(node);}
+   if(!range.collapsed)range.deleteContents();
+   root.insertBefore(node,block.nextSibling);
   }else root.append(node);
   const after=el("p");after.append(el("br"));node.after(after);
   const next=document.createRange();next.selectNodeContents(after);next.collapse(true);
