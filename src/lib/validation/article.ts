@@ -1,6 +1,5 @@
 import {validateRichBody} from "@/lib/rich-article";
 import {NEWSROOM_PREFIX,validateNewsroomBody} from "@/lib/newsroom-document";
-import {NEWSROOM_PREFIX,validateNewsroomBody} from "@/lib/newsroom-document";
 export const slugPattern=/^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 export type ArticleInput = {
   slug:string; headline:string; summary:string; body:string;
