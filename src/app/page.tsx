@@ -14,11 +14,11 @@ function FourColumn({items,hideCategory=false}:{items:NewsItem[];hideCategory?:b
  return <div className="bw-grid-four">{items.map(item=><NewsCard item={item} key={item.id} hideCategory={hideCategory}/>)}</div>;
 }
 function NewsSection({title,items,href,boxed=false,hideCategory=false}:{title:string;items:NewsItem[];href:string;boxed?:boolean;hideCategory?:boolean}){
- if(!items.length)return null;
+ if(!items.length&&!boxed)return null;
  return <section className="bw-section"><div className="bw-wrap">
    <div className={boxed?"bw-selected-box":""}>
     <SectionHeading title={title} href={href} linkText={boxed?"সব প্রতিবেদন":"আরও"}/>
-    <FourColumn items={items} hideCategory={hideCategory}/>
+    {items.length?<FourColumn items={items} hideCategory={hideCategory}/>:<p className="bw-empty">এখনো কোনো এক্সক্লুসিভ প্রতিবেদন প্রকাশিত হয়নি।</p>}
    </div>
  </div></section>;
 }
@@ -30,8 +30,7 @@ export default async function Home(){
  const lead=articles[0];
  const rest=articles.slice(1);
  const latest=articles.slice(3,8);
- const selected=articles.filter(a=>a.featured).slice(0,4);
- const select=selected.length?selected:articles.slice(0,4);
+ const select=articles.filter(a=>a.categorySlug==="exclusive").slice(0,4);
  const national=choose(articles,["national","politics"],new Set<string>(),4);
  const world=choose(articles,["international"],new Set<string>(),4);
  const sports=choose(articles,["sports"],new Set<string>(),4);
@@ -60,7 +59,7 @@ export default async function Home(){
       <div className="bw-latest-list">{latest.map(item=><NewsCard key={item.id} item={item} variant="latest"/>)}</div>
     </aside>
    </div></section>
-   <NewsSection title="এক্সক্লুসিভ" href="/latest" boxed hideCategory items={select}/>
+   <NewsSection title="এক্সক্লুসিভ" href="/category/exclusive" boxed hideCategory items={select}/>
    <NewsSection title="জাতীয়" href="/category/national" items={national}/>
    <NewsSection title="আন্তর্জাতিক" href="/category/international" items={world}/>
    <NewsSection title="খেলাধুলা" href="/category/sports" items={sports}/>
