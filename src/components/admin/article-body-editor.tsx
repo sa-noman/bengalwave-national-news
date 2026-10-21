@@ -174,7 +174,7 @@ function extractBlocks(root:HTMLElement):StoryBlock[]{
  return collected.slice(0,100);
 }
 
-export function ArticleBodyEditor({initialBody=""}:{initialBody?:string}){
+export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initialBody?:string;initialCoverUrl?:string|null}){
  const rootRef=useRef<HTMLDivElement>(null);
  const uploadsRef=useRef<HTMLDivElement>(null);
  const chooserRef=useRef<HTMLInputElement>(null);
@@ -334,7 +334,7 @@ export function ArticleBodyEditor({initialBody=""}:{initialBody?:string}){
   });
   const imageFile=(form.elements.namedItem("image_file") as HTMLInputElement|null)?.files?.[0]||null;
   if(previewCoverRef.current){URL.revokeObjectURL(previewCoverRef.current);previewCoverRef.current=null;}
-  const cover=imageFile?URL.createObjectURL(imageFile):null;
+  const cover=imageFile?URL.createObjectURL(imageFile):initialCoverUrl;
   if(cover)previewCoverRef.current=cover;
   setPreview({title:value("headline")||"সংবাদের শিরোনাম",
    summary:value("summary"),category:category?.selectedOptions[0]?.textContent||"সংবাদ",
