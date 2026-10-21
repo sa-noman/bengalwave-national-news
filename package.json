@@ -18,7 +18,12 @@
     "server-only": "^0.0.1",
     "sharp": "0.35.5",
     "@fontsource/noto-serif-bengali": "5.3.0",
-    "@fontsource/hind-siliguri": "5.3.0"
+    "@fontsource/hind-siliguri": "5.3.0",
+    "@tiptap/react": "3.30.0",
+    "@tiptap/pm": "3.30.0",
+    "@tiptap/starter-kit": "3.30.0",
+    "@tiptap/core": "3.30.0",
+    "@tiptap/extension-text-style": "3.30.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
