@@ -3,6 +3,7 @@
 import {useState} from "react";
 import {createStoryBlock,legacyStoryBlocks,parseRichBody,serializeRichBody} from "@/lib/rich-article";
 import type {StoryBlock,StoryBlockType} from "@/lib/rich-article";
+import {RichArticleBody} from "@/components/rich-article-body";
 
 const options:{type:StoryBlockType;label:string}[]=[
  {type:"paragraph",label:"অনুচ্ছেদ"},
@@ -61,6 +62,7 @@ export function ArticleBodyEditor({initialBody=""}:{initialBody?:string}){
   return known|| (initialBody.trim()?legacyStoryBlocks(initialBody):[createStoryBlock("paragraph","initial-block-001")]);
  });
  const [insertType,setInsertType]=useState<StoryBlockType>("paragraph");
+ const [showPreview,setShowPreview]=useState(false);
  const update=(id:string,patch:Partial<StoryBlock>)=>setBlocks(old=>old.map(b=>b.id===id?{...b,...patch}:b));
  const add=(type:StoryBlockType,after?:number)=>setBlocks(old=>{
   if(old.length>=100)return old;
@@ -156,6 +158,8 @@ export function ArticleBodyEditor({initialBody=""}:{initialBody?:string}){
      </label>
      <button type="button" className="admin-secondary" onClick={()=>add(insertType)} disabled={blocks.length>=100}>＋ ব্লক যোগ করুন</button>
    </div>
+   <button type="button" className="bw-rich-preview-toggle" aria-expanded={showPreview} onClick={()=>setShowPreview(v=>!v)}>{showPreview?"প্রিভিউ বন্ধ করুন":"লেআউটের তাৎক্ষণিক প্রিভিউ দেখুন"}</button>
+   {showPreview&&<div className="bw-rich-editor-live-preview bw-article"><p className="bw-rich-editor-preview-hint">সম্পাদনার প্রিভিউ। নতুন আপলোডের ছবিগুলো সংরক্ষণের পর পূর্ণরূপে দেখা যাবে।</p><RichArticleBody body={serializeRichBody(blocks)}/></div>}
    <p className="bw-rich-editor-help">বোল্ড, ইটালিক ও লিংক যোগ করতে আগে লেখা নির্বাচন করুন। একবারে সর্বোচ্চ ৬টি নতুন ছবি আপলোড করা যাবে। নতুন ব্লক যোগ করলে বিদ্যমান শিরোনাম, ছবি বা ক্যাটাগরি বদলাবে না।</p>
   </section>;
 }
