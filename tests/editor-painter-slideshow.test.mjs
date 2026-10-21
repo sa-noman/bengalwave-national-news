@@ -45,7 +45,7 @@ test("quote and callout border color follows BengalWave, validated before publis
  const nodes=source("src/components/admin/newsroom-nodes.tsx");
  const json=source("src/lib/newsroom-document.ts");
  const css=source("src/app/newsroom-editor.css");
- assert.match(nodes,/borderColor:"#0b4838"/);
+ assert.match(nodes,/borderColor:\{default:"#0b4838"\}/);
  assert.match(json,/COLORS/);
  assert.match(css,/bw-nr-callout/);
  assert.match(css,/border-left:4px solid #0b4838/);
