@@ -1,3 +1,4 @@
+import {validateRichBody} from "@/lib/rich-article";
 export const slugPattern=/^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 export type ArticleInput = {
   slug:string; headline:string; summary:string; body:string;
@@ -13,7 +14,7 @@ export function parseArticleInput(form:FormData):ArticleInput|null {
   const sourceUrl=String(form.get("source_url")||"").trim();
   if(!slugPattern.test(slug) || slug.length>150 ||
       headline.length<5 || headline.length>300 ||
-      summary.length>700 || body.length>80000 ||
+      summary.length>700 || body.length>80000 || !validateRichBody(body,form) ||
       sourceName.length>150 || sourceUrl.length>1200) return null;
   if(category && !/^[0-9a-f-]{36}$/i.test(category)) return null;
   if(sourceUrl) {
