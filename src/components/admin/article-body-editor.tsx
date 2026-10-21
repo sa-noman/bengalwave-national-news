@@ -86,10 +86,16 @@ export function ArticleBodyEditor({initialBody=""}:{initialBody?:string}){
  const totalImages=blocks.filter(b=>needsImage(b.type)).reduce((n,b)=>n+(b.type==="gallery"?2:1),0);
  return <section className="bw-rich-editor full-span" aria-label="সংবাদের বিস্তারিত কনটেন্ট সম্পাদক">
    <div className="bw-rich-editor-top">
-     <div><h2>বিস্তারিত সংবাদ সাজান</h2><p>অনুচ্ছেদ, ছবি, উদ্ধৃতি ও হাইলাইট ব্লক সাজিয়ে প্রতিবেদন তৈরি করুন। ব্লক ওপরে-নিচে সরিয়ে ক্রম বদলাতে পারবেন।</p></div>
+     <div><h2>বিস্তারিত সংবাদ সাজান</h2><p>লেখার মাঝে যত প্রয়োজন ছবি, উদ্ধৃতি ও হাইলাইট ব্লক বসান। নিচের বাটন থেকে ছবি যোগ করুন এবং ↑ ↓ দিয়ে সাজান।</p></div>
      <span className="bw-rich-editor-counter">{blocks.length} ব্লক · {totalImages} ছবি</span>
    </div>
-   <textarea name="body" value={serializeRichBody(blocks)} readOnly hidden aria-hidden="true"/>
+   <input type="hidden" name="body" value={serializeRichBody(blocks)} readOnly/>
+   <div className="bw-rich-quick-add" aria-label="ছবি ও অন্যান্য কনটেন্ট যোগ করুন">
+     <button className="admin-secondary" type="button" onClick={()=>add("image")}>＋ ছবি যোগ করুন</button>
+     <button className="admin-secondary" type="button" onClick={()=>add("split")}>＋ ছবি ও লেখা</button>
+     <button className="admin-secondary" type="button" onClick={()=>add("gallery")}>＋ পাশাপাশি ২ ছবি</button>
+     <button className="admin-secondary" type="button" onClick={()=>add("paragraph")}>＋ অনুচ্ছেদ</button>
+   </div>
    <div className="bw-rich-editor-blocks">
     {blocks.map((b,index)=><div className="bw-rich-editor-block" key={b.id}>
       <div className="bw-rich-editor-block-head">
@@ -98,6 +104,7 @@ export function ArticleBodyEditor({initialBody=""}:{initialBody?:string}){
         <button type="button" onClick={()=>shift(index,-1)} disabled={index===0} title="ওপরে নিন">↑</button>
         <button type="button" onClick={()=>shift(index,1)} disabled={index===blocks.length-1} title="নিচে নিন">↓</button>
         <button type="button" onClick={()=>add("paragraph",index)} disabled={blocks.length>=100} title="নিচে অনুচ্ছেদ যোগ করুন">＋</button>
+        <button type="button" onClick={()=>add("image",index)} disabled={blocks.length>=100} title="এই ব্লকের নিচে ছবি যোগ করুন" aria-label="নিচে ছবি যোগ করুন">＋<span aria-hidden="true">▧</span></button>
         <button type="button" onClick={()=>remove(b.id)} title="এই ব্লক বাদ দিন" aria-label="ব্লক মুছুন">✕</button>
        </div>
       </div>
@@ -160,6 +167,6 @@ export function ArticleBodyEditor({initialBody=""}:{initialBody?:string}){
    </div>
    <button type="button" className="bw-rich-preview-toggle" aria-expanded={showPreview} onClick={()=>setShowPreview(v=>!v)}>{showPreview?"প্রিভিউ বন্ধ করুন":"লেআউটের তাৎক্ষণিক প্রিভিউ দেখুন"}</button>
    {showPreview&&<div className="bw-rich-editor-live-preview bw-article"><p className="bw-rich-editor-preview-hint">সম্পাদনার প্রিভিউ। নতুন আপলোডের ছবিগুলো সংরক্ষণের পর পূর্ণরূপে দেখা যাবে।</p><RichArticleBody body={serializeRichBody(blocks)}/></div>}
-   <p className="bw-rich-editor-help">বোল্ড, ইটালিক ও লিংক যোগ করতে আগে লেখা নির্বাচন করুন। একবারে সর্বোচ্চ ৬টি নতুন ছবি আপলোড করা যাবে। নতুন ব্লক যোগ করলে বিদ্যমান শিরোনাম, ছবি বা ক্যাটাগরি বদলাবে না।</p>
+   <p className="bw-rich-editor-help">ছবি ব্লকের মধ্যে ‘ছবি নির্বাচন করুন’ থেকে ছবি আপলোড করুন। আরও ছবি দিতে আবার ‘＋ ছবি যোগ করুন’ চাপুন, অথবা একসঙ্গে দুটি পাশাপাশি ছবির জন্য ‘＋ পাশাপাশি ২ ছবি’ ব্যবহার করুন। প্রতিটি ছবির ক্যাপশন আলাদাভাবে লিখতে পারবেন। একবারে সর্বোচ্চ ৬টি নতুন ছবি আপলোড করা যাবে।</p>
   </section>;
 }
