@@ -210,3 +210,8 @@ html[data-theme="dark"] .bw-article .bw-article-source a {
   .bw-article .bw-article-byline time,
   .bw-article .bw-article-byline-copy > span{font-size:11px}
 }
+
+/* Exclusive label only: gently enlarge and use the brand red on all screen sizes.
+ * Specificity also preserves red in dark mode without changing other headings. */
+.bw-home .bw-selected-box .bw-section-heading h2 {font-size:20px}
+html .bw-home .bw-selected-box .bw-section-heading h2 > a {color:var(--bw-red)}
