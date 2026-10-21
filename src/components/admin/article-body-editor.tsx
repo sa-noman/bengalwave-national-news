@@ -212,6 +212,8 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
  const [selectedSlider,setSelectedSlider]=useState<string|null>(null);
  const [selectedCallout,setSelectedCallout]=useState<string|null>(null);
  const [message,setMessage]=useState("");
+ const [paintActive,setPaintActive]=useState(false);
+ const [copyMenu,setCopyMenu]=useState(false);
  const [preview,setPreview]=useState<{title:string;summary:string;category:string;body:string;cover:string|null}|null>(null);
 
  useEffect(()=>{
@@ -341,26 +343,37 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
   }catch{setMessage("কপি করার অনুমতি পাওয়া যায়নি। HTTPS পেজে ব্রাউজারের Clipboard permission পরীক্ষা করুন।");}
  };
  const copyFormatting=()=>{
-  focusEditor();const selection=window.getSelection();const node=selection?.anchorNode;
-  if(!node)return;
-  const element=node.nodeType===Node.TEXT_NODE?node.parentElement:node as HTMLElement;
+  const selection=window.getSelection(),root=rootRef.current;
+  if(!selection?.rangeCount||!root||!root.contains(selection.anchorNode)){
+   setMessage("যে লেখার ফরম্যাট কপি করবেন, প্রথমে সেখানে কার্সর রাখুন।");return;
+  }
+  const node=selection.anchorNode;
+  const element=node?.nodeType===Node.TEXT_NODE?node.parentElement:node as HTMLElement|null;
   if(!element)return;
   const computed=window.getComputedStyle(element);
-  const bold=computed.fontWeight==="bold"||Number(computed.fontWeight)>=600;
-  const italic=computed.fontStyle==="italic";
-  styleRef.current={bold,italic,fontSize:computed.fontSize};
-  setMessage("নির্বাচিত লেখার বোল্ড, ইটালিক ও ফন্ট সাইজ কপি হয়েছে। এবার অন্য লেখা সিলেক্ট করে ‘ফরম্যাট বসান’ চাপুন।");
+  styleRef.current={
+   bold:computed.fontWeight==="bold"||Number(computed.fontWeight)>=600,
+   italic:computed.fontStyle==="italic",fontSize:computed.fontSize
+  };
+  setPaintActive(true);
+  setMessage("পেইন্ট ফরম্যাট চালু। অন্য লেখা সিলেক্ট করলে একই ফরম্যাট বসবে।");
  };
- const pasteFormatting=()=>{
-  const styling=styleRef.current;
-  if(!styling){setMessage("প্রথমে ‘ফরম্যাট কপি’ চাপুন।");return;}
-  focusEditor();
-  if(document.queryCommandState("bold")!==styling.bold)document.execCommand("bold");
-  if(document.queryCommandState("italic")!==styling.italic)document.execCommand("italic");
+ const paintSelection=()=>{
+  const styling=styleRef.current,root=rootRef.current,sel=window.getSelection();
+  if(!styling||!root||!sel?.rangeCount||sel.isCollapsed||!root.contains(sel.anchorNode))return;
+  const range=sel.getRangeAt(0);
+  if(!root.contains(range.commonAncestorContainer))return;
   const n=parseInt(styling.fontSize,10);
   const allowed=[14,16,18,20,22,24,28,32];
   const nearest=allowed.reduce((a,b)=>Math.abs(b-n)<Math.abs(a-n)?b:a,18);
-  applyFontSize(String(nearest));save();
+  const fragment=range.extractContents();
+  const span=el("span");span.style.fontSize=String(nearest)+"px";
+  span.style.fontWeight=styling.bold?"700":"400";
+  span.style.fontStyle=styling.italic?"italic":"normal";
+  span.append(fragment);range.insertNode(span);sel.removeAllRanges();
+  const caret=document.createRange();caret.setStartAfter(span);caret.collapse(true);
+  sel.addRange(caret);rememberedSelection.current=caret.cloneRange();
+  setPaintActive(false);setMessage("পেইন্ট ফরম্যাট প্রয়োগ হয়েছে।");save();
  };
  const openDraftPreview=()=>{
   const root=rootRef.current,form=root?.closest("form");
@@ -544,17 +557,24 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
    <button type="button" className="bw-doc-tool-accent" onMouseDown={e=>e.preventDefault()} onClick={()=>addImage("image")}>＋ ছবি</button>
    <button type="button" onMouseDown={e=>e.preventDefault()} onClick={()=>addImage("split")}>ছবি ও লেখা</button>
    <button type="button" onMouseDown={e=>e.preventDefault()} onClick={()=>addImage("gallery")}>২ ছবি</button>
+   <button type="button" className="bw-doc-tool-accent" onMouseDown={e=>e.preventDefault()} onClick={()=>addImage("slideshow")}>▧ স্লাইডশো</button>
    <button type="button" onMouseDown={e=>e.preventDefault()} onClick={insertImageUrl} title="ছবির URL থেকে যোগ করুন">ছবির URL</button>
    <span className="bw-doc-toolbar-separator" aria-hidden="true"/>
    <button type="button" className="bw-doc-tool-accent" onMouseDown={e=>e.preventDefault()} onClick={()=>applyQuote("quote")}>❝ বড় উদ্ধৃতি</button>
    <button type="button" onMouseDown={e=>e.preventDefault()} onClick={()=>applyQuote("callout")}>হাইলাইট বক্স</button>
    <button type="button" onMouseDown={e=>e.preventDefault()} onClick={addDivider}>রেখা</button>
    <span className="bw-doc-toolbar-separator" aria-hidden="true"/>
-   <button type="button" onMouseDown={e=>e.preventDefault()} onClick={()=>copyAs("rich")}>ফরম্যাটসহ কপি</button>
-   <button type="button" onMouseDown={e=>e.preventDefault()} onClick={()=>copyAs("plain")}>Plain Text</button>
-   <button type="button" onMouseDown={e=>e.preventDefault()} onClick={()=>copyAs("markdown")}>Markdown</button>
-   <button type="button" onMouseDown={e=>e.preventDefault()} onClick={copyFormatting}>ফরম্যাট কপি</button>
-   <button type="button" onMouseDown={e=>e.preventDefault()} onClick={pasteFormatting}>ফরম্যাট বসান</button>
+   <div className="bw-doc-copy-menu">
+    <button type="button" onMouseDown={e=>e.preventDefault()} onClick={()=>setCopyMenu(v=>!v)} aria-expanded={copyMenu}>কপি ▾</button>
+    {copyMenu&&<div className="bw-doc-copy-options">
+     <button type="button" onClick={()=>{void copyAs("rich");setCopyMenu(false);}}>ফরম্যাটসহ কপি</button>
+     <button type="button" onClick={()=>{void copyAs("plain");setCopyMenu(false);}}>Plain Text</button>
+     <button type="button" onClick={()=>{void copyAs("markdown");setCopyMenu(false);}}>Markdown</button>
+    </div>}
+   </div>
+   <button type="button" className={paintActive?"bw-doc-painter is-active":"bw-doc-painter"}
+     onMouseDown={e=>e.preventDefault()} onClick={()=>paintActive?setPaintActive(false):copyFormatting()}
+     aria-pressed={paintActive} title="পেইন্ট ফরম্যাট: উৎস লেখায় কার্সর রেখে চাপুন, তারপর অন্য লেখা সিলেক্ট করুন">🖌 ফরম্যাট</button>
    <button type="button" className="bw-doc-preview-action" onMouseDown={e=>e.preventDefault()} onClick={openDraftPreview}>◉ প্রকাশের আগে প্রিভিউ</button>
   </div>
   {selectedImage&&<div className="bw-doc-image-controls" aria-label="ছবির সাইজ ও অবস্থান">
@@ -571,7 +591,7 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
   <div ref={rootRef} className="bw-doc-surface" contentEditable suppressContentEditableWarning
     data-placeholder="এখানে সম্পূর্ণ সংবাদ লিখুন বা পেস্ট করুন…"
     role="textbox" aria-label="সংবাদের মূল লেখা" aria-multiline="true"
-    onInput={save} onBlur={()=>{save();const root=rootRef.current;window.dispatchEvent(new CustomEvent("bw:article-editor-blur",{detail:{body:root?serializeRichBody(extractBlocks(root)):""}}));}} onMouseUp={remember} onKeyUp={remember}
+    onInput={save} onBlur={()=>{save();const root=rootRef.current;window.dispatchEvent(new CustomEvent("bw:article-editor-blur",{detail:{body:root?serializeRichBody(extractBlocks(root)):""}}));}} onMouseUp={()=>paintActive?paintSelection():remember()} onKeyUp={()=>paintActive?paintSelection():remember()}
     onClick={event=>{
       const target=event.target;
       if(!(target instanceof Element))return;
