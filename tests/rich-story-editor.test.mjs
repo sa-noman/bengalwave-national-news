@@ -58,15 +58,48 @@ test("images use the authenticated existing upload path and gallery files map co
  assert.match(read("next.config.ts"),/bodySizeLimit: "30mb"/);
 });
 
-test("visual quoted-excerpt style matches requested large grey pullquote with red marks and byline",()=>{
+test("visual quoted-excerpt style uses Bengal Wave brand-green marks and byline",()=>{
  const css=read("src/app/rich-article.css");
  const editor=read("src/components/admin/article-body-editor.tsx");
  assert.match(css,/\.bw-rich-quote:before/);
- assert.match(css,/color:#ce0000/);
+ assert.match(css,/\.bw-rich-quote:before\{[\s\S]*?color:var\(--bw-green\)/);
  assert.match(css,/\.bw-rich-quote cite/);
  assert.match(css,/\.bw-doc-surface blockquote\.bw-doc-pullquote/);
  assert.match(editor,/cite.contentEditable="true"/);
  assert.match(editor,/applyQuote\("quote"\)/);
  assert.match(css,/@media\(max-width:760px\)/);
  assert.match(read("src/app/layout.tsx"),/import "\.\/rich-article.css"/);
+});
+
+test("pre-publication editor preview uses unsaved form content, never publishes",()=>{
+ const editor=read("src/components/admin/article-body-editor.tsx");
+ assert.match(editor,/openDraftPreview=\(\)=>/);
+ assert.match(editor,/role="dialog" aria-modal="true"/);
+ assert.match(editor,/<RichArticleBody body=\{preview.body\} allowLocalImages\/>/);
+ assert.match(editor,/type="button" className="bw-doc-preview-action"/);
+ assert.match(editor,/previewCoverRef/);
+});
+test("font-size, paste-format and copy modes persist to safe article markup",()=>{
+ const editor=read("src/components/admin/article-body-editor.tsx");
+ const reader=read("src/components/rich-article-body.tsx");
+ for(const text of ["ফরম্যাটসহ কপি","Plain Text","Markdown","ফরম্যাট কপি","ফরম্যাট বসান","নির্বাচিত লেখার ফন্ট সাইজ"]){
+  assert.ok(editor.includes(text),"missing "+text);
+ }
+ assert.match(editor,/style\.fontSize=value\+"px"/);
+ assert.match(editor,/\\[\\[fs:/);
+ assert.match(reader,/fontPattern/);
+ assert.doesNotMatch(reader,/dangerouslySetInnerHTML/);
+});
+test("SEO descriptions are generated only by authenticated editors and AI draft needs credentials",()=>{
+ const summary=read("src/components/admin/article-summary-field.tsx");
+ const action=read("src/app/admin/seo-summary-action.ts");
+ const form=read("src/components/admin/article-form.tsx");
+ assert.match(form,/<ArticleSummaryField initialSummary=/);
+ assert.match(action,/await requireStaff\(\)/);
+ assert.match(action,/process\.env\.OPENAI_API_KEY/);
+ assert.match(action,/store:false/);
+ assert.match(action,/https:\/\/api\.openai\.com\/v1\/responses/);
+ assert.match(action,/কোনো নতুন তথ্য/);
+ assert.match(summary,/AI দিয়ে তৈরি \/ নতুন করে লিখুন/);
+ assert.match(summary,/AI দিয়ে তৈরি নয়/);
 });
