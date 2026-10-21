@@ -8,7 +8,8 @@ test("CMS article body uses a structured editor but continues to save through th
  const form=read("src/components/admin/article-form.tsx");
  const editor=read("src/components/admin/article-body-editor.tsx");
  assert.match(form,/<ArticleBodyEditor initialBody=/);
- assert.match(editor,/name="body" value=\{serializeRichBody\(blocks\)\}/);
+ assert.match(editor,/<input type="hidden" name="body" value=\{serializeRichBody\(blocks\)\} readOnly\/>/);
+ assert.doesNotMatch(editor,/<textarea name="body"/);
  for(const type of ["paragraph","heading","subheading","quote","callout","list","image","split","gallery","divider"]){
    assert.match(editor,new RegExp('type:"'+type+'"'));
  }
@@ -54,4 +55,17 @@ test("rich media layouts collapse responsively instead of distorting photos",()=
  assert.match(css,/grid-template-columns:minmax\(0,1fr\) minmax\(0,1\.12fr\)/);
  assert.match(css,/@media\(max-width:760px\)/);
  assert.match(read("src/app/layout.tsx"),/import "\.\/rich-article.css"/);
+});
+
+test("serialized JSON stays hidden and multiple images have direct action buttons",()=>{
+ const editor=read("src/components/admin/article-body-editor.tsx");
+ const css=read("src/app/rich-article.css");
+ for(const block of ["image","split","gallery"]){
+   assert.ok(editor.includes('onClick={()=>add("'+block+'")}'),block+" shortcut is missing");
+ }
+ assert.match(editor,/onClick=\{\(\)=>add\("image",index\)\}/);
+ assert.match(editor,/type="file" name=\{fieldName\}/);
+ assert.match(editor,/inline_image_/);
+ assert.match(css,/\.admin-form input\[type="hidden"\]/);
+ assert.match(css,/display:none!important/);
 });
