@@ -14,9 +14,8 @@ export function ArticleSlideshow({slides,allowLocalImages=false}:{slides:StorySl
  return <div className="bw-story-slider" role="group" aria-roledescription="carousel" aria-label="সংবাদের ছবির স্লাইডশো">
   <div className="bw-story-slider-stage">
    {source&&<>
-    <div className="bw-story-slider-backdrop" aria-hidden="true">
-     <img key={"backdrop-"+source} src={source} alt="" decoding="async"/>
-    </div>
+    <div className="bw-story-slider-backdrop" aria-hidden="true"
+      style={{backgroundImage:`url(${JSON.stringify(source)})`}}/>
     <img className="bw-story-slider-photo" key={source} src={source}
      alt={active.alt||active.caption||"সংবাদের ছবি"} loading="lazy" decoding="async"/>
    </>}
