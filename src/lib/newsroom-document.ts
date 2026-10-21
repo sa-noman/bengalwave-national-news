@@ -8,7 +8,7 @@ import type {StoryBlock} from "@/lib/rich-article";
 export const NEWSROOM_PREFIX="BW_NEWSROOM_V2\n";
 /** HTML form submissions may normalize line feeds to CRLF before storage.
  * Accept both spellings of the version marker without modifying saved stories. */
-const NEWSROOM_CRLF_PREFIX="BW_NEWSROOM_V2\\r\\n";
+const NEWSROOM_CRLF_PREFIX="BW_NEWSROOM_V2\r\n";
 export function isNewsroomBody(raw:string):boolean{
  return raw.startsWith(NEWSROOM_PREFIX)||raw.startsWith(NEWSROOM_CRLF_PREFIX);
 }
