@@ -9,16 +9,16 @@ import {HeritageStories} from "@/components/heritage-stories";
 function SectionHeading({title,href="/latest",linkText="আরও"}:{title:string;href?:string;linkText?:string}){
  return <div className="bw-section-heading"><h2><Link href={href}>{title}</Link></h2><Link href={href}>{linkText} <span aria-hidden="true">›</span></Link></div>;
 }
-function FourColumn({items}:{items:NewsItem[]}){
+function FourColumn({items,hideCategory=false}:{items:NewsItem[];hideCategory?:boolean}){
  if(!items.length)return <p className="bw-empty">এই বিভাগে এখনো সংবাদ প্রকাশিত হয়নি।</p>;
- return <div className="bw-grid-four">{items.map(item=><NewsCard item={item} key={item.id}/>)}</div>;
+ return <div className="bw-grid-four">{items.map(item=><NewsCard item={item} key={item.id} hideCategory={hideCategory}/>)}</div>;
 }
-function NewsSection({title,items,href,boxed=false}:{title:string;items:NewsItem[];href:string;boxed?:boolean}){
+function NewsSection({title,items,href,boxed=false,hideCategory=false}:{title:string;items:NewsItem[];href:string;boxed?:boolean;hideCategory?:boolean}){
  if(!items.length)return null;
  return <section className="bw-section"><div className="bw-wrap">
    <div className={boxed?"bw-selected-box":""}>
     <SectionHeading title={title} href={href} linkText={boxed?"সব প্রতিবেদন":"আরও"}/>
-    <FourColumn items={items}/>
+    <FourColumn items={items} hideCategory={hideCategory}/>
    </div>
  </div></section>;
 }
@@ -60,7 +60,7 @@ export default async function Home(){
       <div className="bw-latest-list">{latest.map(item=><NewsCard key={item.id} item={item} variant="latest"/>)}</div>
     </aside>
    </div></section>
-   <NewsSection title="এক্সক্লুসিভ" href="/latest" boxed items={select}/>
+   <NewsSection title="এক্সক্লুসিভ" href="/latest" boxed hideCategory items={select}/>
    <NewsSection title="জাতীয়" href="/category/national" items={national}/>
    <NewsSection title="আন্তর্জাতিক" href="/category/international" items={world}/>
    <NewsSection title="খেলাধুলা" href="/category/sports" items={sports}/>
