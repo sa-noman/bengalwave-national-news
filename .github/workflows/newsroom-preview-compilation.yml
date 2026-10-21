@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - preview/professional-newsroom-20261021
+  pull_request:
+    branches: [main]
 permissions:
   contents: read
 jobs:
