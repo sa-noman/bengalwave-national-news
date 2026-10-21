@@ -2,6 +2,7 @@
 
 import {useEffect,useRef,useState} from "react";
 import {createStoryBlock,legacyStoryBlocks,parseRichBody,safeStoryImageUrl,serializeRichBody} from "@/lib/rich-article";
+import {RichArticleBody} from "@/components/rich-article-body";
 import type {StoryBlock,StoryBlockType} from "@/lib/rich-article";
 
 const MAX_IMAGE_BYTES=4*1024*1024;
@@ -11,6 +12,16 @@ function el<K extends keyof HTMLElementTagNameMap>(tag:K,className?:string){
  const node=document.createElement(tag);if(className)node.className=className;return node;
 }
 function textToInline(parent:HTMLElement,raw:string){
+ // Restore bounded font sizes recorded in the article format.
+ const sizes=/\[\[fs:(14|16|18|20|22|24|28|32)\]\]([\s\S]*?)\[\[\/fs\]\]/g;
+ let match:RegExpExecArray|null;let from=0;let any=false;
+ while((match=sizes.exec(raw))!==null){
+  any=true;
+  if(match.index>from)textToInline(parent,raw.slice(from,match.index));
+  const span=el("span");span.style.fontSize=match[1]+"px";
+  textToInline(span,match[2]);parent.append(span);from=match.index+match[0].length;
+ }
+ if(any){if(from<raw.length)textToInline(parent,raw.slice(from));return;}
  // Legacy stored stories use a very small Markdown subset, never raw HTML.
  const parts=raw.split(/(\*\*[^*\n]+\*\*|\*[^*\n]+\*|\[[^\]\n]+\]\(https:\/\/[^\s)]+\))/g);
  for(const part of parts){
@@ -78,6 +89,8 @@ function inlineText(node:Node):string{
  const inside=Array.from(node.childNodes).map(inlineText).join("");
  if(tag==="STRONG"||tag==="B")return "**"+inside+"**";
  if(tag==="EM"||tag==="I")return "*"+inside+"*";
+ if(tag==="SPAN"&&/^(14|16|18|20|22|24|28|32)px$/.test(element.style.fontSize))
+  return "[[fs:"+parseInt(element.style.fontSize,10)+"]]"+inside+"[[/fs]]";
  if(tag==="A"){
   const link=element as HTMLAnchorElement;
   if(link.href.startsWith("https://"))return "["+inside+"]("+link.href+")";
@@ -167,11 +180,14 @@ export function ArticleBodyEditor({initialBody=""}:{initialBody?:string}){
  const chooserRef=useRef<HTMLInputElement>(null);
  const rememberedSelection=useRef<Range|null>(null);
  const modeRef=useRef<ImageMode>("image");
+ const styleRef=useRef<{bold:boolean;italic:boolean;fontSize:string}|null>(null);
+ const previewCoverRef=useRef<string|null>(null);
  const blobUrls=useRef<string[]>([]);
  const [body,setBody]=useState(initialBody);
  const [imageCount,setImageCount]=useState(0);
  const [selectedImage,setSelectedImage]=useState<string|null>(null);
  const [message,setMessage]=useState("");
+ const [preview,setPreview]=useState<{title:string;summary:string;category:string;body:string;cover:string|null}|null>(null);
 
  useEffect(()=>{
   const root=rootRef.current;if(!root)return;
@@ -234,6 +250,100 @@ export function ArticleBodyEditor({initialBody=""}:{initialBody?:string}){
   save();remember();
  };
  const formatBlock=(tag:"p"|"h2"|"h3")=>command("formatBlock","<"+tag+">");
+ const applyFontSize=(value:string)=>{
+  if(!/^(14|16|18|20|22|24|28|32)$/.test(value))return;
+  focusEditor();
+  const selection=window.getSelection(),root=rootRef.current;
+  if(!root||!selection?.rangeCount||selection.isCollapsed||!root.contains(selection.anchorNode)){
+   setMessage("ফন্টের আকার বদলাতে আগে লেখার অংশ সিলেক্ট করুন।");return;
+  }
+  const range=selection.getRangeAt(0);
+  const span=el("span");span.style.fontSize=value+"px";
+  span.append(range.extractContents());range.insertNode(span);
+  const next=document.createRange();next.selectNodeContents(span);
+  selection.removeAllRanges();selection.addRange(next);
+  save();remember();
+ };
+ const collectCopy=():{html:string;plain:string;markdown:string}=>{
+  const root=rootRef.current;
+  const blocks=root?extractBlocks(root):[];
+  const safe=el("div");
+  safe.replaceChildren(...blocks.map(toDOM));
+  const markdown=blocks.map(b=>{
+   if(b.type==="heading")return "## "+b.text;
+   if(b.type==="subheading")return "### "+b.text;
+   if(b.type==="quote")return "> "+b.text+(b.credit?"\n> "+b.credit:"");
+   if(b.type==="list")return b.text.split("\n").map(s=>"- "+s).join("\n");
+   if(b.type==="divider")return "---";
+   if(["image","gallery","split"].includes(b.type))return [b.caption,b.caption2,b.text].filter(Boolean).join("\n");
+   return b.text;
+  }).join("\n\n");
+  return {html:safe.innerHTML,plain:root?.innerText||"",markdown};
+ };
+ const copyAs=async(mode:"rich"|"plain"|"markdown")=>{
+  const content=collectCopy();
+  try{
+   if(mode==="rich"){
+    if(!navigator.clipboard.write||typeof ClipboardItem==="undefined")throw Error("no rich clipboard");
+    await navigator.clipboard.write([new ClipboardItem({
+     "text/html":new Blob([content.html],{type:"text/html"}),
+     "text/plain":new Blob([content.plain],{type:"text/plain"})
+    })]);
+   }else await navigator.clipboard.writeText(mode==="plain"?content.plain:content.markdown);
+   setMessage(mode==="rich"?"ফরম্যাটসহ কপি হয়েছে।":mode==="plain"?"সাধারণ টেক্সট কপি হয়েছে।":"Markdown কপি হয়েছে।");
+  }catch{setMessage("কপি করার অনুমতি পাওয়া যায়নি। HTTPS পেজে ব্রাউজারের Clipboard permission পরীক্ষা করুন।");}
+ };
+ const copyFormatting=()=>{
+  focusEditor();const selection=window.getSelection();const node=selection?.anchorNode;
+  if(!node)return;
+  const element=node.nodeType===Node.TEXT_NODE?node.parentElement:node as HTMLElement;
+  if(!element)return;
+  const computed=window.getComputedStyle(element);
+  const bold=computed.fontWeight==="bold"||Number(computed.fontWeight)>=600;
+  const italic=computed.fontStyle==="italic";
+  styleRef.current={bold,italic,fontSize:computed.fontSize};
+  setMessage("নির্বাচিত লেখার বোল্ড, ইটালিক ও ফন্ট সাইজ কপি হয়েছে। এবার অন্য লেখা সিলেক্ট করে ‘ফরম্যাট বসান’ চাপুন।");
+ };
+ const pasteFormatting=()=>{
+  const styling=styleRef.current;
+  if(!styling){setMessage("প্রথমে ‘ফরম্যাট কপি’ চাপুন।");return;}
+  focusEditor();
+  if(document.queryCommandState("bold")!==styling.bold)document.execCommand("bold");
+  if(document.queryCommandState("italic")!==styling.italic)document.execCommand("italic");
+  const n=parseInt(styling.fontSize,10);
+  const allowed=[14,16,18,20,22,24,28,32];
+  const nearest=allowed.reduce((a,b)=>Math.abs(b-n)<Math.abs(a-n)?b:a,18);
+  applyFontSize(String(nearest));save();
+ };
+ const openDraftPreview=()=>{
+  const root=rootRef.current,form=root?.closest("form");
+  if(!root||!form)return;
+  const value=(name:string)=>(form.elements.namedItem(name) as HTMLInputElement|HTMLTextAreaElement|null)?.value||"";
+  const category=form.elements.namedItem("category_id") as HTMLSelectElement|null;
+  const blocks=extractBlocks(root).map(block=>{
+   const next={...block};
+   const getLocal=(id:string)=>{
+    const figure=Array.from(root.querySelectorAll("figure[data-block-id]"))
+      .find(f=>(f as HTMLElement).dataset.blockId===id);
+    const url=figure?.querySelector("img")?.getAttribute("src")||"";
+    return url.startsWith("blob:")?url:"";
+   };
+   if(!next.src)next.src=getLocal(block.id);
+   if(block.type==="gallery"&&!next.src2)next.src2=getLocal(block.id+"-second");
+   return next;
+  });
+  const imageFile=(form.elements.namedItem("image_file") as HTMLInputElement|null)?.files?.[0]||null;
+  if(previewCoverRef.current){URL.revokeObjectURL(previewCoverRef.current);previewCoverRef.current=null;}
+  const cover=imageFile?URL.createObjectURL(imageFile):null;
+  if(cover)previewCoverRef.current=cover;
+  setPreview({title:value("headline")||"সংবাদের শিরোনাম",
+   summary:value("summary"),category:category?.selectedOptions[0]?.textContent||"সংবাদ",
+   body:serializeRichBody(blocks),cover});
+ };
+ const closeDraftPreview=()=>{
+  setPreview(null);
+  if(previewCoverRef.current){URL.revokeObjectURL(previewCoverRef.current);previewCoverRef.current=null;}
+ };
  const applyQuote=(kind:"quote"|"callout")=>{
   focusEditor();
   document.execCommand("formatBlock",false,"<blockquote>");
@@ -335,6 +445,12 @@ export function ArticleBodyEditor({initialBody=""}:{initialBody?:string}){
    <button type="button" onMouseDown={e=>e.preventDefault()} onClick={()=>formatBlock("h2")}>শিরোনাম</button>
    <button type="button" onMouseDown={e=>e.preventDefault()} onClick={()=>formatBlock("h3")}>উপশিরোনাম</button>
    <button type="button" onMouseDown={e=>e.preventDefault()} onClick={()=>command("insertUnorderedList")}>• তালিকা</button>
+   <label className="bw-doc-font-label">ফন্ট
+    <select aria-label="নির্বাচিত লেখার ফন্ট সাইজ" defaultValue="18" onMouseDown={e=>e.stopPropagation()}
+     onChange={e=>{applyFontSize(e.target.value);}}>
+     {[14,16,18,20,22,24,28,32].map(size=><option key={size} value={size}>{size}px</option>)}
+    </select>
+   </label>
    <button type="button" onMouseDown={e=>e.preventDefault()} onClick={()=>{
     const link=window.prompt("HTTPS লিংক দিন:");if(link?.startsWith("https://"))command("createLink",link);
    }}>লিংক</button>
@@ -347,6 +463,13 @@ export function ArticleBodyEditor({initialBody=""}:{initialBody?:string}){
    <button type="button" className="bw-doc-tool-accent" onMouseDown={e=>e.preventDefault()} onClick={()=>applyQuote("quote")}>❝ বড় উদ্ধৃতি</button>
    <button type="button" onMouseDown={e=>e.preventDefault()} onClick={()=>applyQuote("callout")}>হাইলাইট বক্স</button>
    <button type="button" onMouseDown={e=>e.preventDefault()} onClick={addDivider}>রেখা</button>
+   <span className="bw-doc-toolbar-separator" aria-hidden="true"/>
+   <button type="button" onMouseDown={e=>e.preventDefault()} onClick={()=>copyAs("rich")}>ফরম্যাটসহ কপি</button>
+   <button type="button" onMouseDown={e=>e.preventDefault()} onClick={()=>copyAs("plain")}>Plain Text</button>
+   <button type="button" onMouseDown={e=>e.preventDefault()} onClick={()=>copyAs("markdown")}>Markdown</button>
+   <button type="button" onMouseDown={e=>e.preventDefault()} onClick={copyFormatting}>ফরম্যাট কপি</button>
+   <button type="button" onMouseDown={e=>e.preventDefault()} onClick={pasteFormatting}>ফরম্যাট বসান</button>
+   <button type="button" className="bw-doc-preview-action" onMouseDown={e=>e.preventDefault()} onClick={openDraftPreview}>◉ প্রকাশের আগে প্রিভিউ</button>
   </div>
   {selectedImage&&<div className="bw-doc-image-controls" aria-label="ছবির সাইজ ও অবস্থান">
     <span>নির্বাচিত ছবি:</span>
@@ -362,7 +485,7 @@ export function ArticleBodyEditor({initialBody=""}:{initialBody?:string}){
   <div ref={rootRef} className="bw-doc-surface" contentEditable suppressContentEditableWarning
     data-placeholder="এখানে সম্পূর্ণ সংবাদ লিখুন বা পেস্ট করুন…"
     role="textbox" aria-label="সংবাদের মূল লেখা" aria-multiline="true"
-    onInput={save} onBlur={save} onMouseUp={remember} onKeyUp={remember}
+    onInput={save} onBlur={()=>{save();window.dispatchEvent(new Event("bw:article-editor-blur"));}} onMouseUp={remember} onKeyUp={remember}
     onClick={event=>{
       const target=event.target;
       if(!(target instanceof Element))return;
@@ -388,6 +511,24 @@ export function ArticleBodyEditor({initialBody=""}:{initialBody?:string}){
    onChange={event=>{handleFiles(event.currentTarget.files);event.currentTarget.value="";}}/>
   <div ref={uploadsRef} className="bw-doc-file-rack" aria-hidden="true"/>
   {message&&<p className="bw-doc-message" role="status">{message}</p>}
+  {preview&&<div className="bw-doc-preview-backdrop" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)closeDraftPreview();}}>
+    <div className="bw-doc-preview-modal" role="dialog" aria-modal="true" aria-label="সংবাদ প্রকাশের আগের প্রিভিউ">
+      <div className="bw-doc-preview-head">
+       <strong>সংবাদ প্রিভিউ · এখনো প্রকাশিত হয়নি</strong>
+       <button type="button" onClick={closeDraftPreview} aria-label="প্রিভিউ বন্ধ করুন">✕ বন্ধ করুন</button>
+      </div>
+      <div className="bw-doc-preview-content bw-website">
+       <article className="bw-article">
+        <span className="bw-tag">{preview.category}</span>
+        <h1>{preview.title}</h1>
+        {preview.summary&&<p className="bw-article-deck">{preview.summary}</p>}
+        <div className="bw-article-byline">Bengal Wave · প্রকাশের আগের অস্থায়ী প্রিভিউ</div>
+        {preview.cover&&<figure className="bw-doc-preview-cover"><img src={preview.cover} alt="মূল সংবাদ ছবি"/></figure>}
+        <RichArticleBody body={preview.body} allowLocalImages/>
+       </article>
+      </div>
+    </div>
+   </div>}
   <p className="bw-doc-help"><strong>বড় উদ্ধৃতি:</strong> উদ্ধৃতির অনুচ্ছেদে কার্সর রেখে ‘❝ বড় উদ্ধৃতি’ চাপুন। নিচে বক্তার পরিচয় লিখুন। <strong>ছবির সাইজ:</strong> ছবিতে ক্লিক করে ছোট, মাঝারি বা পূর্ণ প্রস্থ বেছে নিন।</p>
  </section>;
 }
