@@ -4,6 +4,8 @@ import {publicNewsImageUrl} from "@/lib/news-media-paths";
 import {uploadNewsImage} from "@/lib/news-media";
 import {parseRichBody,safeStoryImageUrl,serializeRichBody} from "@/lib/rich-article";
 import type {StoryBlock} from "@/lib/rich-article";
+import {NEWSROOM_PREFIX,parseNewsroomBody,serializeNewsroomBody,validateNewsroomBody} from "@/lib/newsroom-document";
+import type {NewsJSON,NewsPhoto} from "@/lib/newsroom-document";
 
 type Supabase=Awaited<ReturnType<typeof createSupabaseServerClient>>;
 export type InlineImagesResult={ok:true;body:string}|{ok:false;error:string};
@@ -15,7 +17,46 @@ export type InlineImagesResult={ok:true;body:string}|{ok:false;error:string};
 export async function resolveStoryInlineImages(
  body:string,form:FormData,userId:string,supabase:Supabase
 ):Promise<InlineImagesResult>{
- const blocks=parseRichBody(body);
+ if(body.startsWith(NEWSROOM_PREFIX)){
+  if(!validateNewsroomBody(body,form))return {ok:false,error:"invalid"};
+  const doc=parseNewsroomBody(body);
+  if(!doc)return {ok:false,error:"invalid"};
+  let count=0;
+  const resolve=async(node:NewsJSON):Promise<NewsJSON>=>{
+   let updated:NewsJSON={...node};
+   if(node.type==="newsMedia"){
+    const attrs={...(node.attrs||{})};
+    const photos=(attrs.photos||[]) as NewsPhoto[];
+    const changed:NewsPhoto[]=[];
+    for(const photo of photos){
+     const clone={...photo};
+     const file=form.get("newsroom_media_"+photo.id);
+     if(file instanceof File&&file.size>0){
+      if(++count>6)throw new Error("limit");
+      const uploaded=await uploadNewsImage(file,
+       {alt:photo.alt||"সংবাদের ছবি",caption:photo.caption,credit:photo.credit},
+       userId,supabase);
+      if(!uploaded.ok)throw new Error(uploaded.error);
+      const {data,error}=await supabase.from("media_assets").select("storage_path")
+       .eq("id",uploaded.mediaId).maybeSingle();
+      const url=!error&&data?publicNewsImageUrl(supabase,data.storage_path,"full"):null;
+      if(!url)throw new Error("metadata");
+      clone.src=url;
+     }
+     changed.push(clone);
+    }
+    updated={...updated,attrs:{...attrs,photos:changed}};
+   }
+   if(node.content)updated.content=await Promise.all(node.content.map(resolve));
+   return updated;
+  };
+  try{
+   const saved=serializeNewsroomBody(await resolve(doc));
+   if(saved.length>80000)return {ok:false,error:"too_long"};
+   return {ok:true,body:saved};
+  }catch{return {ok:false,error:"upload_failed"};}
+ }
+  const blocks=parseRichBody(body);
  if(!blocks)return {ok:true,body};
  let newImages=0;
  const updated:StoryBlock[]=[];
