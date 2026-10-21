@@ -23,12 +23,12 @@ export function ArticleSummaryField({initialSummary=""}:{initialSummary?:string}
  const touched=useRef(Boolean(initialSummary.trim()));
  const current=useRef(initialSummary);
  current.current=value;
- const generate=async(force=false)=>{
+ const generate=async(force=false,bodyOverride?:string)=>{
   const field=document.querySelector<HTMLTextAreaElement>('textarea[name="summary"]');
   const form=field?.closest("form");if(!form||generating.current)return;
   if(!force&&(touched.current||current.current.trim()))return;
   const headline=(form.elements.namedItem("headline") as HTMLInputElement|null)?.value.trim()||"";
-  const raw=(form.elements.namedItem("body") as HTMLInputElement|null)?.value||"";
+  const raw=bodyOverride||(form.elements.namedItem("body") as HTMLInputElement|null)?.value||"";
   const blocks=parseRichBody(raw);
   const len=blocks?blocks.reduce((n,b)=>n+b.text.trim().length,0):raw.trim().length;
   if(headline.length<5||len<60)return;
@@ -59,7 +59,7 @@ export function ArticleSummaryField({initialSummary=""}:{initialSummary?:string}
   }finally{setBusy(false);generating.current=false;}
  };
  useEffect(()=>{
-  const listener=()=>{void generate(false);};
+  const listener=(event:Event)=>{const body=(event as CustomEvent<{body?:string}>).detail?.body;void generate(false,body);};
   window.addEventListener("bw:article-editor-blur",listener);
   return ()=>window.removeEventListener("bw:article-editor-blur",listener);
  // Document change event only; the active inputs are always read at execution time.
