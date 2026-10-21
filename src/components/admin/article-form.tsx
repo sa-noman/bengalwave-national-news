@@ -34,7 +34,7 @@ export function ArticleForm({categories,article,role,media}:{
         <input name="source_name" maxLength={150} defaultValue={article?.source_name||""} placeholder="প্রতিষ্ঠানের নাম"/>
       </label>
       <ArticleSummaryField initialSummary={article?.summary||""}/>
-      <ArticleBodyEditor initialBody={article?.body||""}/>
+      <ArticleBodyEditor initialBody={article?.body||""} initialCoverUrl={media?.url}/>
       <label className="full-span">উৎসের URL (ঐচ্ছিক)
         <input name="source_url" type="url" defaultValue={article?.source_url||""} placeholder="https://example.com/article"/>
       </label>
