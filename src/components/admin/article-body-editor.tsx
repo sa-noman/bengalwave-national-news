@@ -7,7 +7,7 @@ import type {StoryBlock,StoryBlockType} from "@/lib/rich-article";
 
 const MAX_IMAGE_BYTES=4*1024*1024;
 const ACCEPTED=["image/jpeg","image/png","image/webp","image/avif"];
-type ImageMode="image"|"split"|"gallery";
+type ImageMode="image"|"split"|"gallery"|"slideshow";
 function el<K extends keyof HTMLElementTagNameMap>(tag:K,className?:string){
  const node=document.createElement(tag);if(className)node.className=className;return node;
 }
@@ -58,7 +58,10 @@ function toDOM(block:StoryBlock):HTMLElement{
  if(tag==="quote"||tag==="callout"){
   const q=el("blockquote",tag==="quote"?"bw-doc-pullquote":"bw-doc-highlight");
   q.dataset.kind=tag;
-  if(tag==="callout")q.dataset.tone=block.tone;
+  if(tag==="callout"){
+   q.dataset.tone=block.tone;
+   if(block.borderColor){q.dataset.borderColor=block.borderColor;q.style.borderLeftColor=block.borderColor;}
+  }
   const p=el("p");textToInline(p,block.text);q.append(p);
   if(tag==="quote"){const cite=el("cite");cite.contentEditable="true";cite.dataset.placeholder="উদ্ধৃতির ব্যক্তির নাম ও পদবি";cite.textContent=block.credit;q.append(cite);}
   return q;
@@ -77,6 +80,18 @@ function toDOM(block:StoryBlock):HTMLElement{
   grid.append(makeFigure(block.src,block.id,block.caption,block.alt,block.credit));
   grid.append(makeFigure(block.src2,block.id+"-second",block.caption2,block.alt2));
   return grid;
+ }
+ if(tag==="slideshow"){
+  const slideshow=el("section","bw-doc-slider-editor");
+  slideshow.dataset.sliderId=block.id;
+  const title=el("strong","bw-doc-slider-label");title.contentEditable="false";title.textContent="ছবির স্লাইডশো · প্রতিটি ছবির নিচে নিজস্ব ক্যাপশন";
+  slideshow.append(title);
+  for(const [index,slide] of (block.slides||[]).entries()){
+   const figure=makeFigure(slide.src,block.id+"-slide-"+index,slide.caption,slide.alt,slide.credit);
+   figure.dataset.slideIndex=String(index);
+   slideshow.append(figure);
+  }
+  return slideshow;
  }
  const p=el("p");textToInline(p,block.text);return p;
 }
@@ -122,6 +137,12 @@ function extractBlocks(root:HTMLElement):StoryBlock[]{
   if(node.nodeType===Node.TEXT_NODE){paragraph(node);return;}
   if(node.nodeType!==Node.ELEMENT_NODE)return;
   const e=node as HTMLElement,tag=e.tagName;
+  if(tag==="SECTION"&&e.classList.contains("bw-doc-slider-editor")){
+   const figures=Array.from(e.querySelectorAll(":scope > figure"));
+   if(figures.length>=2)append({type:"slideshow",id:e.dataset.sliderId||crypto.randomUUID(),
+     slides:figures.map(figure=>{const slide=readFigure(figure);return {src:slide.src,alt:slide.alt,caption:slide.caption,credit:slide.credit};})});
+   return;
+  }
   if(tag==="SECTION"&&e.classList.contains("bw-doc-gallery")){
    const pics=e.querySelectorAll(":scope > figure");
    if(pics.length===2){
@@ -154,7 +175,8 @@ function extractBlocks(root:HTMLElement):StoryBlock[]{
    const content=textNode?inlineText(textNode):Array.from(e.childNodes).filter(n=>n!==citation).map(inlineText).join("");
    append({type,text:content.trim(),
     credit:citation?.textContent?.trim()||"",
-    tone:(["cream","gray","red"].includes(e.dataset.tone||"")?e.dataset.tone:"cream") as StoryBlock["tone"]});
+    tone:(["cream","gray","red"].includes(e.dataset.tone||"")?e.dataset.tone:"cream") as StoryBlock["tone"],
+    borderColor:e.dataset.borderColor&&/^#[0-9a-fA-F]{6}$/.test(e.dataset.borderColor)?e.dataset.borderColor:""});
    return;
   }
   if(tag==="UL"||tag==="OL"){
@@ -275,7 +297,8 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
    if(b.type==="quote")return "> "+b.text+(b.credit?"\n> "+b.credit:"");
    if(b.type==="list")return b.text.split("\n").map(s=>"- "+s).join("\n");
    if(b.type==="divider")return "---";
-   if(["image","gallery","split"].includes(b.type))return [b.caption,b.caption2,b.text].filter(Boolean).join("\n");
+   if(b.type==="slideshow")return (b.slides||[]).map(s=>s.caption||s.alt).filter(Boolean).join("\n");
+   if(["image","gallery","split","slideshow"].includes(b.type))return [b.caption,b.caption2,b.text].filter(Boolean).join("\n");
    return b.text;
   }).join("\n\n");
   return {html:safe.innerHTML,plain:root?.innerText||"",markdown};
