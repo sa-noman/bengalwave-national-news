@@ -1,6 +1,7 @@
 import React from "react";
 import {legacyStoryBlocks,parseRichBody,safeStoryImageUrl} from "@/lib/rich-article";
 import type {StoryBlock} from "@/lib/rich-article";
+import {ArticleSlideshow} from "@/components/article-slideshow";
 
 function renderInline(value:string):React.ReactNode{
  // Limited font-size markup emitted by the authenticated editor.
@@ -42,7 +43,8 @@ function RichBlock({block,allowLocalImages=false}: {block:StoryBlock;allowLocalI
  if(b.type==="heading")return <h2 className="bw-rich-heading">{renderInline(b.text)}</h2>;
  if(b.type==="subheading")return <h3 className="bw-rich-subheading">{renderInline(b.text)}</h3>;
  if(b.type==="quote")return <blockquote className="bw-rich-quote"><p>{renderInline(b.text)}</p>{b.credit&&<cite>{b.credit}</cite>}</blockquote>;
- if(b.type==="callout")return <aside className={"bw-rich-callout bw-rich-tone-"+b.tone}><p>{renderInline(b.text)}</p></aside>;
+ if(b.type==="callout")return <aside className={"bw-rich-callout bw-rich-tone-"+b.tone} style={b.borderColor?{borderLeftColor:b.borderColor}:undefined}><p>{renderInline(b.text)}</p></aside>;
+ if(b.type==="slideshow")return <ArticleSlideshow slides={b.slides||[]} allowLocalImages={allowLocalImages}/>;
  if(b.type==="list")return <ul className="bw-rich-list">{b.text.split("\n").filter(s=>s.trim()).map((item,i)=><li key={i}>{renderInline(item.replace(/^\s*[-•]\s*/,""))}</li>)}</ul>;
  if(b.type==="image")return <div className={"bw-rich-image bw-rich-width-"+b.width+" bw-rich-align-"+b.align}>
    <ImageUnit src={b.src} alt={b.alt} caption={b.caption} credit={b.credit} allowLocalImages={allowLocalImages}/>
