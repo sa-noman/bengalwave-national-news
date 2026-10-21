@@ -14,17 +14,20 @@ const ACCEPT=["image/jpeg","image/png","image/webp","image/avif"];
 const fontSizes=[14,16,18,20,22,24,28,32];
 type Paint={bold:boolean;italic:boolean;underline:boolean;strike:boolean;fontSize?:string;color?:string;heading:number};
 type Preview={title:string;summary:string;category:string;cover:string|null;body:string};
+type LinkRange={from:number;to:number;text:string;href:string};
 
 export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initialBody?:string;initialCoverUrl?:string|null}){
  const initial=useMemo(()=>existingBodyToNewsJSON(initialBody),[initialBody]);
  const [body,setBody]=useState(()=>serializeNewsroomBody(initial));
  const [copyOpen,setCopyOpen]=useState(false),[paintMode,setPaintMode]=useState(false);
+ const [linkOpen,setLinkOpen]=useState(false),[linkText,setLinkText]=useState(""),[linkUrl,setLinkUrl]=useState(""),[linkError,setLinkError]=useState("");
  const [message,setMessage]=useState(""),[preview,setPreview]=useState<Preview|null>(null);
  const [restoreAvailable,setRestoreAvailable]=useState(false),[charCount,setCharCount]=useState(0);
  const rackRef=useRef<HTMLDivElement>(null),fileRef=useRef<HTMLInputElement>(null);
  const intent=useRef<{mode:Mode;mediaId?:string;position:number}|null>(null);
  const paintRef=useRef<Paint|null>(null),filesRef=useRef(new Map<string,string>());
  const coverRef=useRef<string|null>(null);
+ const linkRange=useRef<LinkRange|null>(null);
  const draftKey=useRef("bw-newsroom-draft-new");
  const saveSnapshot=useCallback((doc:NewsJSON)=>{
   const value=serializeNewsroomBody(doc);
@@ -202,6 +205,56 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
   }catch{setMessage("কপি করার জন্য ব্রাউজারের Clipboard অনুমতি প্রয়োজন।");}
   setCopyOpen(false);
  };
+ const openLinkEditor=()=>{
+  if(!editor)return;
+  if(editor.isActive("link"))editor.chain().focus().extendMarkRange("link").run();
+  const {from,to}=editor.state.selection;
+  const selected=from<to?editor.state.doc.textBetween(from,to," "):"";
+  const href=String(editor.getAttributes("link").href||"");
+  linkRange.current={from,to,text:selected,href};
+  setLinkText(selected);setLinkUrl(href);setLinkError("");setLinkOpen(true);
+ };
+ const normalizeHyperlink=(raw:string):string|null=>{
+  const trimmed=raw.trim();
+  if(!trimmed||trimmed.length>1200)return null;
+  const absolute=/^https:\/\//i.test(trimmed)?trimmed:
+   (/^[a-z0-9][a-z0-9.-]+\.[a-z]{2,}(?::\d+)?(?:[/?#][^\s]*)?$/i.test(trimmed)?"https://"+trimmed:null);
+  if(!absolute)return null;
+  try{
+   const url=new URL(absolute);
+   if(url.protocol!=="https:"||!url.hostname||url.username||url.password)return null;
+   return url.href;
+  }catch{return null;}
+ };
+ const saveHyperlink=()=>{
+  if(!editor||!linkRange.current)return;
+  const href=normalizeHyperlink(linkUrl),label=linkText.trim();
+  if(!href){setLinkError("বৈধ HTTPS ওয়েব ঠিকানা দিন (যেমন https://example.com/news)।");return;}
+  if(!label){setLinkError("হাইপারলিংকের জন্য আগে লেখা লিখুন বা নির্বাচন করুন।");return;}
+  const {from,to,text}=linkRange.current;
+  if(from<to&&text===label){
+   editor.chain().focus().setTextSelection({from,to}).setLink({
+    href,target:"_blank",rel:"noopener noreferrer nofollow"
+   }).run();
+  }else{
+   editor.chain().focus().insertContentAt({from,to},{
+    type:"text",text:label,
+    marks:[{type:"link",attrs:{href,target:"_blank",rel:"noopener noreferrer nofollow"}}]
+   }).run();
+  }
+  linkRange.current=null;setLinkOpen(false);setLinkError("");
+  setMessage("হাইপারলিংক যুক্ত হয়েছে। সংবাদ সংরক্ষণ ও প্রিভিউতেও লিংক থাকবে।");
+ };
+ const removeHyperlink=()=>{
+  const range=linkRange.current;
+  if(!editor||!range||range.from===range.to)return;
+  editor.chain().focus().setTextSelection({from:range.from,to:range.to}).unsetLink().run();
+  setLinkOpen(false);linkRange.current=null;setLinkError("");
+  setMessage("লিংক সরানো হয়েছে, লেখাটি অক্ষত আছে।");
+ };
+ const cancelHyperlink=()=>{
+  setLinkOpen(false);linkRange.current=null;setLinkError("");
+ };
  const showPreview=()=>{
   if(!editor)return;
   const form=rackRef.current?.closest("form");if(!form)return;
@@ -259,9 +312,10 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
    <label className="bw-nr-color" title="লেখার রং">
     <span>◉</span><input type="color" defaultValue="#173f32" onChange={e=>editor?.chain().focus().setColor(e.target.value).run()}/>
    </label>
-   <button type="button" onClick={()=>{
-    const href=window.prompt("HTTPS লিংক দিন:");if(href?.startsWith("https://"))editor?.chain().focus().setLink({href}).run();
-   }} title="লিংক">🔗</button>
+   <button type="button" title="নির্বাচিত লেখায় হাইপারলিংক যুক্ত করুন (Ctrl+K)"
+    aria-expanded={linkOpen} onMouseDown={e=>e.preventDefault()} onClick={openLinkEditor}>
+     🔗 হাইপারলিংক
+   </button>
    <button type="button" title="তালিকা" onClick={()=>editor?.chain().focus().toggleBulletList().run()}>☷</button>
    <span className="bw-nr-sep"/>
    <button type="button" className="bw-nr-primary" onClick={()=>promptPhotos("image")}>＋ ছবি</button>
@@ -281,7 +335,28 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
    </div>
    <button type="button" className="bw-nr-primary bw-nr-preview-action" onClick={showPreview}>◉ প্রকাশের আগে প্রিভিউ</button>
   </div>
-  <div className="bw-nr-main" onMouseUp={()=>{if(paintMode)applyPaint();}}>
+  {linkOpen&&<form className="bw-nr-link-panel" onSubmit={event=>{event.preventDefault();saveHyperlink();}}
+    aria-label="হাইপারলিংক যুক্ত বা সম্পাদনা করুন">
+   <label>লিংকে যে লেখা দেখাবে
+    <input autoFocus value={linkText} onChange={e=>setLinkText(e.target.value)}
+     placeholder="লিংকের লেখা" maxLength={400}/>
+   </label>
+   <label>ওয়েবসাইটের লিংক (HTTPS)
+    <input type="url" value={linkUrl} onChange={e=>setLinkUrl(e.target.value)}
+     placeholder="https://example.com/news" maxLength={1200}/>
+   </label>
+   <button type="submit" className="bw-nr-link-save">লিংক যুক্ত / আপডেট</button>
+   {linkRange.current?.href&&<button type="button" onClick={removeHyperlink}>লিংক সরান</button>}
+   <button type="button" onClick={cancelHyperlink}>বাতিল</button>
+   {linkError&&<p className="bw-nr-link-error" role="alert">{linkError}</p>}
+  </form>}
+  <div className="bw-nr-main"
+   onKeyDown={event=>{
+    if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==="k"){
+     event.preventDefault();openLinkEditor();
+    }
+   }}
+   onMouseUp={()=>{if(paintMode)applyPaint();}}>
    {editor?<EditorContent editor={editor}/>:<p className="bw-nr-loading">এডিটর প্রস্তুত হচ্ছে…</p>}
   </div>
   <input name="body" type="hidden" value={body} readOnly/>
