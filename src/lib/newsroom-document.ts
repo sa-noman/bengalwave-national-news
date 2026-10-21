@@ -132,3 +132,11 @@ export function existingBodyToNewsJSON(raw:string):NewsJSON{
  const nodes=blocks.map(blockToNode);
  return {type:"doc",content:nodes.length?nodes:[{type:"paragraph"}]};
 }
+
+export function newsroomPublishableText(raw:string):boolean{
+ if(raw.startsWith(NEWSROOM_PREFIX)){
+  const doc=parseNewsroomBody(raw);
+  return !!doc&&textContent(doc).length>=30;
+ }
+ return raw.startsWith("BW_RICH_V1\n") ? !!parseRichBody(raw)&&parseRichBody(raw)!.reduce((sum,b)=>sum+b.text.trim().length,0)>=30 : raw.trim().length>=30;
+}
