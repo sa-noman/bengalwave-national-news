@@ -34,6 +34,10 @@ export function ArticleSubmitControls({status,isEditor,previewOnly=false}:{
 
   return <>
     <div className="admin-controls">
+      <button className="admin-secondary" type="button" disabled={pending}
+       onClick={()=>window.dispatchEvent(new Event("bw:open-draft-preview"))}>
+        ◉ প্রকাশের আগে সংবাদ প্রিভিউ দেখুন
+      </button>
       <button className="admin-primary" type="submit" disabled={pending||(previewOnly&&status==="published")}>
         {pending?"সংরক্ষণ হচ্ছে…":status?"পরিবর্তন সংরক্ষণ করুন":"খসড়া হিসেবে সংরক্ষণ করুন"}
       </button>
