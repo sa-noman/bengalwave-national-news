@@ -4,7 +4,7 @@ import {publicNewsImageUrl} from "@/lib/news-media-paths";
 import {uploadNewsImage} from "@/lib/news-media";
 import {parseRichBody,safeStoryImageUrl,serializeRichBody} from "@/lib/rich-article";
 import type {StoryBlock} from "@/lib/rich-article";
-import {NEWSROOM_PREFIX,parseNewsroomBody,serializeNewsroomBody,validateNewsroomBody} from "@/lib/newsroom-document";
+import {isNewsroomBody,parseNewsroomBody,serializeNewsroomBody,validateNewsroomBody} from "@/lib/newsroom-document";
 import type {NewsJSON,NewsPhoto} from "@/lib/newsroom-document";
 
 type Supabase=Awaited<ReturnType<typeof createSupabaseServerClient>>;
@@ -17,7 +17,7 @@ export type InlineImagesResult={ok:true;body:string}|{ok:false;error:string};
 export async function resolveStoryInlineImages(
  body:string,form:FormData,userId:string,supabase:Supabase
 ):Promise<InlineImagesResult>{
- if(body.startsWith(NEWSROOM_PREFIX)){
+ if(isNewsroomBody(body)){
   if(!validateNewsroomBody(body,form))return {ok:false,error:"invalid"};
   const doc=parseNewsroomBody(body);
   if(!doc)return {ok:false,error:"invalid"};
