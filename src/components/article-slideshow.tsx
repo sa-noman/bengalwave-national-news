@@ -13,7 +13,13 @@ export function ArticleSlideshow({slides,allowLocalImages=false}:{slides:StorySl
  const next=()=>setIndex(n=>(n+1)%slides.length);
  return <div className="bw-story-slider" role="group" aria-roledescription="carousel" aria-label="সংবাদের ছবির স্লাইডশো">
   <div className="bw-story-slider-stage">
-   {source&&<img key={source} src={source} alt={active.alt||active.caption||"সংবাদের ছবি"} loading="lazy" decoding="async"/>}
+   {source&&<>
+    <div className="bw-story-slider-backdrop" aria-hidden="true">
+     <img key={"backdrop-"+source} src={source} alt="" decoding="async"/>
+    </div>
+    <img className="bw-story-slider-photo" key={source} src={source}
+     alt={active.alt||active.caption||"সংবাদের ছবি"} loading="lazy" decoding="async"/>
+   </>}
    <div className="bw-story-slider-controls">
     <span className="bw-story-slider-counter" aria-live="polite">{index+1} / {slides.length}</span>
     <button type="button" onClick={previous} aria-label="আগের ছবি" title="আগের ছবি">‹</button>
