@@ -340,6 +340,11 @@ export function ArticleBodyEditor({initialBody=""}:{initialBody?:string}){
    summary:value("summary"),category:category?.selectedOptions[0]?.textContent||"সংবাদ",
    body:serializeRichBody(blocks),cover});
  };
+ useEffect(()=>{
+  const show=()=>openDraftPreview();
+  window.addEventListener("bw:open-draft-preview",show);
+  return ()=>window.removeEventListener("bw:open-draft-preview",show);
+ });
  const closeDraftPreview=()=>{
   setPreview(null);
   if(previewCoverRef.current){URL.revokeObjectURL(previewCoverRef.current);previewCoverRef.current=null;}
