@@ -3,10 +3,11 @@
 import {useEffect,useRef,useState} from "react";
 import {generateSeoSummary} from "@/app/admin/seo-summary-action";
 import {parseRichBody} from "@/lib/rich-article";
+import {parseNewsroomBody,textContent} from "@/lib/newsroom-document";
 
 function fallbackSuggestion(title:string,raw:string):string{
- const blocks=parseRichBody(raw);
- const text=(blocks?blocks.map(b=>b.text).filter(Boolean).join(" "):raw)
+ const blocks=parseRichBody(raw),news=parseNewsroomBody(raw);
+ const text=(news?textContent(news):blocks?blocks.map(b=>b.text).filter(Boolean).join(" "):raw)
   .replace(/\[\[\/?fs(?::\d+)?\]\]/g,"").replace(/\*\*/g,"")
   .replace(/\[(.*?)\]\(https:\/\/[^)]+\)/g,"$1").replace(/\s+/g," ").trim();
  if(text.length<30)return title.trim().slice(0,160);
@@ -29,8 +30,8 @@ export function ArticleSummaryField({initialSummary=""}:{initialSummary?:string}
   if(!force&&(touched.current||current.current.trim()))return;
   const headline=(form.elements.namedItem("headline") as HTMLInputElement|null)?.value.trim()||"";
   const raw=bodyOverride||(form.elements.namedItem("body") as HTMLInputElement|null)?.value||"";
-  const blocks=parseRichBody(raw);
-  const len=blocks?blocks.reduce((n,b)=>n+b.text.trim().length,0):raw.trim().length;
+  const blocks=parseRichBody(raw),news=parseNewsroomBody(raw);
+  const len=news?textContent(news).length:blocks?blocks.reduce((n,b)=>n+b.text.trim().length,0):raw.trim().length;
   if(headline.length<5||len<60)return;
   const sig=headline+"|"+raw.length+"|"+raw.slice(-130);
   if(!force&&sig===lastSignature.current)return;
