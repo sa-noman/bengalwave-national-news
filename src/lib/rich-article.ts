@@ -73,7 +73,7 @@ export function hasArticleContent(blocks:StoryBlock[]):boolean{
 export function validateRichBody(raw:string,form?:FormData):boolean{
  if(!raw.startsWith(RICH_BODY_PREFIX))return true;
  const blocks=parseRichBody(raw);
- if(!blocks||!hasArticleContent(blocks))return false;
+ if(!blocks)return false;
  let fileCount=0;
  for(const block of blocks){
   for(const field of (block.type==="gallery"?["src","src2"] as const:
@@ -92,4 +92,10 @@ export function legacyStoryBlocks(raw:string):StoryBlock[]{
  return raw.split(/\n\s*\n/).map(t=>t.trim()).filter(Boolean).map((text,i)=>({
   ...createStoryBlock("paragraph","legacy-block-"+i),text
  }));
+}
+
+/** Count actual editorial text rather than JSON formatting metadata on publish. */
+export function hasPublishableStoryText(raw:string):boolean{
+ const b=parseRichBody(raw);
+ return b?b.reduce((n,item)=>n+item.text.trim().length,0)>=30:raw.trim().length>=30;
 }
