@@ -23,11 +23,13 @@ function textToInline(parent:HTMLElement,raw:string){
  }
  if(any){if(from<raw.length)textToInline(parent,raw.slice(from));return;}
  // Legacy stored stories use a very small Markdown subset, never raw HTML.
- const parts=raw.split(/(\*\*[^*\n]+\*\*|\*[^*\n]+\*|\[[^\]\n]+\]\(https:\/\/[^\s)]+\))/g);
+ const parts=raw.split(/(\*\*\*[^*\n]+\*\*\*|\*\*[^*\n]+\*\*|\*[^*\n]+\*|\[[^\]\n]+\]\(https:\/\/[^\s)]+\))/g);
  for(const part of parts){
   if(!part)continue;
   let child:HTMLElement|undefined;
-  if(part.startsWith("**")&&part.endsWith("**")){
+  if(part.startsWith("***")&&part.endsWith("***")){
+   child=el("strong");const em=el("em");em.textContent=part.slice(3,-3);child.append(em);
+  }else if(part.startsWith("**")&&part.endsWith("**")){
    child=el("strong");child.textContent=part.slice(2,-2);
   }else if(part.startsWith("*")&&part.endsWith("*")){
    child=el("em");child.textContent=part.slice(1,-1);
