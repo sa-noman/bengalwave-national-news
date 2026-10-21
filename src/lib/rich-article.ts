@@ -83,7 +83,7 @@ export function validateRichBody(raw:string,form?:FormData):boolean{
    if(upload)fileCount++;
    const src=block[field];
    if(!upload&&(!src||!safeStoryImageUrl(src)))return false;
-   if(upload&&file!.size>4*1024*1024)return false;
+   if(file instanceof File&&file.size>4*1024*1024)return false;
   }
  }
  return fileCount<=6;
