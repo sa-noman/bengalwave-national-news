@@ -22,7 +22,7 @@ export function ArticleSubmitControls({status,isEditor,previewOnly=false}:{
   function validateDirectPublish(event:MouseEvent<HTMLButtonElement>){
     const form=event.currentTarget.form;
     const summary=form?.elements.namedItem("summary") as HTMLTextAreaElement|null;
-    const body=form?.elements.namedItem("body") as HTMLTextAreaElement|null;
+    const body=form?.elements.namedItem("body") as HTMLInputElement|null;
     const category=form?.elements.namedItem("category_id") as HTMLSelectElement|null;
     if(!category?.value || (summary?.value.trim().length||0)<10 || !hasPublishableStoryText(body?.value||"")){
       event.preventDefault();
