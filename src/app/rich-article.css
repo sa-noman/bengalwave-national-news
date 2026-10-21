@@ -94,3 +94,10 @@ html[data-theme="dark"] .bw-rich-article-body .bw-rich-quote cite{color:#aab8af}
 html[data-theme="dark"] .bw-rich-article-body .bw-rich-tone-cream,
 html[data-theme="dark"] .bw-rich-article-body .bw-rich-tone-gray,
 html[data-theme="dark"] .bw-rich-article-body .bw-rich-tone-red{color:#edf2eb;background:#26342f}
+
+.bw-rich-preview-toggle{display:inline-flex;align-items:center;justify-content:center;margin-top:14px;border:1px solid #a9c3b2;border-radius:7px;background:#fff;color:#0e513e;padding:9px 15px;font-size:13px;font-weight:700;cursor:pointer}
+.bw-rich-preview-toggle:hover{background:#edf5ef}
+.bw-rich-editor-live-preview.bw-article{max-width:100%;padding:18px;margin-top:12px;background:#fff;border:1px dashed #bacdc0;border-radius:8px;color:#192820}
+.bw-rich-editor-live-preview .bw-rich-editor-preview-hint{font-size:12px;line-height:1.65;color:#587465;border-bottom:1px solid #e3eae4;padding-bottom:8px;margin-bottom:18px}
+.bw-rich-editor-live-preview .bw-rich-article-body{max-width:100%;font-size:16px;line-height:1.85}
+.bw-rich-editor-live-preview.bw-article .bw-rich-article-body .bw-rich-figure img{width:100%;height:auto;aspect-ratio:auto;max-height:none;object-fit:contain}
