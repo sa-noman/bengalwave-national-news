@@ -17,8 +17,9 @@ function renderInline(value:string):React.ReactNode{
  return nodes.length?nodes:renderSimpleInline(value);
 }
 function renderSimpleInline(value:string):React.ReactNode[]{
- const token=/(\*\*[^*\n]{1,400}\*\*|\*[^*\n]{1,400}\*|\[[^\]\n]{1,150}\]\(https:\/\/[^\s)]{1,1200}\))/g;
+ const token=/(\*\*\*[^*\n]{1,400}\*\*\*|\*\*[^*\n]{1,400}\*\*|\*[^*\n]{1,400}\*|\[[^\]\n]{1,150}\]\(https:\/\/[^\s)]{1,1200}\))/g;
  return value.split(token).map((part,i)=>{
+  if(part.startsWith("***")&&part.endsWith("***"))return <strong key={i}><em>{part.slice(3,-3)}</em></strong>;
   if(part.startsWith("**")&&part.endsWith("**"))return <strong key={i}>{part.slice(2,-2)}</strong>;
   if(part.startsWith("*")&&part.endsWith("*"))return <em key={i}>{part.slice(1,-1)}</em>;
   const match=/^\[([^\]]+)\]\((https:\/\/[^\s)]+)\)$/.exec(part);
