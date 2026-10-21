@@ -58,6 +58,7 @@ function toDOM(block:StoryBlock):HTMLElement{
  if(tag==="quote"||tag==="callout"){
   const q=el("blockquote",tag==="quote"?"bw-doc-pullquote":"bw-doc-highlight");
   q.dataset.kind=tag;
+  q.dataset.calloutId=block.id;
   if(tag==="callout"){
    q.dataset.tone=block.tone;
    if(block.borderColor){q.dataset.borderColor=block.borderColor;q.style.borderLeftColor=block.borderColor;}
@@ -104,8 +105,12 @@ function inlineText(node:Node):string{
  const inside=Array.from(node.childNodes).map(inlineText).join("");
  if(tag==="STRONG"||tag==="B")return "**"+inside+"**";
  if(tag==="EM"||tag==="I")return "*"+inside+"*";
- if(tag==="SPAN"&&/^(14|16|18|20|22|24|28|32)px$/.test(element.style.fontSize))
-  return "[[fs:"+parseInt(element.style.fontSize,10)+"]]"+inside+"[[/fs]]";
+ if(tag==="SPAN"&&/^(14|16|18|20|22|24|28|32)px$/.test(element.style.fontSize)){
+  let content=inside;
+  if(element.style.fontWeight==="700"||element.style.fontWeight==="bold")content="**"+content+"**";
+  if(element.style.fontStyle==="italic")content="*"+content+"*";
+  return "[[fs:"+parseInt(element.style.fontSize,10)+"]]"+content+"[[/fs]]";
+ }
  if(tag==="A"){
   const link=element as HTMLAnchorElement;
   if(link.href.startsWith("https://"))return "["+inside+"]("+link.href+")";
@@ -173,7 +178,7 @@ function extractBlocks(root:HTMLElement):StoryBlock[]{
    const citation=e.querySelector("cite");
    const textNode=e.querySelector("p");
    const content=textNode?inlineText(textNode):Array.from(e.childNodes).filter(n=>n!==citation).map(inlineText).join("");
-   append({type,text:content.trim(),
+   append({type,id:e.dataset.calloutId||crypto.randomUUID(),text:content.trim(),
     credit:citation?.textContent?.trim()||"",
     tone:(["cream","gray","red"].includes(e.dataset.tone||"")?e.dataset.tone:"cream") as StoryBlock["tone"],
     borderColor:e.dataset.borderColor&&/^#[0-9a-fA-F]{6}$/.test(e.dataset.borderColor)?e.dataset.borderColor:""});
@@ -390,6 +395,7 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
    };
    if(!next.src)next.src=getLocal(block.id);
    if(block.type==="gallery"&&!next.src2)next.src2=getLocal(block.id+"-second");
+   if(block.type==="slideshow")next.slides=(next.slides||[]).map((slide,i)=>({...slide,src:slide.src||getLocal(block.id+"-slide-"+i)}));
    return next;
   });
   const imageFile=(form.elements.namedItem("image_file") as HTMLInputElement|null)?.files?.[0]||null;
@@ -421,6 +427,7 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
   if(quote&&quote.tagName==="BLOCKQUOTE"){
    quote.className=kind==="quote"?"bw-doc-pullquote":"bw-doc-highlight";
    quote.dataset.kind=kind;
+   if(!quote.dataset.calloutId)quote.dataset.calloutId=crypto.randomUUID();
    if(kind==="quote"&&!quote.querySelector("cite")){
     const cite=el("cite");cite.contentEditable="true";cite.dataset.placeholder="উদ্ধৃতির ব্যক্তির নাম ও পদবি";
     quote.append(cite);
@@ -432,6 +439,7 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
  };
  const addImage=(mode:ImageMode)=>{
   modeRef.current=mode;
+  if(mode==="slide-add")targetSliderRef.current=selectedSlider;
   const chooser=chooserRef.current;if(!chooser)return;
   chooser.multiple=mode==="gallery"||mode==="slideshow"||mode==="slide-add";
   remember();chooser.click();
@@ -525,6 +533,14 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
   div.append(makeFigure(url,crypto.randomUUID()));insertNode(div);
  };
  const addDivider=()=>insertNode(el("hr"));
+ const changeCalloutBorder=(hex:string)=>{
+  const root=rootRef.current;
+  if(!root||!selectedCallout||!/^#[0-9a-fA-F]{6}$/.test(hex))return;
+  const callout=Array.from(root.querySelectorAll(".bw-doc-highlight"))
+    .find(node=>(node as HTMLElement).dataset.calloutId===selectedCallout) as HTMLElement|undefined;
+  if(!callout)return;
+  callout.dataset.borderColor=hex;callout.style.borderLeftColor=hex;save();
+ };
  const changeImage=(attribute:"width"|"align",value:string)=>{
   const root=rootRef.current;if(!root||!selectedImage)return;
   const target=Array.from(root.querySelectorAll(".bw-doc-image-block")).find(element=>element.querySelector("figure")?.getAttribute("data-block-id")===selectedImage) as HTMLElement|undefined;
@@ -577,6 +593,19 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
      aria-pressed={paintActive} title="পেইন্ট ফরম্যাট: উৎস লেখায় কার্সর রেখে চাপুন, তারপর অন্য লেখা সিলেক্ট করুন">🖌 ফরম্যাট</button>
    <button type="button" className="bw-doc-preview-action" onMouseDown={e=>e.preventDefault()} onClick={openDraftPreview}>◉ প্রকাশের আগে প্রিভিউ</button>
   </div>
+  {selectedCallout&&<div className="bw-doc-highlight-controls" aria-label="হাইলাইট বক্সের বর্ডারের রং">
+    <strong>বাম রেখার রং</strong>
+    <button type="button" onClick={()=>changeCalloutBorder("#0b4838")}>সবুজ</button>
+    <button type="button" onClick={()=>changeCalloutBorder("#d4a017")}>হলুদ</button>
+    <button type="button" onClick={()=>changeCalloutBorder("#c53c32")}>লাল</button>
+    <label>নিজের রং <input type="color" defaultValue="#0b4838" onChange={e=>changeCalloutBorder(e.target.value)}/></label>
+    <button type="button" onClick={()=>setSelectedCallout(null)}>✕</button>
+   </div>}
+  {selectedSlider&&<div className="bw-doc-slider-controls" aria-label="স্লাইডশো ছবি যোগ">
+    <strong>স্লাইডশো নির্বাচন করা হয়েছে</strong>
+    <button type="button" onClick={()=>addImage("slide-add")}>＋ নতুন স্লাইড যোগ করুন</button>
+    <button type="button" onClick={()=>setSelectedSlider(null)}>✕</button>
+   </div>}
   {selectedImage&&<div className="bw-doc-image-controls" aria-label="ছবির সাইজ ও অবস্থান">
     <span>নির্বাচিত ছবি:</span>
     <button type="button" onClick={()=>changeImage("width","small")}>ছোট</button>
@@ -591,13 +620,24 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
   <div ref={rootRef} className="bw-doc-surface" contentEditable suppressContentEditableWarning
     data-placeholder="এখানে সম্পূর্ণ সংবাদ লিখুন বা পেস্ট করুন…"
     role="textbox" aria-label="সংবাদের মূল লেখা" aria-multiline="true"
-    onInput={save} onBlur={()=>{save();const root=rootRef.current;window.dispatchEvent(new CustomEvent("bw:article-editor-blur",{detail:{body:root?serializeRichBody(extractBlocks(root)):""}}));}} onMouseUp={()=>paintActive?paintSelection():remember()} onKeyUp={()=>paintActive?paintSelection():remember()}
+    onInput={save} onBlurCapture={event=>{
+      const target=event.target;
+      if(target instanceof HTMLElement&&target.tagName==="FIGCAPTION"&&!target.textContent?.trim()){
+       // Empty captions can retain invisible <br> after focus leaves.
+       // Clear that stray node so the placeholder remains clickable.
+       target.replaceChildren();save();
+      }
+    }} onBlur={()=>{save();const root=rootRef.current;window.dispatchEvent(new CustomEvent("bw:article-editor-blur",{detail:{body:root?serializeRichBody(extractBlocks(root)):""}}));}} onMouseUp={()=>paintActive?paintSelection():remember()} onKeyUp={()=>paintActive?paintSelection():remember()}
     onClick={event=>{
       const target=event.target;
       if(!(target instanceof Element))return;
       const wrap=target.closest(".bw-doc-image-block");
       const figure=wrap?.querySelector("figure[data-block-id]");
       setSelectedImage(figure?.getAttribute("data-block-id")||null);
+      const group=target.closest(".bw-doc-slider-editor") as HTMLElement|null;
+      setSelectedSlider(group?.dataset.sliderId||null);
+      const callout=target.closest(".bw-doc-highlight") as HTMLElement|null;
+      setSelectedCallout(callout?.dataset.calloutId||null);
     }}
     onPaste={event=>{
       // Treat pasted outside HTML as plain editorial text, never executable markup.
