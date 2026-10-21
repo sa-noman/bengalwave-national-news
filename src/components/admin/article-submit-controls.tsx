@@ -3,6 +3,7 @@
 import {useFormStatus} from "react-dom";
 import {useState} from "react";
 import type {MouseEvent} from "react";
+import {hasPublishableStoryText} from "@/lib/rich-article";
 import {
   approveArticle,
   createAndPublishArticle,
@@ -23,7 +24,7 @@ export function ArticleSubmitControls({status,isEditor,previewOnly=false}:{
     const summary=form?.elements.namedItem("summary") as HTMLTextAreaElement|null;
     const body=form?.elements.namedItem("body") as HTMLTextAreaElement|null;
     const category=form?.elements.namedItem("category_id") as HTMLSelectElement|null;
-    if(!category?.value || (summary?.value.trim().length||0)<10 || (body?.value.trim().length||0)<30){
+    if(!category?.value || (summary?.value.trim().length||0)<10 || !hasPublishableStoryText(body?.value||"")){
       event.preventDefault();
       setPublishError("লাইভ প্রকাশের আগে বিভাগ, অন্তত ১০ অক্ষরের সংক্ষিপ্ত বিবরণ এবং ৩০ অক্ষরের সম্পূর্ণ সংবাদ লিখুন।");
       return;
