@@ -194,3 +194,11 @@ html[data-theme="dark"] .bw-article .bw-rich-article-body blockquote.bw-rich-quo
  .bw-doc-surface blockquote.bw-doc-pullquote:before{font-size:74px}
  .bw-article .bw-rich-article-body blockquote.bw-rich-quote p{font-size:20px}
 }
+
+/* Contextual image placement controls appear only after clicking a photo. */
+.bw-doc-editor .bw-doc-image-controls{display:flex;align-items:center;flex-wrap:wrap;gap:7px;padding:9px 12px;background:#fff9e9;border-inline:1px solid #ddcfb4;border-top:1px solid #ddcfb4}
+.bw-doc-image-controls>span:first-child{color:#4b614d;font-size:12px;font-weight:700}
+.bw-doc-image-controls button{border:1px solid #bacfbf;background:#fff;border-radius:5px;color:#244a38;font:600 12px var(--bw-serif);padding:6px 10px;cursor:pointer}
+.bw-doc-image-controls button:hover{background:#e9f5e9}
+.bw-doc-surface .bw-doc-split-text p:empty:before{content:attr(data-placeholder);color:#8c9891}
+.bw-doc-surface .bw-doc-image-block:has(figure:focus-within){outline:2px solid #8fb3a2;outline-offset:4px}
