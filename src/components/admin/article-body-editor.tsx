@@ -272,7 +272,8 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
   let block:Node|null=range.startContainer;
   while(block&&block.parentNode!==root)block=block.parentNode;
   let after:HTMLElement;
-  if(block instanceof HTMLElement&&["P","H2","H3"].includes(block.tagName)){
+  if(block instanceof HTMLElement&&(["P","H2","H3"].includes(block.tagName)||
+    (block.tagName==="DIV"&&!block.matches(".bw-doc-image-block")&&!block.querySelector("figure,section,blockquote,p,h2,h3")))){
    const tail=document.createRange();
    tail.setStart(range.startContainer,range.startOffset);
    tail.setEnd(block,block.childNodes.length);
