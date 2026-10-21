@@ -4,23 +4,26 @@ import {readFileSync} from "node:fs";
 
 const read=p=>readFileSync(new URL("../"+p,import.meta.url),"utf8");
 
-test("CMS article body uses a structured editor but continues to save through the original form",()=>{
+test("story body is a single editable document, not a stack of repeated forms",()=>{
  const form=read("src/components/admin/article-form.tsx");
  const editor=read("src/components/admin/article-body-editor.tsx");
  assert.match(form,/<ArticleBodyEditor initialBody=/);
- assert.match(editor,/<input type="hidden" name="body" value=\{serializeRichBody\(blocks\)\} readOnly\/>/);
+ assert.match(editor,/className="bw-doc-surface" contentEditable/);
+ assert.match(editor,/data-placeholder="এখানে সম্পূর্ণ সংবাদ লিখুন বা পেস্ট করুন/);
+ assert.match(editor,/<input type="hidden" name="body" value=\{body\} readOnly\/>/);
+ assert.doesNotMatch(editor,/className="bw-rich-editor-blocks"/);
  assert.doesNotMatch(editor,/<textarea name="body"/);
- for(const type of ["paragraph","heading","subheading","quote","callout","list","image","split","gallery","divider"]){
-   assert.match(editor,new RegExp('type:"'+type+'"'));
+ for(const button of ["＋ ছবি","ছবি ও লেখা","২ ছবি","❝ বড় উদ্ধৃতি","হাইলাইট বক্স","শিরোনাম","উপশিরোনাম"]){
+  assert.ok(editor.includes(button),"missing action: "+button);
  }
- assert.match(editor,/onClick=\{\(\)=>shift\(index,-1\)\}/);
- assert.match(editor,/onClick=\{\(\)=>shift\(index,1\)\}/);
- assert.match(editor,/inline_image_/);
+ assert.match(editor,/onPaste=\{event=>/);
+ assert.match(editor,/event.clipboardData.getData\("text\/plain"\)/);
 });
 
-test("legacy paragraphs and versioned new stories use a safe component renderer without HTML injection",()=>{
+test("structured stories and existing plain-text articles remain readable without raw HTML injection",()=>{
  const renderer=read("src/components/rich-article-body.tsx");
  const parser=read("src/lib/rich-article.ts");
+ const editor=read("src/components/admin/article-body-editor.tsx");
  for(const route of ["src/app/news/[slug]/page.tsx","src/app/admin/articles/[id]/preview/page.tsx"]){
    assert.match(read(route),/<RichArticleBody body=\{/);
  }
@@ -32,40 +35,38 @@ test("legacy paragraphs and versioned new stories use a safe component renderer 
  assert.match(renderer,/bw-rich-callout/);
  assert.match(parser,/url.protocol==="https:"/);
  assert.match(parser,/new Set\(ids\).size!==ids.length/);
+ assert.match(editor,/parseRichBody\(initialBody\)\|\|legacyStoryBlocks\(initialBody\)/);
+ assert.match(editor,/document.createElement/);
+ assert.doesNotMatch(editor,/dangerouslySetInnerHTML/);
 });
 
-test("inline images are validated and uploaded before saving or publishing an article",()=>{
- const action=read("src/app/admin/actions.ts");
+test("images use the authenticated existing upload path and gallery files map correctly",()=>{
+ const actions=read("src/app/admin/actions.ts");
  const uploads=read("src/lib/story-inline-images.ts");
- const photo=read("src/lib/news-media.ts");
- assert.match(action,/resolveStoryInlineImages\(input.body,formData,user.id,supabase\)/);
- assert.match(action,/body:rich.body/);
- assert.match(action,/if\(!rich.ok\)redirect/);
- assert.match(action,/hasPublishableStoryText/);
+ const editor=read("src/components/admin/article-body-editor.tsx");
+ assert.match(actions,/resolveStoryInlineImages\(input.body,formData,user.id,supabase\)/);
+ assert.match(actions,/body:rich.body/);
+ assert.match(actions,/if\(!rich.ok\)redirect/);
+ assert.match(actions,/hasPublishableStoryText/);
  assert.match(uploads,/if\(newImages>6\)/);
  assert.match(uploads,/await uploadNewsImage/);
  assert.match(uploads,/publicNewsImageUrl\(supabase,data.storage_path,"full"\)/);
- assert.match(photo,/limitInputPixels:25000000/);
+ assert.match(editor,/hidden.name="inline_image_"\+id/);
+ assert.match(editor,/secondInput.name="inline_image_"\+firstId\+"_second"/);
+ assert.match(editor,/hidden.files=dt.files/);
+ assert.match(editor,/save\(\)/);
  assert.match(read("next.config.ts"),/bodySizeLimit: "30mb"/);
 });
 
-test("rich media layouts collapse responsively instead of distorting photos",()=>{
+test("visual quoted-excerpt style matches requested large grey pullquote with red marks and byline",()=>{
  const css=read("src/app/rich-article.css");
- assert.match(css,/object-fit:contain/);
- assert.match(css,/grid-template-columns:minmax\(0,1fr\) minmax\(0,1\.12fr\)/);
+ const editor=read("src/components/admin/article-body-editor.tsx");
+ assert.match(css,/\.bw-rich-quote:before/);
+ assert.match(css,/color:#ce0000/);
+ assert.match(css,/\.bw-rich-quote cite/);
+ assert.match(css,/\.bw-doc-surface blockquote\.bw-doc-pullquote/);
+ assert.match(editor,/cite.contentEditable="true"/);
+ assert.match(editor,/applyQuote\("quote"\)/);
  assert.match(css,/@media\(max-width:760px\)/);
  assert.match(read("src/app/layout.tsx"),/import "\.\/rich-article.css"/);
-});
-
-test("serialized JSON stays hidden and multiple images have direct action buttons",()=>{
- const editor=read("src/components/admin/article-body-editor.tsx");
- const css=read("src/app/rich-article.css");
- for(const block of ["image","split","gallery"]){
-   assert.ok(editor.includes('onClick={()=>add("'+block+'")}'),block+" shortcut is missing");
- }
- assert.match(editor,/onClick=\{\(\)=>add\("image",index\)\}/);
- assert.match(editor,/type="file" name=\{fieldName\}/);
- assert.match(editor,/inline_image_/);
- assert.match(css,/\.admin-form input\[type="hidden"\]/);
- assert.match(css,/display:none!important/);
 });
