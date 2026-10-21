@@ -136,8 +136,11 @@ function extractBlocks(root:HTMLElement):StoryBlock[]{
   }
   if(tag==="BLOCKQUOTE"){
    const type=e.dataset.kind==="callout"?"callout":"quote";
-   append({type,text:inlineText(e.querySelector("p")||e).trim(),
-    credit:e.querySelector("cite")?.textContent?.trim()||"",
+   const citation=e.querySelector("cite");
+   const textNode=e.querySelector("p");
+   const content=textNode?inlineText(textNode):Array.from(e.childNodes).filter(n=>n!==citation).map(inlineText).join("");
+   append({type,text:content.trim(),
+    credit:citation?.textContent?.trim()||"",
     tone:(["cream","gray","red"].includes(e.dataset.tone||"")?e.dataset.tone:"cream") as StoryBlock["tone"]});
    return;
   }
@@ -167,6 +170,7 @@ export function ArticleBodyEditor({initialBody=""}:{initialBody?:string}){
  const blobUrls=useRef<string[]>([]);
  const [body,setBody]=useState(initialBody);
  const [imageCount,setImageCount]=useState(0);
+ const [selectedImage,setSelectedImage]=useState<string|null>(null);
  const [message,setMessage]=useState("");
 
  useEffect(()=>{
@@ -289,7 +293,7 @@ export function ArticleBodyEditor({initialBody=""}:{initialBody?:string}){
   let wrap:HTMLElement;
   if(mode==="split"){
    wrap=el("section","bw-doc-split");wrap.dataset.layout="image-left";wrap.append(figures[0]);
-   const copy=el("div","bw-doc-split-text");const p=el("p");p.textContent="ছবির পাশে এখানে লিখুন";copy.append(p);wrap.append(copy);
+   const copy=el("div","bw-doc-split-text");const p=el("p");p.dataset.placeholder="ছবির পাশে এখানে লিখুন";copy.append(p);wrap.append(copy);
   }else if(mode==="gallery"){
    const firstId=figures[0].dataset.blockId||crypto.randomUUID();
    const secondOldId=figures[1].dataset.blockId||"";
@@ -312,6 +316,13 @@ export function ArticleBodyEditor({initialBody=""}:{initialBody?:string}){
   div.append(makeFigure(url,crypto.randomUUID()));insertNode(div);
  };
  const addDivider=()=>insertNode(el("hr"));
+ const changeImage=(attribute:"width"|"align",value:string)=>{
+  const root=rootRef.current;if(!root||!selectedImage)return;
+  const target=Array.from(root.querySelectorAll(".bw-doc-image-block")).find(element=>element.querySelector("figure")?.getAttribute("data-block-id")===selectedImage) as HTMLElement|undefined;
+  if(!target)return;
+  target.dataset[attribute]=value;
+  save();
+ };
  return <section className="bw-doc-editor full-span" aria-label="এক জায়গায় সংবাদ লেখা ও সাজানো">
   <div className="bw-doc-head">
    <div><h2>সম্পূর্ণ সংবাদ</h2><p>Google Docs-এর মতো এক জায়গায় লিখুন বা পুরো সংবাদ পেস্ট করুন। লেখা নির্বাচন করে ফরম্যাট করুন, প্রয়োজনের জায়গায় ছবি বা উদ্ধৃতি বসান।</p></div>
@@ -337,10 +348,28 @@ export function ArticleBodyEditor({initialBody=""}:{initialBody?:string}){
    <button type="button" onMouseDown={e=>e.preventDefault()} onClick={()=>applyQuote("callout")}>হাইলাইট বক্স</button>
    <button type="button" onMouseDown={e=>e.preventDefault()} onClick={addDivider}>রেখা</button>
   </div>
+  {selectedImage&&<div className="bw-doc-image-controls" aria-label="ছবির সাইজ ও অবস্থান">
+    <span>নির্বাচিত ছবি:</span>
+    <button type="button" onClick={()=>changeImage("width","small")}>ছোট</button>
+    <button type="button" onClick={()=>changeImage("width","medium")}>মাঝারি</button>
+    <button type="button" onClick={()=>changeImage("width","full")}>পূর্ণ প্রস্থ</button>
+    <span className="bw-doc-toolbar-separator"/>
+    <button type="button" onClick={()=>changeImage("align","left")}>বামে</button>
+    <button type="button" onClick={()=>changeImage("align","center")}>মাঝে</button>
+    <button type="button" onClick={()=>changeImage("align","right")}>ডানে</button>
+    <button type="button" onClick={()=>setSelectedImage(null)} aria-label="ছবির সেটিংস বন্ধ করুন">✕</button>
+   </div>}
   <div ref={rootRef} className="bw-doc-surface" contentEditable suppressContentEditableWarning
     data-placeholder="এখানে সম্পূর্ণ সংবাদ লিখুন বা পেস্ট করুন…"
     role="textbox" aria-label="সংবাদের মূল লেখা" aria-multiline="true"
     onInput={save} onBlur={save} onMouseUp={remember} onKeyUp={remember}
+    onClick={event=>{
+      const target=event.target;
+      if(!(target instanceof Element))return;
+      const wrap=target.closest(".bw-doc-image-block");
+      const figure=wrap?.querySelector("figure[data-block-id]");
+      setSelectedImage(figure?.getAttribute("data-block-id")||null);
+    }}
     onPaste={event=>{
       // Treat pasted outside HTML as plain editorial text, never executable markup.
       event.preventDefault();
@@ -359,6 +388,6 @@ export function ArticleBodyEditor({initialBody=""}:{initialBody?:string}){
    onChange={event=>{handleFiles(event.currentTarget.files);event.currentTarget.value="";}}/>
   <div ref={uploadsRef} className="bw-doc-file-rack" aria-hidden="true"/>
   {message&&<p className="bw-doc-message" role="status">{message}</p>}
-  <p className="bw-doc-help">**বড় উদ্ধৃতি তৈরি:** উদ্ধৃতির অনুচ্ছেদে কার্সর রেখে ‘❝ বড় উদ্ধৃতি’ চাপুন, তারপর নিচে ব্যক্তির নাম লিখুন। নতুন ছবি একই লেখার মধ্যে কার্সরের অবস্থানে বসবে।</p>
+  <p className="bw-doc-help"><strong>বড় উদ্ধৃতি:</strong> উদ্ধৃতির অনুচ্ছেদে কার্সর রেখে ‘❝ বড় উদ্ধৃতি’ চাপুন। নিচে বক্তার পরিচয় লিখুন। <strong>ছবির সাইজ:</strong> ছবিতে ক্লিক করে ছোট, মাঝারি বা পূর্ণ প্রস্থ বেছে নিন।</p>
  </section>;
 }
