@@ -60,7 +60,7 @@ export default async function Home(){
       <div className="bw-latest-list">{latest.map(item=><NewsCard key={item.id} item={item} variant="latest"/>)}</div>
     </aside>
    </div></section>
-   <NewsSection title="নির্বাচিত প্রতিবেদন" href="/latest" boxed items={select}/>
+   <NewsSection title="এক্সক্লুসিভ" href="/latest" boxed items={select}/>
    <NewsSection title="জাতীয়" href="/category/national" items={national}/>
    <NewsSection title="আন্তর্জাতিক" href="/category/international" items={world}/>
    <NewsSection title="খেলাধুলা" href="/category/sports" items={sports}/>
