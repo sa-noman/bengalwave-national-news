@@ -24,7 +24,7 @@ test("Tiptap version 2 body works with legacy and V1 published article pages",()
  for(const route of ["src/app/news/[slug]/page.tsx","src/app/admin/articles/[id]/preview/page.tsx"]){
   assert.match(read(route),/<RichArticleBody body=\{/);
  }
- assert.match(reader,/NEWSROOM_PREFIX/);
+ assert.match(reader,/isNewsroomBody/);
  assert.match(reader,/parseRichBody\(body\)\|\|legacyStoryBlocks\(body\)/);
  assert.match(doc,/existingBodyToNewsJSON/);
  assert.match(doc,/parseRichBody\(raw\)\|\|legacyStoryBlocks\(raw\)/);
@@ -40,7 +40,7 @@ test("Media must pass server-side validation before write",()=>{
  assert.match(actions,/body:rich.body/);
  assert.match(actions,/newsroomPublishableText\(input.body\)/);
  assert.match(validation,/validateNewsroomBody\(body,form\)/);
- assert.match(uploads,/NEWSROOM_PREFIX/);
+ assert.match(uploads,/isNewsroomBody/);
  assert.match(uploads,/newsroom_media_/);
  assert.match(uploads,/await uploadNewsImage/);
  assert.match(uploads,/publicNewsImageUrl\(supabase,data.storage_path,"full"\)/);
