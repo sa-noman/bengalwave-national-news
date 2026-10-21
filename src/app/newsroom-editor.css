@@ -55,8 +55,8 @@
 .bw-nr-media-options select{min-width:130px}
 .bw-nr-split-copy{padding:0 12px 12px}
 .bw-nr-callout{margin:20px 0;background:#faf3df;border-left:4px solid #0b4838;padding:13px 15px}
-.bw-nr-callout-quote{position:relative;background:transparent}
-.bw-nr-callout-quote:before{content:"“";position:absolute;top:20px;left:14px;color:#0b4838;font:700 56px Georgia,serif;pointer-events:none}
+.bw-nr-callout-quote{position:relative;background:transparent;border-left:0!important;padding-left:15px}
+.bw-nr-callout-quote:before{content:"“";position:absolute;top:20px;left:14px;color:var(--bw-quote-accent,#0b4838);font:700 56px Georgia,serif;pointer-events:none}
 .bw-nr-callout-quote .bw-nr-callout-content{padding-left:35px}
 .bw-nr-callout-controls{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:10px;color:#37644c;font:600 12px var(--bw-serif)}
 .bw-nr-callout-controls input[type="color"]{width:34px;height:29px;padding:1px;cursor:pointer}
@@ -64,7 +64,13 @@
 .bw-nr-callout-content{min-height:28px}
 .bw-nr-quote-credit{width:100%;background:transparent;border:0;border-bottom:1px solid #d5e0d5;padding:8px 0;font:600 13px/1.5 var(--bw-serif)}
 /* Newsroom V2 published stories: compact natural news paragraphs. Legacy articles unchanged. */
-.bw-newsroom-published-body>p{margin:0 0 .8em!important;line-height:1.82!important}
+.bw-article .bw-newsroom-published-body{color:#111!important}
+.bw-article .bw-newsroom-published-body>p{color:#111!important;margin:0 0 .8em!important;line-height:1.82!important}
+.bw-article .bw-newsroom-published-body .bw-rich-list{color:#111}
+.bw-article .bw-newsroom-published-body blockquote.bw-newsroom-quote{border:0!important;border-left:0!important}
+.bw-article .bw-newsroom-published-body blockquote.bw-newsroom-quote:before{color:var(--bw-quote-accent,#0b4838)!important}
+html[data-theme="dark"] .bw-article .bw-newsroom-published-body,
+html[data-theme="dark"] .bw-article .bw-newsroom-published-body>p{color:#f0f1ed!important}
 .bw-newsroom-published-body>h2,.bw-newsroom-published-body>h3{margin:1.1em 0 .4em}
 .bw-newsroom-published-body .bw-rich-callout{border-left:4px solid #0b4838!important;border-top:0!important}
 .bw-newsroom-published-body .bw-rich-callout p{margin:0}
@@ -80,3 +86,20 @@
  .bw-nr-media-head{padding:8px;gap:6px}
  .bw-nr-toolbar .bw-nr-preview-action{margin-left:0}
 }
+
+/* Slide background is the SAME image, softly blurred to fill unused side space. */
+.bw-story-slider-stage{isolation:isolate}
+.bw-story-slider-backdrop{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.bw-article .bw-rich-article-body .bw-story-slider-backdrop img{
+ position:absolute;inset:0;width:100%;height:100%;max-height:none;
+ display:block;object-fit:cover;object-position:center;
+ filter:blur(24px) brightness(.75);transform:scale(1.15);
+ border-radius:0;aspect-ratio:auto
+}
+.bw-article .bw-rich-article-body .bw-story-slider-stage>img.bw-story-slider-photo{
+ position:relative;z-index:1;width:100%;height:100%;max-height:none;
+ object-fit:contain;display:block;aspect-ratio:auto
+}
+.bw-story-slider-stage>.bw-story-slider-controls{z-index:3}
+.bw-story-slider-stage>.bw-story-slider-caption{z-index:3}
+/* The unmodified image remains sharp while only the fill layer is blurred. */
