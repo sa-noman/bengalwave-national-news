@@ -1,172 +1,359 @@
 "use client";
 
-import {useState} from "react";
-import {createStoryBlock,legacyStoryBlocks,parseRichBody,serializeRichBody} from "@/lib/rich-article";
+import {useEffect,useRef,useState} from "react";
+import {createStoryBlock,legacyStoryBlocks,parseRichBody,safeStoryImageUrl,serializeRichBody} from "@/lib/rich-article";
 import type {StoryBlock,StoryBlockType} from "@/lib/rich-article";
-import {RichArticleBody} from "@/components/rich-article-body";
 
-const options:{type:StoryBlockType;label:string}[]=[
- {type:"paragraph",label:"অনুচ্ছেদ"},
- {type:"heading",label:"শিরোনাম"},
- {type:"subheading",label:"উপশিরোনাম"},
- {type:"image",label:"ছবি ও ক্যাপশন"},
- {type:"split",label:"পাশাপাশি ছবি ও লেখা"},
- {type:"gallery",label:"পাশাপাশি দুই ছবি"},
- {type:"quote",label:"বড় উদ্ধৃতি"},
- {type:"callout",label:"হাইলাইট বক্স"},
- {type:"list",label:"তালিকা"},
- {type:"divider",label:"বিভাজক রেখা"},
-];
-const needsText=(type:StoryBlockType)=>!["image","gallery","divider"].includes(type);
-const needsImage=(type:StoryBlockType)=>["image","split","gallery"].includes(type);
-function BlockImageFields({block,update,second=false}:{
- block:StoryBlock;update:(key:keyof StoryBlock,value:string)=>void;second?:boolean
-}){
- const srcKey=second?"src2":"src",altKey=second?"alt2":"alt",captionKey=second?"caption2":"caption";
- const fieldName="inline_image_"+block.id+(second?"_second":"");
- const [name,setName]=useState("");
- return <div className="bw-block-image-fields">
-   <label>ছবি নির্বাচন করুন (JPG, PNG, WebP, AVIF; সর্বোচ্চ ৪ MB)
-    <input type="file" name={fieldName} accept="image/jpeg,image/png,image/webp,image/avif,.avif"
-     onChange={event=>{
-       const file=event.currentTarget.files?.[0];
-       event.currentTarget.setCustomValidity("");
-       if(file&&(!["image/jpeg","image/png","image/webp","image/avif"].includes(file.type)||file.size>4*1024*1024)){
-         event.currentTarget.setCustomValidity("JPG, PNG, WebP বা AVIF দিন। সর্বোচ্চ ৪ MB।");
-         event.currentTarget.reportValidity();setName("");return;
-       }
-       setName(file?.name||"");
-     }}/>
-   </label>
-   {name&&<small className="bw-rich-upload-status">সংরক্ষণ করলে ছবিটি নিরাপদ মিডিয়া স্টোরেজে আপলোড হবে: {name}</small>}
-   <label>অথবা ছবির HTTPS URL
-    <input type="url" value={block[srcKey]} onChange={e=>update(srcKey,e.target.value)}
-      placeholder="https://example.com/photo.jpg"/>
-   </label>
-   {block[srcKey]&&/^https:\/\//.test(block[srcKey])&&
-     <img className="bw-rich-editor-thumb" alt="ছবির প্রিভিউ" src={block[srcKey]}/>}
-   <label>ছবির বিকল্প বর্ণনা (Alt)
-    <input value={block[altKey]} onChange={e=>update(altKey,e.target.value)} maxLength={300}/>
-   </label>
-   <label>ক্যাপশন
-    <input value={block[captionKey]} onChange={e=>update(captionKey,e.target.value)} maxLength={700}/>
-   </label>
-   {!second&&<label>ছবির উৎস / ফটো ক্রেডিট
-    <input value={block.credit} onChange={e=>update("credit",e.target.value)} maxLength={200}/>
-   </label>}
- </div>;
+const MAX_IMAGE_BYTES=4*1024*1024;
+const ACCEPTED=["image/jpeg","image/png","image/webp","image/avif"];
+type ImageMode="image"|"split"|"gallery";
+function el<K extends keyof HTMLElementTagNameMap>(tag:K,className?:string){
+ const node=document.createElement(tag);if(className)node.className=className;return node;
 }
-export function ArticleBodyEditor({initialBody=""}:{initialBody?:string}){
- const [blocks,setBlocks]=useState<StoryBlock[]>(()=>{
-  const known=parseRichBody(initialBody);
-  return known|| (initialBody.trim()?legacyStoryBlocks(initialBody):[createStoryBlock("paragraph","initial-block-001")]);
- });
- const [insertType,setInsertType]=useState<StoryBlockType>("paragraph");
- const [showPreview,setShowPreview]=useState(false);
- const update=(id:string,patch:Partial<StoryBlock>)=>setBlocks(old=>old.map(b=>b.id===id?{...b,...patch}:b));
- const add=(type:StoryBlockType,after?:number)=>setBlocks(old=>{
-  if(old.length>=100)return old;
-  const block=createStoryBlock(type,crypto.randomUUID());
-  const next=[...old];next.splice(after===undefined?next.length:after+1,0,block);return next;
- });
- const remove=(id:string)=>setBlocks(old=>old.filter(b=>b.id!==id));
- const shift=(index:number,by:number)=>setBlocks(old=>{
-  const j=index+by;if(j<0||j>=old.length)return old;
-  const next=[...old];[next[index],next[j]]=[next[j],next[index]];return next;
- });
- const format=(id:string,marker:string)=>{
-  const area=document.getElementById("rich-text-"+id) as HTMLTextAreaElement|null;
-  const block=blocks.find(b=>b.id===id);if(!area||!block)return;
-  const start=area.selectionStart,end=area.selectionEnd;
-  const selected=block.text.slice(start,end)||"লেখা";
-  const wrapped=marker==="link"?"["+selected+"](https://example.com)":marker+selected+marker;
-  update(id,{text:block.text.slice(0,start)+wrapped+block.text.slice(end)});
-  requestAnimationFrame(()=>{area.focus();area.setSelectionRange(start,start+wrapped.length);});
+function textToInline(parent:HTMLElement,raw:string){
+ // Legacy stored stories use a very small Markdown subset, never raw HTML.
+ const parts=raw.split(/(\*\*[^*\n]+\*\*|\*[^*\n]+\*|\[[^\]\n]+\]\(https:\/\/[^\s)]+\))/g);
+ for(const part of parts){
+  if(!part)continue;
+  let child:HTMLElement|undefined;
+  if(part.startsWith("**")&&part.endsWith("**")){
+   child=el("strong");child.textContent=part.slice(2,-2);
+  }else if(part.startsWith("*")&&part.endsWith("*")){
+   child=el("em");child.textContent=part.slice(1,-1);
+  }else{
+   const link=/^\[([^\]]+)\]\((https:\/\/[^\s)]+)\)$/.exec(part);
+   if(link){child=el("a");child.textContent=link[1];(child as HTMLAnchorElement).href=link[2];(child as HTMLAnchorElement).target="_blank";(child as HTMLAnchorElement).rel="noopener noreferrer";}
+  }
+  if(child)parent.append(child);else parent.append(document.createTextNode(part));
+ }
+}
+function makeFigure(src:string,id:string,caption="",alt="",credit=""){
+ const figure=el("figure","bw-doc-figure");
+ figure.dataset.blockId=id;figure.dataset.src=src;
+ const image=el("img");image.alt=alt||"সংবাদের ছবি";image.loading="lazy";
+ if(src)image.src=src;
+ else image.dataset.awaitingUpload="true";
+ figure.append(image);
+ const cap=el("figcaption");cap.contentEditable="true";cap.dataset.placeholder="ছবির ক্যাপশন লিখুন (ঐচ্ছিক)";cap.textContent=caption;
+ figure.append(cap);
+ if(credit){const cred=el("small","bw-doc-credit");cred.contentEditable="true";cred.textContent=credit;figure.append(cred);}
+ return figure;
+}
+function toDOM(block:StoryBlock):HTMLElement{
+ const tag=block.type;
+ if(tag==="heading"||tag==="subheading"){
+  const h=el(tag==="heading"?"h2":"h3");textToInline(h,block.text);return h;
+ }
+ if(tag==="quote"||tag==="callout"){
+  const q=el("blockquote",tag==="quote"?"bw-doc-pullquote":"bw-doc-highlight");
+  q.dataset.kind=tag;
+  if(tag==="callout")q.dataset.tone=block.tone;
+  const p=el("p");textToInline(p,block.text);q.append(p);
+  if(tag==="quote"){const cite=el("cite");cite.contentEditable="true";cite.dataset.placeholder="উদ্ধৃতির ব্যক্তির নাম ও পদবি";cite.textContent=block.credit;q.append(cite);}
+  return q;
+ }
+ if(tag==="divider")return el("hr");
+ if(tag==="list"){const ul=el("ul");for(const line of block.text.split("\n")){if(!line.trim())continue;const li=el("li");textToInline(li,line);ul.append(li);}return ul;}
+ if(tag==="image"){const div=el("div","bw-doc-image-block");div.dataset.width=block.width;div.dataset.align=block.align;div.append(makeFigure(block.src,block.id,block.caption,block.alt,block.credit));return div;}
+ if(tag==="split"){
+  const wrap=el("section","bw-doc-split");wrap.dataset.layout=block.layout;
+  wrap.append(makeFigure(block.src,block.id,block.caption,block.alt,block.credit));
+  const copy=el("div","bw-doc-split-text");const p=el("p");textToInline(p,block.text);copy.append(p);wrap.append(copy);
+  return wrap;
+ }
+ if(tag==="gallery"){
+  const grid=el("section","bw-doc-gallery");grid.dataset.galleryId=block.id;
+  grid.append(makeFigure(block.src,block.id,block.caption,block.alt,block.credit));
+  grid.append(makeFigure(block.src2,block.id+"-second",block.caption2,block.alt2));
+  return grid;
+ }
+ const p=el("p");textToInline(p,block.text);return p;
+}
+function inlineText(node:Node):string{
+ if(node.nodeType===Node.TEXT_NODE)return node.textContent||"";
+ if(node.nodeType!==Node.ELEMENT_NODE)return "";
+ const element=node as HTMLElement;
+ const tag=element.tagName;
+ if(tag==="BR")return "\n";
+ const inside=Array.from(node.childNodes).map(inlineText).join("");
+ if(tag==="STRONG"||tag==="B")return "**"+inside+"**";
+ if(tag==="EM"||tag==="I")return "*"+inside+"*";
+ if(tag==="A"){
+  const link=element as HTMLAnchorElement;
+  if(link.href.startsWith("https://"))return "["+inside+"]("+link.href+")";
+ }
+ return inside;
+}
+function readFigure(node:Element):{id:string;src:string;alt:string;caption:string;credit:string}{
+ const figure=node as HTMLElement;
+ const img=figure.querySelector("img");
+ return {
+  id:figure.dataset.blockId||crypto.randomUUID(),
+  src:figure.dataset.src||"",
+  alt:img?.alt||"",
+  caption:figure.querySelector("figcaption")?.textContent?.trim()||"",
+  credit:figure.querySelector(".bw-doc-credit")?.textContent?.trim()||""
  };
- const totalImages=blocks.filter(b=>needsImage(b.type)).reduce((n,b)=>n+(b.type==="gallery"?2:1),0);
- return <section className="bw-rich-editor full-span" aria-label="সংবাদের বিস্তারিত কনটেন্ট সম্পাদক">
-   <div className="bw-rich-editor-top">
-     <div><h2>বিস্তারিত সংবাদ সাজান</h2><p>লেখার মাঝে যত প্রয়োজন ছবি, উদ্ধৃতি ও হাইলাইট ব্লক বসান। নিচের বাটন থেকে ছবি যোগ করুন এবং ↑ ↓ দিয়ে সাজান।</p></div>
-     <span className="bw-rich-editor-counter">{blocks.length} ব্লক · {totalImages} ছবি</span>
-   </div>
-   <input type="hidden" name="body" value={serializeRichBody(blocks)} readOnly/>
-   <div className="bw-rich-quick-add" aria-label="ছবি ও অন্যান্য কনটেন্ট যোগ করুন">
-     <button className="admin-secondary" type="button" onClick={()=>add("image")}>＋ ছবি যোগ করুন</button>
-     <button className="admin-secondary" type="button" onClick={()=>add("split")}>＋ ছবি ও লেখা</button>
-     <button className="admin-secondary" type="button" onClick={()=>add("gallery")}>＋ পাশাপাশি ২ ছবি</button>
-     <button className="admin-secondary" type="button" onClick={()=>add("paragraph")}>＋ অনুচ্ছেদ</button>
-   </div>
-   <div className="bw-rich-editor-blocks">
-    {blocks.map((b,index)=><div className="bw-rich-editor-block" key={b.id}>
-      <div className="bw-rich-editor-block-head">
-       <strong>{index+1}. {options.find(o=>o.type===b.type)?.label}</strong>
-       <div className="bw-rich-editor-actions">
-        <button type="button" onClick={()=>shift(index,-1)} disabled={index===0} title="ওপরে নিন">↑</button>
-        <button type="button" onClick={()=>shift(index,1)} disabled={index===blocks.length-1} title="নিচে নিন">↓</button>
-        <button type="button" onClick={()=>add("paragraph",index)} disabled={blocks.length>=100} title="নিচে অনুচ্ছেদ যোগ করুন">＋</button>
-        <button type="button" onClick={()=>add("image",index)} disabled={blocks.length>=100} title="এই ব্লকের নিচে ছবি যোগ করুন" aria-label="নিচে ছবি যোগ করুন">＋<span aria-hidden="true">▧</span></button>
-        <button type="button" onClick={()=>remove(b.id)} title="এই ব্লক বাদ দিন" aria-label="ব্লক মুছুন">✕</button>
-       </div>
-      </div>
-      <div className="bw-rich-editor-block-content">
-       <label>ব্লকের ধরন
-        <select value={b.type} onChange={e=>update(b.id,{type:e.target.value as StoryBlockType})}>
-         {options.map(o=><option key={o.type} value={o.type}>{o.label}</option>)}
-        </select>
-       </label>
-       {needsText(b.type)&&<>
-        <label>{b.type==="split"?"ছবির পাশের লেখা":b.type==="list"?"তালিকা (প্রতি লাইনে একটি)":b.type==="quote"?"উদ্ধৃতি":b.type==="callout"?"হাইলাইটের লেখা":"লেখা"}
-         <textarea id={"rich-text-"+b.id} rows={b.type==="paragraph"||b.type==="split"?5:3}
-          value={b.text} onChange={e=>update(b.id,{text:e.target.value})}
-          placeholder={b.type==="paragraph"?"প্রতিবেদনের অনুচ্ছেদ লিখুন…":"এখানে লিখুন…"} maxLength={10000}/>
-        </label>
-        <div className="bw-rich-format-tools" aria-label="লেখার ফরম্যাটিং">
-         <button type="button" onClick={()=>format(b.id,"**")} title="নির্বাচিত লেখা বোল্ড"><strong>B</strong></button>
-         <button type="button" onClick={()=>format(b.id,"*")} title="নির্বাচিত লেখা ইটালিক"><em>I</em></button>
-         <button type="button" onClick={()=>format(b.id,"link")} title="নির্বাচিত লেখায় HTTPS লিংক দিন">লিংক</button>
-        </div>
-       </>}
-       {b.type==="quote"&&<label>উদ্ধৃতির ব্যক্তি / সূত্র<input value={b.credit} onChange={e=>update(b.id,{credit:e.target.value})} maxLength={200}/></label>}
-       {b.type==="callout"&&<label>হাইলাইটের রং
-        <select value={b.tone} onChange={e=>update(b.id,{tone:e.target.value as StoryBlock["tone"]})}>
-          <option value="cream">হালকা হলুদ</option><option value="gray">হালকা ধূসর</option><option value="red">লাল বর্ডার</option>
-        </select>
-       </label>}
-       {needsImage(b.type)&&<>
-         <BlockImageFields block={b} update={(key,value)=>update(b.id,{[key]:value})}/>
-         {b.type==="gallery"&&<><h3>দ্বিতীয় ছবি</h3><BlockImageFields block={b} second update={(key,value)=>update(b.id,{[key]:value})}/></>}
-         {b.type==="image"&&<div className="bw-rich-editor-controls">
-           <label>ছবির প্রস্থ
-            <select value={b.width} onChange={e=>update(b.id,{width:e.target.value as StoryBlock["width"]})}>
-             <option value="full">সম্পূর্ণ প্রস্থ</option><option value="medium">মাঝারি</option><option value="small">ছোট</option>
-            </select>
-           </label>
-           <label>ছবির অবস্থান
-            <select value={b.align} onChange={e=>update(b.id,{align:e.target.value as StoryBlock["align"]})}>
-             <option value="center">মাঝে</option><option value="left">বামে</option><option value="right">ডানে</option>
-            </select>
-           </label>
-          </div>}
-         {b.type==="split"&&<label>পাশাপাশি অবস্থান
-           <select value={b.layout} onChange={e=>update(b.id,{layout:e.target.value as StoryBlock["layout"]})}>
-            <option value="image-left">বামে ছবি, ডানে লেখা</option>
-            <option value="image-right">ডানে ছবি, বামে লেখা</option>
-           </select>
-          </label>}
-       </>}
-      </div>
-    </div>)}
-   </div>
-   <div className="bw-rich-editor-add">
-     <label>নতুন ব্লক যোগ করুন
-      <select value={insertType} onChange={e=>setInsertType(e.target.value as StoryBlockType)}>
-       {options.map(o=><option key={o.type} value={o.type}>{o.label}</option>)}
-      </select>
-     </label>
-     <button type="button" className="admin-secondary" onClick={()=>add(insertType)} disabled={blocks.length>=100}>＋ ব্লক যোগ করুন</button>
-   </div>
-   <button type="button" className="bw-rich-preview-toggle" aria-expanded={showPreview} onClick={()=>setShowPreview(v=>!v)}>{showPreview?"প্রিভিউ বন্ধ করুন":"লেআউটের তাৎক্ষণিক প্রিভিউ দেখুন"}</button>
-   {showPreview&&<div className="bw-rich-editor-live-preview bw-article"><p className="bw-rich-editor-preview-hint">সম্পাদনার প্রিভিউ। নতুন আপলোডের ছবিগুলো সংরক্ষণের পর পূর্ণরূপে দেখা যাবে।</p><RichArticleBody body={serializeRichBody(blocks)}/></div>}
-   <p className="bw-rich-editor-help">ছবি ব্লকের মধ্যে ‘ছবি নির্বাচন করুন’ থেকে ছবি আপলোড করুন। আরও ছবি দিতে আবার ‘＋ ছবি যোগ করুন’ চাপুন, অথবা একসঙ্গে দুটি পাশাপাশি ছবির জন্য ‘＋ পাশাপাশি ২ ছবি’ ব্যবহার করুন। প্রতিটি ছবির ক্যাপশন আলাদাভাবে লিখতে পারবেন। একবারে সর্বোচ্চ ৬টি নতুন ছবি আপলোড করা যাবে।</p>
-  </section>;
+}
+function extractBlocks(root:HTMLElement):StoryBlock[]{
+ const collected:StoryBlock[]=[];
+ const append=(block:Partial<StoryBlock>&{type:StoryBlockType})=>{
+  const base=createStoryBlock(block.type,block.id||crypto.randomUUID());
+  collected.push({...base,...block});
+ };
+ const paragraph=(node:Node)=>{
+  const s=inlineText(node).trim();
+  if(s)append({type:"paragraph",text:s});
+ };
+ const visit=(node:Node)=>{
+  if(node.nodeType===Node.TEXT_NODE){paragraph(node);return;}
+  if(node.nodeType!==Node.ELEMENT_NODE)return;
+  const e=node as HTMLElement,tag=e.tagName;
+  if(tag==="SECTION"&&e.classList.contains("bw-doc-gallery")){
+   const pics=e.querySelectorAll(":scope > figure");
+   if(pics.length===2){
+    const a=readFigure(pics[0]),b=readFigure(pics[1]);
+    append({type:"gallery",id:e.dataset.galleryId||a.id,src:a.src,src2:b.src,alt:a.alt,alt2:b.alt,caption:a.caption,caption2:b.caption,credit:a.credit});
+   }return;
+  }
+  if(tag==="SECTION"&&e.classList.contains("bw-doc-split")){
+   const figure=e.querySelector(":scope > figure");
+   if(!figure)return;
+   const a=readFigure(figure);
+   const content=e.querySelector(".bw-doc-split-text");
+   append({type:"split",id:a.id,src:a.src,alt:a.alt,caption:a.caption,credit:a.credit,
+    layout:e.dataset.layout==="image-right"?"image-right":"image-left",text:content?inlineText(content).trim():""});
+   return;
+  }
+  if(e.classList.contains("bw-doc-image-block")){
+   const figure=e.querySelector("figure");if(!figure)return;
+   const a=readFigure(figure);
+   append({type:"image",...a,width:(["small","medium","full"].includes(e.dataset.width||"")?e.dataset.width:"full") as StoryBlock["width"],align:(["left","center","right"].includes(e.dataset.align||"")?e.dataset.align:"center") as StoryBlock["align"]});return;
+  }
+  if(tag==="FIGURE"){append({type:"image",...readFigure(e)});return;}
+  if(tag==="H2"||tag==="H3"){
+   append({type:tag==="H2"?"heading":"subheading",text:inlineText(e).trim()});return;
+  }
+  if(tag==="BLOCKQUOTE"){
+   const type=e.dataset.kind==="callout"?"callout":"quote";
+   append({type,text:inlineText(e.querySelector("p")||e).trim(),
+    credit:e.querySelector("cite")?.textContent?.trim()||"",
+    tone:(["cream","gray","red"].includes(e.dataset.tone||"")?e.dataset.tone:"cream") as StoryBlock["tone"]});
+   return;
+  }
+  if(tag==="UL"||tag==="OL"){
+   append({type:"list",text:Array.from(e.querySelectorAll(":scope > li")).map(inlineText).join("\n")});return;
+  }
+  if(tag==="HR"){append({type:"divider"});return;}
+  if(tag==="P"){paragraph(e);return;}
+  if(tag==="DIV"){
+   if(e.children.length&&Array.from(e.children).some(child=>["DIV","P","FIGURE","H2","H3","BLOCKQUOTE","SECTION"].includes(child.tagName))){
+    e.childNodes.forEach(visit);
+   }else paragraph(e);
+   return;
+  }
+  paragraph(e);
+ };
+ root.childNodes.forEach(visit);
+ return collected.slice(0,100);
+}
+
+export function ArticleBodyEditor({initialBody=""}:{initialBody?:string}){
+ const rootRef=useRef<HTMLDivElement>(null);
+ const uploadsRef=useRef<HTMLDivElement>(null);
+ const chooserRef=useRef<HTMLInputElement>(null);
+ const rememberedSelection=useRef<Range|null>(null);
+ const modeRef=useRef<ImageMode>("image");
+ const blobUrls=useRef<string[]>([]);
+ const [body,setBody]=useState(initialBody);
+ const [imageCount,setImageCount]=useState(0);
+ const [message,setMessage]=useState("");
+
+ useEffect(()=>{
+  const root=rootRef.current;if(!root)return;
+  const blocks=parseRichBody(initialBody)||legacyStoryBlocks(initialBody);
+  root.replaceChildren(...blocks.map(toDOM));
+  if(!blocks.length)root.append(el("p"));
+  setBody(serializeRichBody(blocks));
+  setImageCount(blocks.reduce((n,b)=>n+(b.type==="gallery"?2:["image","split"].includes(b.type)?1:0),0));
+  return ()=>{blobUrls.current.forEach(URL.revokeObjectURL);blobUrls.current=[];};
+ },[initialBody]);
+
+ const remember=()=>{
+  const sel=window.getSelection(),root=rootRef.current;
+  if(sel?.rangeCount&&root&&root.contains(sel.anchorNode))rememberedSelection.current=sel.getRangeAt(0).cloneRange();
+ };
+ const save=()=>{
+  const root=rootRef.current;if(!root)return;
+  // Removed photos must not be sent to Supabase.
+  const active=new Set(Array.from(root.querySelectorAll("figure[data-block-id]")).map(n=>(n as HTMLElement).dataset.blockId));
+  uploadsRef.current?.querySelectorAll('input[type="file"]').forEach(input=>{
+   if(!active.has((input as HTMLInputElement).dataset.blockId))input.remove();
+  });
+  const blocks=extractBlocks(root);
+  setBody(serializeRichBody(blocks));
+  setImageCount(blocks.reduce((n,b)=>n+(b.type==="gallery"?2:["image","split"].includes(b.type)?1:0),0));
+ };
+ const focusEditor=()=>{
+  const root=rootRef.current;if(!root)return;
+  root.focus();
+  const current=rememberedSelection.current;
+  const sel=window.getSelection();if(!sel)return;
+  if(current&&root.contains(current.commonAncestorContainer)){
+   sel.removeAllRanges();sel.addRange(current);return;
+  }
+  const range=document.createRange();range.selectNodeContents(root);range.collapse(false);
+  sel.removeAllRanges();sel.addRange(range);
+ };
+ const insertNode=(node:HTMLElement)=>{
+  const root=rootRef.current;if(!root)return;
+  focusEditor();
+  const selection=window.getSelection();
+  if(!selection||!selection.rangeCount){root.append(node);save();return;}
+  const range=selection.getRangeAt(0);
+  // Insert a block at the nearest top-level boundary for valid editable HTML.
+  let block:Node|null=range.startContainer;
+  while(block&&block.parentNode!==root)block=block.parentNode;
+  if(block&&block.parentNode===root){
+   if(range.collapsed){block.after(node);}
+   else{range.deleteContents();block.after(node);}
+  }else root.append(node);
+  const after=el("p");after.append(el("br"));node.after(after);
+  const next=document.createRange();next.selectNodeContents(after);next.collapse(true);
+  selection.removeAllRanges();selection.addRange(next);
+  rememberedSelection.current=next.cloneRange();
+  save();
+ };
+ const command=(name:string,value?:string)=>{
+  focusEditor();
+  document.execCommand(name,false,value);
+  save();remember();
+ };
+ const formatBlock=(tag:"p"|"h2"|"h3")=>command("formatBlock","<"+tag+">");
+ const applyQuote=(kind:"quote"|"callout")=>{
+  focusEditor();
+  document.execCommand("formatBlock",false,"<blockquote>");
+  const selection=window.getSelection();let target=selection?.anchorNode as Node|null;
+  while(target&&target.nodeType===1&&(target as HTMLElement).tagName!=="BLOCKQUOTE"&&target.parentNode)target=target.parentNode;
+  if(target?.nodeType!==1||(target as HTMLElement).tagName!=="BLOCKQUOTE"){
+   target=(selection?.anchorNode?.parentElement?.closest("blockquote"))||null;
+  }
+  const quote=target as HTMLElement|null;
+  if(quote&&quote.tagName==="BLOCKQUOTE"){
+   quote.className=kind==="quote"?"bw-doc-pullquote":"bw-doc-highlight";
+   quote.dataset.kind=kind;
+   if(kind==="quote"&&!quote.querySelector("cite")){
+    const cite=el("cite");cite.contentEditable="true";cite.dataset.placeholder="উদ্ধৃতির ব্যক্তির নাম ও পদবি";
+    quote.append(cite);
+   }
+  }else{
+   const q=toDOM(createStoryBlock(kind,crypto.randomUUID()));insertNode(q);
+  }
+  save();remember();
+ };
+ const addImage=(mode:ImageMode)=>{
+  modeRef.current=mode;
+  const chooser=chooserRef.current;if(!chooser)return;
+  chooser.multiple=mode==="gallery";
+  remember();chooser.click();
+ };
+ const registerFile=(file:File,id:string)=>{
+  const chooser=chooserRef.current,rack=uploadsRef.current;
+  if(!chooser||!rack)return;
+  const hidden=el("input");hidden.type="file";hidden.name="inline_image_"+id;
+  hidden.dataset.blockId=id;hidden.className="bw-doc-hidden-file";hidden.tabIndex=-1;
+  const dt=new DataTransfer();dt.items.add(file);hidden.files=dt.files;rack.append(hidden);
+ };
+ const attachFile=(file:File)=>{
+  if(!ACCEPTED.includes(file.type)||file.size>MAX_IMAGE_BYTES){setMessage("প্রতিটি ছবি JPG, PNG, WebP বা AVIF হতে হবে এবং সর্বোচ্চ ৪ MB।");return null;}
+  const id=crypto.randomUUID();
+  const url=URL.createObjectURL(file);blobUrls.current.push(url);
+  registerFile(file,id);
+  return makeFigure("",id,"","", "");
+ };
+ const handleFiles=(files:FileList|null)=>{
+  if(!files?.length)return;
+  const mode=modeRef.current;
+  const current=rootRef.current?.querySelectorAll("figure[data-block-id]").length||0;
+  if(current+(mode==="gallery"?2:1)>100){setMessage("সর্বোচ্চ ১০০টি কনটেন্ট ব্লক রাখা যাবে।");return;}
+  if(mode==="gallery"&&files.length!==2){setMessage("পাশাপাশি ছবির জন্য একবারে ঠিক ২টি ছবি নির্বাচন করুন।");return;}
+  if(Array.from(files).some(f=>!ACCEPTED.includes(f.type)||f.size>MAX_IMAGE_BYTES)){setMessage("JPG, PNG, WebP বা AVIF ছবি দিন, প্রতিটি সর্বোচ্চ ৪ MB।");return;}
+  const selected=Array.from(files).slice(0,mode==="gallery"?2:1);
+  const queued=uploadsRef.current?.querySelectorAll('input[type="file"]').length||0;
+  if(queued+selected.length>6){setMessage("একবারে সর্বোচ্চ ৬টি নতুন ছবি আপলোড করা যায়। আগে খসড়া সংরক্ষণ করে তারপর আরও ছবি যোগ করুন।");return;}
+  const figures=selected.map(f=>{
+   const figure=attachFile(f);
+   if(figure){const img=figure.querySelector("img");if(img){const obj=blobUrls.current[blobUrls.current.length-1];img.src=obj;delete img.dataset.awaitingUpload;}}
+   return figure;
+  }).filter((x):x is HTMLElement=>Boolean(x));
+  if(!figures.length)return;
+  let wrap:HTMLElement;
+  if(mode==="split"){
+   wrap=el("section","bw-doc-split");wrap.dataset.layout="image-left";wrap.append(figures[0]);
+   const copy=el("div","bw-doc-split-text");const p=el("p");p.textContent="ছবির পাশে এখানে লিখুন";copy.append(p);wrap.append(copy);
+  }else if(mode==="gallery"){
+   wrap=el("section","bw-doc-gallery");wrap.dataset.galleryId=figures[0].dataset.blockId;figures.forEach(f=>wrap.append(f));
+  }else{
+   wrap=el("div","bw-doc-image-block");wrap.dataset.width="full";wrap.dataset.align="center";wrap.append(figures[0]);
+  }
+  insertNode(wrap);setMessage("ছবি যুক্ত হয়েছে। ক্যাপশন চাইলে ছবির নিচে লিখুন।");
+ };
+ const insertImageUrl=()=>{
+  const raw=window.prompt("ছবির HTTPS লিংক দিন:");
+  if(!raw)return;
+  const url=safeStoryImageUrl(raw.trim());
+  if(!url){setMessage("বৈধ HTTPS ছবির লিংক দিন।");return;}
+  const div=el("div","bw-doc-image-block");div.dataset.width="full";div.dataset.align="center";
+  div.append(makeFigure(url,crypto.randomUUID()));insertNode(div);
+ };
+ const addDivider=()=>insertNode(el("hr"));
+ return <section className="bw-doc-editor full-span" aria-label="এক জায়গায় সংবাদ লেখা ও সাজানো">
+  <div className="bw-doc-head">
+   <div><h2>সম্পূর্ণ সংবাদ</h2><p>Google Docs-এর মতো এক জায়গায় লিখুন বা পুরো সংবাদ পেস্ট করুন। লেখা নির্বাচন করে ফরম্যাট করুন, প্রয়োজনের জায়গায় ছবি বা উদ্ধৃতি বসান।</p></div>
+   <span className="bw-doc-counter">{imageCount}টি ছবি</span>
+  </div>
+  <div className="bw-doc-toolbar" role="toolbar" aria-label="সংবাদের ফরম্যাটিং">
+   <button type="button" onMouseDown={e=>e.preventDefault()} onClick={()=>command("bold")} title="বোল্ড"><strong>B</strong></button>
+   <button type="button" onMouseDown={e=>e.preventDefault()} onClick={()=>command("italic")} title="ইটালিক"><em>I</em></button>
+   <button type="button" onMouseDown={e=>e.preventDefault()} onClick={()=>formatBlock("p")}>সাধারণ</button>
+   <button type="button" onMouseDown={e=>e.preventDefault()} onClick={()=>formatBlock("h2")}>শিরোনাম</button>
+   <button type="button" onMouseDown={e=>e.preventDefault()} onClick={()=>formatBlock("h3")}>উপশিরোনাম</button>
+   <button type="button" onMouseDown={e=>e.preventDefault()} onClick={()=>command("insertUnorderedList")}>• তালিকা</button>
+   <button type="button" onMouseDown={e=>e.preventDefault()} onClick={()=>{
+    const link=window.prompt("HTTPS লিংক দিন:");if(link?.startsWith("https://"))command("createLink",link);
+   }}>লিংক</button>
+   <span className="bw-doc-toolbar-separator" aria-hidden="true"/>
+   <button type="button" className="bw-doc-tool-accent" onMouseDown={e=>e.preventDefault()} onClick={()=>addImage("image")}>＋ ছবি</button>
+   <button type="button" onMouseDown={e=>e.preventDefault()} onClick={()=>addImage("split")}>ছবি ও লেখা</button>
+   <button type="button" onMouseDown={e=>e.preventDefault()} onClick={()=>addImage("gallery")}>২ ছবি</button>
+   <button type="button" onMouseDown={e=>e.preventDefault()} onClick={insertImageUrl} title="ছবির URL থেকে যোগ করুন">ছবির URL</button>
+   <span className="bw-doc-toolbar-separator" aria-hidden="true"/>
+   <button type="button" className="bw-doc-tool-accent" onMouseDown={e=>e.preventDefault()} onClick={()=>applyQuote("quote")}>❝ বড় উদ্ধৃতি</button>
+   <button type="button" onMouseDown={e=>e.preventDefault()} onClick={()=>applyQuote("callout")}>হাইলাইট বক্স</button>
+   <button type="button" onMouseDown={e=>e.preventDefault()} onClick={addDivider}>রেখা</button>
+  </div>
+  <div ref={rootRef} className="bw-doc-surface" contentEditable suppressContentEditableWarning
+    data-placeholder="এখানে সম্পূর্ণ সংবাদ লিখুন বা পেস্ট করুন…"
+    role="textbox" aria-label="সংবাদের মূল লেখা" aria-multiline="true"
+    onInput={save} onBlur={save} onMouseUp={remember} onKeyUp={remember}
+    onPaste={event=>{
+      // Treat pasted outside HTML as plain editorial text, never executable markup.
+      event.preventDefault();
+      document.execCommand("insertText",false,event.clipboardData.getData("text/plain"));
+      save();
+    }}
+    onDrop={event=>{
+      if(event.dataTransfer.files.length){
+       event.preventDefault();handleFiles(event.dataTransfer.files);
+      }
+    }}
+  />
+  <input type="hidden" name="body" value={body} readOnly/>
+  <input ref={chooserRef} type="file" accept="image/jpeg,image/png,image/webp,image/avif,.avif"
+   className="bw-doc-hidden-file" aria-label="সংবাদের মধ্যে ছবি নির্বাচন"
+   onChange={event=>{handleFiles(event.currentTarget.files);event.currentTarget.value="";}}/>
+  <div ref={uploadsRef} className="bw-doc-file-rack" aria-hidden="true"/>
+  {message&&<p className="bw-doc-message" role="status">{message}</p>}
+  <p className="bw-doc-help">**বড় উদ্ধৃতি তৈরি:** উদ্ধৃতির অনুচ্ছেদে কার্সর রেখে ‘❝ বড় উদ্ধৃতি’ চাপুন, তারপর নিচে ব্যক্তির নাম লিখুন। নতুন ছবি একই লেখার মধ্যে কার্সরের অবস্থানে বসবে।</p>
+ </section>;
 }
