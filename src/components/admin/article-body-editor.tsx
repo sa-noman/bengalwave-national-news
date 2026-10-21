@@ -46,7 +46,12 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
    });
    URL.revokeObjectURL(url);filesRef.current.delete(id);
   }
-  try{if(value.length<=80000)sessionStorage.setItem(draftKey.current,JSON.stringify({updated:Date.now(),value}));}catch{}
+  // Unsaved browser File objects cannot survive a page reload. Do not offer
+  // to restore a draft whose photos would be broken blob URLs.
+  try{
+   if(filesRef.current.size>0)sessionStorage.removeItem(draftKey.current);
+   else if(value.length<=80000)sessionStorage.setItem(draftKey.current,JSON.stringify({updated:Date.now(),value}));
+  }catch{}
  },[]);
 
  const editor=useEditor({
