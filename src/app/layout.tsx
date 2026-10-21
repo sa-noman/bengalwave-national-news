@@ -18,6 +18,7 @@ import "./header-calendar.css";
 import "./heritage-stories.css";
 import "./dark-theme.css";
 import "./rich-article.css";
+import "./newsroom-editor.css";
 export const metadata:Metadata={
  title:{default:"Bengal Wave | বাংলা নিউজ",template:"%s | Bengal Wave"},
  description:"Bengal Wave | ইতিহাস, সংবাদ ও সংস্কৃতির প্রতিচ্ছবি",
