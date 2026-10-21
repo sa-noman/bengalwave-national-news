@@ -485,7 +485,7 @@ export function ArticleBodyEditor({initialBody=""}:{initialBody?:string}){
   <div ref={rootRef} className="bw-doc-surface" contentEditable suppressContentEditableWarning
     data-placeholder="এখানে সম্পূর্ণ সংবাদ লিখুন বা পেস্ট করুন…"
     role="textbox" aria-label="সংবাদের মূল লেখা" aria-multiline="true"
-    onInput={save} onBlur={()=>{save();window.dispatchEvent(new Event("bw:article-editor-blur"));}} onMouseUp={remember} onKeyUp={remember}
+    onInput={save} onBlur={()=>{save();const root=rootRef.current;window.dispatchEvent(new CustomEvent("bw:article-editor-blur",{detail:{body:root?serializeRichBody(extractBlocks(root)):""}}));}} onMouseUp={remember} onKeyUp={remember}
     onClick={event=>{
       const target=event.target;
       if(!(target instanceof Element))return;
