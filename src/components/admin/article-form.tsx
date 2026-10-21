@@ -1,6 +1,7 @@
 import {createDraft,updateArticle} from "@/app/admin/actions";
 import {ArticleImageField} from "./article-image-field";
 import {ArticleSubmitControls} from "./article-submit-controls";
+import {ArticleBodyEditor} from "./article-body-editor";
 type Category={id:string;label_bn:string};
 type Article={
  id:string;slug:string;headline:string;summary:string;body:string;
@@ -34,9 +35,7 @@ export function ArticleForm({categories,article,role,media}:{
       <label className="full-span">সংক্ষিপ্ত বিবরণ
         <textarea name="summary" maxLength={700} rows={3} defaultValue={article?.summary||""} placeholder="হোমপেজ ও সংবাদ কার্ডে দেখানো হবে"/>
       </label>
-      <label className="full-span">সম্পূর্ণ সংবাদ
-        <textarea name="body" rows={15} maxLength={80000} defaultValue={article?.body||""} placeholder="যাচাইকৃত বাংলা সংবাদ লিখুন"/>
-      </label>
+      <ArticleBodyEditor initialBody={article?.body||""}/>
       <label className="full-span">উৎসের URL (ঐচ্ছিক)
         <input name="source_url" type="url" defaultValue={article?.source_url||""} placeholder="https://example.com/article"/>
       </label>
