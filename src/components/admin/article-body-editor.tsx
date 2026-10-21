@@ -420,7 +420,7 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
  const addImage=(mode:ImageMode)=>{
   modeRef.current=mode;
   const chooser=chooserRef.current;if(!chooser)return;
-  chooser.multiple=mode==="gallery";
+  chooser.multiple=mode==="gallery"||mode==="slideshow"||mode==="slide-add";
   remember();chooser.click();
  };
  const registerFile=(file:File,id:string)=>{
@@ -444,18 +444,52 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
   if(!files?.length)return;
   const mode=modeRef.current;
   const current=rootRef.current?.querySelectorAll("figure[data-block-id]").length||0;
-  if(current+(mode==="gallery"?2:1)>100){setMessage("সর্বোচ্চ ১০০টি কনটেন্ট ব্লক রাখা যাবে।");return;}
+  if(current+files.length>100){setMessage("সর্বোচ্চ ১০০টি কনটেন্ট ব্লক রাখা যাবে।");return;}
   if(mode==="gallery"&&files.length!==2){setMessage("পাশাপাশি ছবির জন্য একবারে ঠিক ২টি ছবি নির্বাচন করুন।");return;}
+  if(mode==="slideshow"&&(files.length<2||files.length>6)){setMessage("স্লাইডশোতে একবারে ২-৬টি ছবি নির্বাচন করুন।");return;}
   if(Array.from(files).some(f=>!ACCEPTED.includes(f.type)||f.size>MAX_IMAGE_BYTES)){setMessage("JPG, PNG, WebP বা AVIF ছবি দিন, প্রতিটি সর্বোচ্চ ৪ MB।");return;}
-  const selected=Array.from(files).slice(0,mode==="gallery"?2:1);
+  const selected=Array.from(files).slice(0,mode==="gallery"?2:mode==="slideshow"||mode==="slide-add"?6:1);
   const queued=uploadsRef.current?.querySelectorAll('input[type="file"]').length||0;
   if(queued+selected.length>6){setMessage("একবারে সর্বোচ্চ ৬টি নতুন ছবি আপলোড করা যায়। আগে খসড়া সংরক্ষণ করে তারপর আরও ছবি যোগ করুন।");return;}
   const figures=selected.map(attachFile).filter((x):x is HTMLElement=>Boolean(x));
   if(!figures.length)return;
+  if(mode==="slide-add"){
+   const root=rootRef.current;
+   const group=Array.from(root?.querySelectorAll(".bw-doc-slider-editor")||[])
+     .find(node=>(node as HTMLElement).dataset.sliderId===targetSliderRef.current) as HTMLElement|undefined;
+   if(!group){setMessage("প্রথমে স্লাইডশোতে ক্লিক করুন।");return;}
+   const id=group.dataset.sliderId||"",count=group.querySelectorAll(":scope > figure").length;
+   if(count+figures.length>12){setMessage("একটি স্লাইডশোতে সর্বোচ্চ ১২টি ছবি রাখা যাবে।");return;}
+   figures.forEach((figure,i)=>{
+    const original=figure.dataset.blockId;
+    const input=Array.from(uploadsRef.current?.querySelectorAll('input[type="file"]')||[])
+      .find(x=>(x as HTMLInputElement).dataset.blockId===original) as HTMLInputElement|undefined;
+    const index=count+i;
+    if(input){input.name="inline_image_"+id+"_slide_"+index;input.dataset.blockId=id+"-slide-"+index;}
+    figure.dataset.blockId=id+"-slide-"+index;figure.dataset.slideIndex=String(index);group.append(figure);
+   });
+   save();setMessage("নতুন ছবি স্লাইডশোতে যুক্ত হয়েছে। প্রতিটি ছবির নিচে ক্যাপশন দিন।");return;
+  }
   let wrap:HTMLElement;
   if(mode==="split"){
    wrap=el("section","bw-doc-split");wrap.dataset.layout="image-left";wrap.append(figures[0]);
    const copy=el("div","bw-doc-split-text");const p=el("p");p.dataset.placeholder="ছবির পাশে এখানে লিখুন";copy.append(p);wrap.append(copy);
+  }else if(mode==="slideshow"){
+   const id=crypto.randomUUID();
+   wrap=el("section","bw-doc-slider-editor");
+   wrap.dataset.sliderId=id;
+   const heading=el("strong","bw-doc-slider-label");
+   heading.contentEditable="false";heading.textContent="স্লাইডশো · প্রতিটি ছবির আলাদা ক্যাপশন";
+   wrap.append(heading);
+   figures.forEach((figure,i)=>{
+    const original=figure.dataset.blockId;
+    const input=Array.from(uploadsRef.current?.querySelectorAll('input[type="file"]')||[])
+     .find(x=>(x as HTMLInputElement).dataset.blockId===original) as HTMLInputElement|undefined;
+    if(input){input.name="inline_image_"+id+"_slide_"+i;input.dataset.blockId=id+"-slide-"+i;}
+    figure.dataset.blockId=id+"-slide-"+i;
+    figure.dataset.slideIndex=String(i);
+    wrap.append(figure);
+   });
   }else if(mode==="gallery"){
    const firstId=figures[0].dataset.blockId||crypto.randomUUID();
    const secondOldId=figures[1].dataset.blockId||"";
