@@ -19,6 +19,7 @@ export type NewsItem = {
 // Legacy development fixtures, intentionally not used for public pages.
 // Only published, server-filtered Supabase articles may appear as real news.
 export const categories = [
+  {slug:"exclusive",label:"এক্সক্লুসিভ"},
   {slug:"national",label:"জাতীয়"},
   {slug:"international",label:"আন্তর্জাতিক"},
   {slug:"politics",label:"রাজনীতি"},

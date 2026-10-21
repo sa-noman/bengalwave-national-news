@@ -4,6 +4,7 @@ import {notFound} from "next/navigation";
 import {requireStaff} from "@/lib/auth/require-staff";
 import {publicNewsImageUrl} from "@/lib/news-media-paths";
 import {NewsImage} from "@/components/news-image";
+import {RichArticleBody} from "@/components/rich-article-body";
 
 // This page is an authenticated editorial preview in BOTH Preview and Production; NEVER a public article.
 // Publishing is an explicit separate action on the edit form.
@@ -85,10 +86,7 @@ export default async function PreviewArticle({params}:{
           </div>
           {caption&&<figcaption>{caption}</figcaption>}
         </figure>
-        <div className="bw-article-body">
-          {item.body.split(/\n\s*\n/).filter(Boolean)
-            .map((paragraph:string,index:number)=><p key={index}>{paragraph}</p>)}
-        </div>
+        <RichArticleBody body={item.body}/>
       </article>
       <Link href={editorHref} className="bw-article-back">← সংবাদ সম্পাদনায় ফিরুন</Link>
     </div>

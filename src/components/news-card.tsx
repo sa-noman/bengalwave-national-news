@@ -4,8 +4,8 @@ import type {NewsItem} from "@/lib/demo-news";
 import {formatNewsCardDate,formatFullNewsDate} from "@/lib/news-date";
 
 export type CardVariant="regular"|"lead"|"middle"|"text"|"latest"|"feature";
-export function NewsCard({item,compact=false,hero=false,variant}:{
-  item:NewsItem;compact?:boolean;hero?:boolean;variant?:CardVariant;
+export function NewsCard({item,compact=false,hero=false,variant,hideCategory=false}:{
+  item:NewsItem;compact?:boolean;hero?:boolean;variant?:CardVariant;hideCategory?:boolean;
 }){
   const kind=variant||(hero?"lead":compact?"text":"regular");
   const href="/news/"+item.slug;
@@ -17,7 +17,7 @@ export function NewsCard({item,compact=false,hero=false,variant}:{
       <NewsImage key={item.image} src={kind==="lead"?(item.fullImage||item.image):item.image} alt={item.imageAlt||item.title} eager={kind==="lead"} quality={kind==="lead"?84:78} sizes={imageSizes}/>
     </span>}
     <span className="bw-card-copy">
-      <span className="bw-tag">{item.category}</span>
+      {!hideCategory&&<span className="bw-tag">{item.category}</span>}
       <h3 className="bw-card-title"><span className="bw-title-underline">{item.title}</span></h3>
       {["lead","middle","feature","text"].includes(kind)&&item.summary&&<span className="bw-card-summary">{item.summary}</span>}
       {kind!=="latest"&&<span className="bw-card-meta">{item.publishedAt&&!item.isDemo?

@@ -153,6 +153,24 @@ export async function getPublishedNews(limit=60):Promise<NewsItem[]> {
   const media=await loadAttachedMedia(supabase,rows);
   return rows.map(row=>asNewsItem(row,media.get(row.id),supabase));
 }
+/** Read only stories explicitly assigned to a category.
+ * Unlike filtering the site's latest stories in memory, older exclusive
+ * reports remain available even after many unrelated stories are published.
+ */
+export async function getPublishedNewsByCategory(slug:string,limit=100):Promise<NewsItem[]> {
+  const supabase=createSupabasePublicClient();
+  if(!supabase)return [];
+  const {data,error}=await supabase.from("articles")
+    .select("id,slug,headline,summary,is_featured,published_at,hero_media_id,categories!inner(slug,label_bn)")
+    .eq("categories.slug",slug)
+    .eq("status","published").lte("published_at",new Date().toISOString())
+    .order("published_at",{ascending:false}).limit(limit);
+  if(error){console.error("Bengal Wave: category news fetch failed",error.code);return [];}
+  const rows=(data||[]) as unknown as DatabaseArticle[];
+  const media=await loadAttachedMedia(supabase,rows);
+  return rows.map(row=>asNewsItem(row,media.get(row.id),supabase));
+}
+
 export async function getPublishedArticle(slug:string) {
   const supabase=createSupabasePublicClient();
   if(!supabase) return null;

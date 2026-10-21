@@ -3,6 +3,7 @@
 import {useFormStatus} from "react-dom";
 import {useState} from "react";
 import type {MouseEvent} from "react";
+import {newsroomPublishableText} from "@/lib/newsroom-document";
 import {
   approveArticle,
   createAndPublishArticle,
@@ -21,9 +22,9 @@ export function ArticleSubmitControls({status,isEditor,previewOnly=false}:{
   function validateDirectPublish(event:MouseEvent<HTMLButtonElement>){
     const form=event.currentTarget.form;
     const summary=form?.elements.namedItem("summary") as HTMLTextAreaElement|null;
-    const body=form?.elements.namedItem("body") as HTMLTextAreaElement|null;
+    const body=form?.elements.namedItem("body") as HTMLInputElement|null;
     const category=form?.elements.namedItem("category_id") as HTMLSelectElement|null;
-    if(!category?.value || (summary?.value.trim().length||0)<10 || (body?.value.trim().length||0)<30){
+    if(!category?.value || (summary?.value.trim().length||0)<10 || !newsroomPublishableText(body?.value||"")){
       event.preventDefault();
       setPublishError("লাইভ প্রকাশের আগে বিভাগ, অন্তত ১০ অক্ষরের সংক্ষিপ্ত বিবরণ এবং ৩০ অক্ষরের সম্পূর্ণ সংবাদ লিখুন।");
       return;
@@ -33,6 +34,10 @@ export function ArticleSubmitControls({status,isEditor,previewOnly=false}:{
 
   return <>
     <div className="admin-controls">
+      <button className="admin-secondary" type="button" disabled={pending}
+       onClick={()=>window.dispatchEvent(new Event("bw:open-draft-preview"))}>
+        ◉ প্রকাশের আগে সংবাদ প্রিভিউ দেখুন
+      </button>
       <button className="admin-primary" type="submit" disabled={pending||(previewOnly&&status==="published")}>
         {pending?"সংরক্ষণ হচ্ছে…":status?"পরিবর্তন সংরক্ষণ করুন":"খসড়া হিসেবে সংরক্ষণ করুন"}
       </button>
