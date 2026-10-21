@@ -35,8 +35,8 @@ export function validateNewsJSON(n:unknown,depth=0):n is NewsJSON{
    const attrs=mark.attrs||{};
    if(mark.type==="link")return typeof attrs.href==="string"&&!!safeStoryImageUrl(attrs.href);
    if(mark.type==="textStyle"){
-    if(attrs.fontSize!==undefined&&(!/^(1[2-9]|2[0-8]|3[02])px$/.test(String(attrs.fontSize))))return false;
-    if(attrs.color!==undefined&&!COLORS.test(String(attrs.color)))return false;
+    if(attrs.fontSize!=null&&!/^(1[2-9]|2[0-8]|3[02])px$/.test(String(attrs.fontSize)))return false;
+    if(attrs.color!=null&&!COLORS.test(String(attrs.color)))return false;
    }
    return true;
  })))return false;
