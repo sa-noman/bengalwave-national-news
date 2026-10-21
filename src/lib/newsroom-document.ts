@@ -6,6 +6,13 @@ import {legacyStoryBlocks,parseRichBody,safeStoryImageUrl} from "@/lib/rich-arti
 import type {StoryBlock} from "@/lib/rich-article";
 
 export const NEWSROOM_PREFIX="BW_NEWSROOM_V2\n";
+/** HTML form submissions may normalize line feeds to CRLF before storage.
+ * Accept both spellings of the version marker without modifying saved stories. */
+const NEWSROOM_CRLF_PREFIX="BW_NEWSROOM_V2\\r\\n";
+export function isNewsroomBody(raw:string):boolean{
+ return raw.startsWith(NEWSROOM_PREFIX)||raw.startsWith(NEWSROOM_CRLF_PREFIX);
+}
+
 export type NewsJSON={type:string;attrs?:Record<string,unknown>;text?:string;marks?:NewsJSON[];content?:NewsJSON[]};
 export type NewsPhoto={id:string;src:string;alt:string;caption:string;credit:string};
 export const ID=/^[a-z0-9-]{8,64}$/i;
@@ -63,9 +70,10 @@ export function validateNewsJSON(n:unknown,depth=0):n is NewsJSON{
  return true;
 }
 export function parseNewsroomBody(raw:string):NewsJSON|null{
- if(!raw.startsWith(NEWSROOM_PREFIX)||raw.length>80000)return null;
+ if(!isNewsroomBody(raw)||raw.length>80000)return null;
  try{
-  const doc=JSON.parse(raw.slice(NEWSROOM_PREFIX.length)) as NewsJSON;
+  const prefixLength=raw.startsWith(NEWSROOM_PREFIX)?NEWSROOM_PREFIX.length:NEWSROOM_CRLF_PREFIX.length;
+  const doc=JSON.parse(raw.slice(prefixLength)) as NewsJSON;
   return doc.type==="doc"&&validateNewsJSON(doc)?doc:null;
  }catch{return null;}
 }
@@ -134,7 +142,7 @@ export function existingBodyToNewsJSON(raw:string):NewsJSON{
 }
 
 export function newsroomPublishableText(raw:string):boolean{
- if(raw.startsWith(NEWSROOM_PREFIX)){
+ if(isNewsroomBody(raw)){
   const doc=parseNewsroomBody(raw);
   return !!doc&&textContent(doc).length>=30;
  }
