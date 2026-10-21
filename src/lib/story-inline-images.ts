@@ -21,6 +21,27 @@ export async function resolveStoryInlineImages(
  const updated:StoryBlock[]=[];
  for(const b of blocks){
   const entry:StoryBlock={...b};
+  if(b.type==="slideshow"){
+   if(!b.slides||b.slides.length<2||b.slides.length>12)return {ok:false,error:"invalid_slides"};
+   const newSlides=[];
+   for(let i=0;i<b.slides.length;i++){
+    const slide={...b.slides[i]};
+    const input="inline_image_"+b.id+"_slide_"+i;
+    const file=form.get(input);
+    if(file instanceof File&&file.size>0){
+     if(++newImages>6)return {ok:false,error:"limit"};
+     const uploaded=await uploadNewsImage(file,{alt:slide.alt||"সংবাদের স্লাইড",caption:slide.caption,credit:slide.credit},userId,supabase);
+     if(!uploaded.ok)return {ok:false,error:uploaded.error};
+     const {data,error}=await supabase.from("media_assets").select("storage_path")
+       .eq("id",uploaded.mediaId).maybeSingle();
+     const url=!error&&data?publicNewsImageUrl(supabase,data.storage_path,"full"):null;
+     if(!url)return {ok:false,error:"metadata"};
+     slide.src=url;
+    }else if(!safeStoryImageUrl(slide.src))return {ok:false,error:"missing"};
+    newSlides.push(slide);
+   }
+   entry.slides=newSlides;
+  }
   const slots:(("src"|"src2"))[]=b.type==="gallery"?["src","src2"]:
     (b.type==="image"||b.type==="split")?["src"]:[];
   for(const field of slots){
