@@ -19,7 +19,7 @@ export default async function CategoryPage({params}:{params:Promise<{slug:string
  return <main className="bw-website">{(isDesignPreview()||showingSamples)&&<PreviewNotice samples={showingSamples}/>}
   <section className="bw-wrap bw-listing">
    <div className="bw-section-heading"><h1>{category.label}</h1></div>
-   {list.length?<div className="bw-listing-grid">{list.map(item=><NewsCard key={item.id} item={item}/>)}</div>:<p className="bw-empty">এই বিভাগে এখনো সংবাদ প্রকাশিত হয়নি।</p>}
+   {list.length?<div className="bw-listing-grid">{list.map(item=><NewsCard key={item.id} item={item} hideCategory={slug==="exclusive"}/>)}</div>:<p className="bw-empty">{slug==="exclusive"?"এখনো কোনো এক্সক্লুসিভ প্রতিবেদন প্রকাশিত হয়নি।":"এই বিভাগে এখনো সংবাদ প্রকাশিত হয়নি।"}</p>}
   </section>
  </main>;
 }
