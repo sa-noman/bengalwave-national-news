@@ -282,3 +282,7 @@ html[data-theme="dark"] .bw-article .bw-rich-article-body blockquote.bw-rich-quo
  .bw-doc-surface .bw-doc-slider-editor{padding:9px}
  .bw-doc-copy-options{right:auto;left:0}
 }
+
+.bw-doc-caption-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 11px;background:#f4f7f3;border:1px solid #cbdbce}
+.bw-doc-caption-controls button{border:1px solid #adccba;border-radius:6px;background:#fff;color:#145038;padding:7px 10px;font:600 12px var(--bw-serif);cursor:pointer}
+.bw-doc-surface figcaption[data-placeholder]:empty::before{content:attr(data-placeholder);color:#84968a;opacity:.85;pointer-events:none}
