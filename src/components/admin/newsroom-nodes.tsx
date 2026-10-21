@@ -1,5 +1,6 @@
 "use client";
 import {Node,mergeAttributes} from "@tiptap/core";
+import type {CSSProperties} from "react";
 import {NodeViewContent,NodeViewWrapper,ReactNodeViewRenderer} from "@tiptap/react";
 import type {NodeViewProps} from "@tiptap/react";
 import type {NewsPhoto} from "@/lib/newsroom-document";
@@ -91,11 +92,15 @@ function NewsMediaView({node,updateAttributes,deleteNode,selected,editor}:NodeVi
 }
 function NewsCalloutView({node,updateAttributes,deleteNode}:NodeViewProps){
  const kind=node.attrs.kind==="quote"?"quote":"highlight";
+ const accent=String(node.attrs.borderColor||"#0b4838");
  return <NodeViewWrapper className={"bw-nr-callout bw-nr-callout-"+kind}
-    style={{borderLeftColor:String(node.attrs.borderColor||"#0b4838")}}>
+    style={kind==="quote"?{"--bw-quote-accent":accent} as CSSProperties:{borderLeftColor:accent}}>
   <div className="bw-nr-callout-controls" contentEditable={false}>
    <strong>{kind==="quote"?"বড় উদ্ধৃতি":"হাইলাইট বক্স"}</strong>
-   <label>বাম রেখার রং <input type="color" value={node.attrs.borderColor||"#0b4838"} onChange={e=>updateAttributes({borderColor:e.target.value})}/></label>
+   <label>{kind==="quote"?"উদ্ধৃতিচিহ্নের রং":"বাম রেখার রং"}
+    <input type="color" value={accent} aria-label={kind==="quote"?"উদ্ধৃতিচিহ্নের রং":"বাম রেখার রং"}
+     onChange={e=>updateAttributes({borderColor:e.target.value})}/>
+   </label>
    <button type="button" onClick={deleteNode}>✕ ডিলিট</button>
   </div>
   <NodeViewContent as="div" className="bw-nr-callout-content"/>
