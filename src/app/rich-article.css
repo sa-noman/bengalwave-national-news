@@ -107,3 +107,90 @@ html[data-theme="dark"] .bw-rich-article-body .bw-rich-tone-red{color:#edf2eb;ba
 .bw-rich-quick-add{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 17px}
 .bw-rich-quick-add .admin-secondary{font-size:13px;padding:8px 12px;min-height:38px;border-radius:7px}
 .bw-rich-editor-actions button span{font-size:12px;margin-left:2px}
+
+
+/* One-surface, document-like CMS composer. Only the authenticated editor uses these rules. */
+.bw-doc-editor{border:1px solid #d8e4dc;border-radius:12px;padding:16px;background:#fbfcfb;min-width:0}
+.bw-doc-head{display:flex;justify-content:space-between;align-items:start;gap:14px;margin-bottom:12px}
+.bw-doc-head h2{font-size:20px;color:#0f503e;margin:0 0 3px;font-weight:700}
+.bw-doc-head p{font-size:13px;line-height:1.65;color:#4d6258;margin:0}
+.bw-doc-counter{font-size:11px;white-space:nowrap;color:#335d49;border:1px solid #d2e0d7;padding:5px 10px;border-radius:20px}
+.bw-doc-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:5px;background:#f1f5f1;border:1px solid #d8e4da;border-radius:8px 8px 0 0;padding:10px;position:sticky;top:47px;z-index:3}
+.bw-doc-toolbar button{font:600 13px/1.5 var(--bw-serif);background:#fff;border:1px solid #c6d6cb;color:#244b3b;padding:6px 9px;border-radius:5px;cursor:pointer;min-height:35px}
+.bw-doc-toolbar button:hover{background:#e4f0e8;border-color:#8eb29c}
+.bw-doc-toolbar .bw-doc-tool-accent{background:#0b4838;color:#fff;border-color:#0b4838}
+.bw-doc-toolbar .bw-doc-tool-accent:hover{background:#146c53;color:#fff}
+.bw-doc-toolbar-separator{height:25px;border-left:1px solid #c5d8c9;margin:0 3px}
+.bw-doc-editor .bw-doc-surface{
+ width:100%;min-width:0;min-height:440px;padding:28px 32px;
+ background:#fff;border:1px solid #d8e4da;border-top:0;border-radius:0 0 8px 8px;
+ color:#172b22;font:400 18px/1.95 var(--bw-serif);white-space:normal;
+ outline:none;overflow-wrap:anywhere;cursor:text
+}
+.bw-doc-editor .bw-doc-surface:focus{border-color:#8fae9a;box-shadow:0 0 0 2px #d0e5d5}
+.bw-doc-editor .bw-doc-surface:empty:before{content:attr(data-placeholder);color:#829087;pointer-events:none}
+.bw-doc-surface > p,.bw-doc-surface > div:not(.bw-doc-image-block),.bw-doc-surface > ul{margin:0 0 18px}
+.bw-doc-surface h2{font-size:26px;font-weight:700;line-height:1.5;margin:28px 0 12px}
+.bw-doc-surface h3{font-size:22px;font-weight:700;line-height:1.5;margin:24px 0 10px}
+.bw-doc-surface ul,.bw-doc-surface ol{padding-left:26px;list-style:disc;margin:12px 0 18px}
+.bw-doc-surface a{color:#115a8e;text-decoration:underline}
+.bw-doc-surface hr{border:0;border-top:1px solid #cbd7cf;margin:28px 0}
+.bw-doc-surface .bw-doc-image-block{max-width:100%;margin:23px auto}
+.bw-doc-surface .bw-doc-image-block[data-width="medium"]{width:75%}
+.bw-doc-surface .bw-doc-image-block[data-width="small"]{width:55%}
+.bw-doc-surface .bw-doc-image-block[data-align="left"]{margin-left:0}
+.bw-doc-surface .bw-doc-image-block[data-align="right"]{margin-right:0}
+.bw-doc-surface .bw-doc-image-block[data-align="center"]{margin-inline:auto}
+.bw-doc-surface figure{margin:0;display:block;min-width:0}
+.bw-doc-surface figure img{display:block;max-width:100%;width:100%;height:auto;max-height:560px;object-fit:contain;background:#f4f2ed;border-radius:5px}
+.bw-doc-surface figure img[data-awaiting-upload="true"]{min-height:110px}
+.bw-doc-surface figcaption{font-size:13px;line-height:1.7;color:#626e65;text-align:left;min-height:22px;margin-top:6px}
+.bw-doc-surface figcaption:empty:before,.bw-doc-surface cite:empty:before{content:attr(data-placeholder);color:#9aa69d}
+.bw-doc-surface .bw-doc-credit{display:block;font-size:12px;color:#6d756e;line-height:1.6}
+.bw-doc-surface .bw-doc-split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.12fr);gap:22px;align-items:start;margin:23px 0}
+.bw-doc-surface .bw-doc-split[data-layout="image-right"] > figure{order:2}
+.bw-doc-surface .bw-doc-split-text{min-height:90px;min-width:0}
+.bw-doc-surface .bw-doc-split-text p{margin:0}
+.bw-doc-surface .bw-doc-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin:23px 0}
+.bw-doc-surface .bw-doc-gallery figure img{max-height:350px}
+.bw-doc-surface blockquote.bw-doc-pullquote{
+ position:relative;max-width:670px;margin:30px auto;padding:38px 10px 8px;
+ background:transparent;border:0;color:#969696;font:700 23px/1.65 var(--bw-serif);
+}
+.bw-doc-surface blockquote.bw-doc-pullquote:before{content:"“";position:absolute;top:-15px;left:4px;color:#c60000;font:700 90px/1 serif}
+.bw-doc-surface blockquote.bw-doc-pullquote p{margin:0 0 15px}
+.bw-doc-surface blockquote.bw-doc-pullquote cite{display:block;font-size:14px;font-weight:700;line-height:1.5;color:#171717;font-style:normal;min-height:23px}
+.bw-doc-surface blockquote.bw-doc-highlight{margin:24px 0;padding:17px 20px;background:#fbf3df;border-left:4px solid #ce2d20;color:#26322b;font-weight:700}
+.bw-doc-surface blockquote.bw-doc-highlight p{margin:0}
+.bw-doc-editor .bw-doc-hidden-file,.bw-doc-editor .bw-doc-file-rack{display:none!important}
+.bw-doc-editor .bw-doc-message{color:#17563f;font-size:12px;margin:9px 0;line-height:1.6}
+.bw-doc-editor .bw-doc-help{font-size:12px;line-height:1.75;color:#617269;margin:10px 0 0}
+.bw-article .bw-rich-article-body blockquote.bw-rich-quote{
+ border:0;position:relative;margin:30px auto;padding:35px 12px 6px;max-width:670px;
+ background:transparent;font-weight:700;line-height:1.7;
+}
+.bw-article .bw-rich-article-body blockquote.bw-rich-quote:before{
+ content:"“";display:block;position:absolute;top:-22px;left:8px;color:#ce0000;
+ font:700 86px/1 serif;
+}
+.bw-article .bw-rich-article-body blockquote.bw-rich-quote p{
+ margin:0 0 16px;color:#959595;font-size:clamp(20px,2.4vw,27px);line-height:1.65;font-weight:700
+}
+.bw-article .bw-rich-article-body blockquote.bw-rich-quote cite{
+ display:block;font-size:14px;line-height:1.6;font-weight:700;color:#1f2520
+}
+html[data-theme="dark"] .bw-article .bw-rich-article-body blockquote.bw-rich-quote cite{color:#eef0ef}
+@media(max-width:760px){
+ .bw-doc-editor{padding:10px}
+ .bw-doc-head{flex-wrap:wrap}
+ .bw-doc-toolbar{position:sticky;top:45px;padding:7px}
+ .bw-doc-toolbar button{font-size:12px;padding:5px 7px}
+ .bw-doc-editor .bw-doc-surface{padding:17px 14px;min-height:360px;font-size:16px}
+ .bw-doc-surface h2{font-size:22px}
+ .bw-doc-surface .bw-doc-split{grid-template-columns:1fr;gap:12px}
+ .bw-doc-surface .bw-doc-split[data-layout="image-right"] > figure{order:0}
+ .bw-doc-surface .bw-doc-gallery{gap:7px}
+ .bw-doc-surface blockquote.bw-doc-pullquote{font-size:19px;padding-top:35px;margin:24px 0}
+ .bw-doc-surface blockquote.bw-doc-pullquote:before{font-size:74px}
+ .bw-article .bw-rich-article-body blockquote.bw-rich-quote p{font-size:20px}
+}
