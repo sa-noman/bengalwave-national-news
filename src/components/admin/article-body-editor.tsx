@@ -7,7 +7,7 @@ import type {StoryBlock,StoryBlockType} from "@/lib/rich-article";
 
 const MAX_IMAGE_BYTES=4*1024*1024;
 const ACCEPTED=["image/jpeg","image/png","image/webp","image/avif"];
-type ImageMode="image"|"split"|"gallery"|"slideshow";
+type ImageMode="image"|"split"|"gallery"|"slideshow"|"slide-add";
 function el<K extends keyof HTMLElementTagNameMap>(tag:K,className?:string){
  const node=document.createElement(tag);if(className)node.className=className;return node;
 }
@@ -202,12 +202,15 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
  const chooserRef=useRef<HTMLInputElement>(null);
  const rememberedSelection=useRef<Range|null>(null);
  const modeRef=useRef<ImageMode>("image");
+ const targetSliderRef=useRef<string|null>(null);
  const styleRef=useRef<{bold:boolean;italic:boolean;fontSize:string}|null>(null);
  const previewCoverRef=useRef<string|null>(null);
  const blobUrls=useRef<string[]>([]);
  const [body,setBody]=useState(initialBody);
  const [imageCount,setImageCount]=useState(0);
  const [selectedImage,setSelectedImage]=useState<string|null>(null);
+ const [selectedSlider,setSelectedSlider]=useState<string|null>(null);
+ const [selectedCallout,setSelectedCallout]=useState<string|null>(null);
  const [message,setMessage]=useState("");
  const [preview,setPreview]=useState<{title:string;summary:string;category:string;body:string;cover:string|null}|null>(null);
 
@@ -217,7 +220,7 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
   root.replaceChildren(...blocks.map(toDOM));
   if(!blocks.length)root.append(el("p"));
   setBody(serializeRichBody(blocks));
-  setImageCount(blocks.reduce((n,b)=>n+(b.type==="gallery"?2:["image","split"].includes(b.type)?1:0),0));
+  setImageCount(blocks.reduce((n,b)=>n+(b.type==="gallery"?2:b.type==="slideshow"?(b.slides?.length||0):["image","split"].includes(b.type)?1:0),0));
   return ()=>{blobUrls.current.forEach(URL.revokeObjectURL);blobUrls.current=[];};
  },[initialBody]);
 
@@ -234,7 +237,7 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
   });
   const blocks=extractBlocks(root);
   setBody(serializeRichBody(blocks));
-  setImageCount(blocks.reduce((n,b)=>n+(b.type==="gallery"?2:["image","split"].includes(b.type)?1:0),0));
+  setImageCount(blocks.reduce((n,b)=>n+(b.type==="gallery"?2:b.type==="slideshow"?(b.slides?.length||0):["image","split"].includes(b.type)?1:0),0));
  };
  const focusEditor=()=>{
   const root=rootRef.current;if(!root)return;
@@ -249,20 +252,41 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
  };
  const insertNode=(node:HTMLElement)=>{
   const root=rootRef.current;if(!root)return;
-  focusEditor();
-  const selection=window.getSelection();
-  if(!selection||!selection.rangeCount){root.append(node);save();return;}
-  const range=selection.getRangeAt(0);
-  // Insert a block at the nearest top-level boundary for valid editable HTML.
+  const saved=rememberedSelection.current;
+  // Restore the exact saved caret after the browser file picker steals focus.
+  const range=(saved&&root.contains(saved.commonAncestorContainer))
+   ?saved.cloneRange():document.createRange();
+  if(!(saved&&root.contains(saved.commonAncestorContainer))){
+   range.selectNodeContents(root);range.collapse(false);
+  }
+  if(!range.collapsed){range.deleteContents();range.collapse(true);}
   let block:Node|null=range.startContainer;
   while(block&&block.parentNode!==root)block=block.parentNode;
-  if(block&&block.parentNode===root){
-   if(!range.collapsed)range.deleteContents();
+  let after:HTMLElement;
+  if(block instanceof HTMLElement&&["P","H2","H3"].includes(block.tagName)){
+   const tail=document.createRange();
+   tail.setStart(range.startContainer,range.startOffset);
+   tail.setEnd(block,block.childNodes.length);
+   const remainder=tail.extractContents();
+   after=block.cloneNode(false) as HTMLElement;
+   after.append(remainder);
+   if(!after.hasChildNodes())after.append(el("br"));
    root.insertBefore(node,block.nextSibling);
-  }else root.append(node);
-  const after=el("p");after.append(el("br"));node.after(after);
-  const next=document.createRange();next.selectNodeContents(after);next.collapse(true);
-  selection.removeAllRanges();selection.addRange(next);
+   root.insertBefore(after,node.nextSibling);
+  }else if(range.startContainer===root){
+   root.insertBefore(node,root.childNodes[range.startOffset]||null);
+   after=el("p");after.append(el("br"));root.insertBefore(after,node.nextSibling);
+  }else if(block&&block.parentNode===root){
+   root.insertBefore(node,block.nextSibling);
+   after=el("p");after.append(el("br"));root.insertBefore(after,node.nextSibling);
+  }else{
+   root.append(node);
+   after=el("p");after.append(el("br"));root.append(after);
+  }
+  root.focus();
+  const selection=window.getSelection(),next=document.createRange();
+  next.selectNodeContents(after);next.collapse(true);
+  selection?.removeAllRanges();selection?.addRange(next);
   rememberedSelection.current=next.cloneRange();
   save();
  };
