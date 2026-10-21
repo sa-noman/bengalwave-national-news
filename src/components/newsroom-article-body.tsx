@@ -49,7 +49,9 @@ function draw(node:NewsJSON,key:number|string,preview:boolean):React.ReactNode{
   const color=String(a.borderColor||"#0b4838");
   const border=/^#[0-9a-fA-F]{6}$/.test(color)?color:"#0b4838";
   return kind==="quote"
-   ?<blockquote className="bw-rich-quote" key={key}>{inner}{typeof a.credit==="string"&&a.credit.length>0&&<cite>{a.credit}</cite>}</blockquote>
+   ?<blockquote className="bw-rich-quote bw-newsroom-quote" style={{"--bw-quote-accent":border} as React.CSSProperties} key={key}>
+     {inner}{typeof a.credit==="string"&&a.credit.length>0&&<cite>{a.credit}</cite>}
+    </blockquote>
    :<aside className="bw-rich-callout bw-rich-tone-cream" style={{borderLeftColor:border}} key={key}>{inner}</aside>;
  }
  if(node.type==="newsMedia"){
