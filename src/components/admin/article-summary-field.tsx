@@ -49,11 +49,22 @@ export function ArticleSummaryField({initialSummary=""}:{initialSummary?:string}
     if(!current.current.trim()||force){setValue(suggestion);current.current=suggestion;}
     setStatus("AI API কী কনফিগার করা নেই। সংবাদ থেকে প্রাথমিক বিবরণ বসানো হয়েছে (AI দিয়ে তৈরি নয়)। যাচাই করুন।");
    }else{
+    const reasonText={
+     auth:"Gemini API Key-এর অনুমতি বা Free Tier প্রকল্পের অ্যাক্সেসে সমস্যা। Google AI Studio-তে Key ও Project Status যাচাই করুন।",
+     quota:"Gemini Free Tier-এর ব্যবহারসীমা শেষ বা সাময়িকভাবে অতিক্রম করেছে। পরে আবার চেষ্টা করুন।",
+     model:"Gemini মডেলটি এই প্রজেক্টে উপলব্ধ নয়।",
+     request:"Gemini API অনুরোধ গ্রহণ করেনি। সার্ভারের কনফিগারেশন যাচাই প্রয়োজন।",
+     network:"Gemini সার্ভারে সংযোগ বা সময়সীমার সমস্যা হয়েছে। আবার চেষ্টা করুন।",
+     blocked:"সংবাদটির জন্য Gemini বিবরণ তৈরি করতে পারেনি। অন্যভাবে লিখে চেষ্টা করুন।",
+     empty:"প্রথমে অন্তত ৬০ অক্ষরের সম্পূর্ণ সংবাদ লিখুন।",
+     invalid:"শিরোনাম বা সংবাদের দৈর্ঘ্য সঠিক নয়।",
+     provider:"Gemini সেবায় সমস্যা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।"
+    }[response.reason];
     if(!current.current.trim()){
      const suggestion=fallbackSuggestion(headline,raw);
      setValue(suggestion);current.current=suggestion;
-     setStatus("AI সেবা পাওয়া যায়নি। প্রাথমিক বিবরণ বসানো হয়েছে (AI নয়)। যাচাই করুন।");
-    }else setStatus("AI দিয়ে এখন তৈরি করা যায়নি। আবার চেষ্টা করুন।");
+     setStatus(reasonText+" প্রাথমিক বিবরণ বসানো হয়েছে (AI নয়)। যাচাই করুন।");
+    }else setStatus(reasonText);
    }
   }catch{
    setStatus("AI সেবায় সাময়িক সমস্যা হয়েছে। আবার চেষ্টা করুন।");
