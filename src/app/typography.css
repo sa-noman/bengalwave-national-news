@@ -215,3 +215,14 @@ html[data-theme="dark"] .bw-article .bw-article-source a {
  * Specificity also preserves red in dark mode without changing other headings. */
 .bw-home .bw-selected-box .bw-section-heading h2 {font-size:20px}
 html .bw-home .bw-selected-box .bw-section-heading h2 > a {color:var(--bw-red)}
+
+
+/* Consistent 20px editorial reading size on mobile and desktop. */
+.bw-article .bw-article-body{font:400 20px/1.85 var(--bw-serif);color:#111}
+.bw-article .bw-article-body>p{font-size:20px}
+.bw-article figcaption{font:400 12px/1.7 var(--bw-serif);text-align:left;color:var(--bw-muted);margin-top:7px}
+.bw-article .bw-article-source{font-size:12px;line-height:1.65;color:var(--bw-muted);font-weight:400;margin-top:26px}
+.bw-article .bw-article-source a{text-decoration:underline;text-underline-offset:2px;color:inherit;font-weight:400}
+.bw-article .bw-article-source a:hover{color:var(--bw-green)}
+html[data-theme="dark"] .bw-article .bw-article-body{color:#f0f1ed}
+@media(max-width:760px){.bw-article .bw-article-body,.bw-article .bw-article-body>p{font-size:20px}}
