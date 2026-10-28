@@ -347,3 +347,57 @@ html[data-theme="dark"] .bw-article .bw-rich-article-body blockquote.bw-rich-quo
  .bw-story-slider-controls,.bw-story-slider-dots{display:none!important}
  .bw-story-slider-layer.is-entering{animation:none!important}
 }
+
+
+/* Follow the arrow direction: the sharp photo and its blurred gutters travel as one layer. */
+.bw-story-slider-layer.is-entering.bw-slide-forward{
+ animation:bw-slide-forward-in 520ms cubic-bezier(.22,.61,.36,1) both
+}
+.bw-story-slider-layer.is-leaving.bw-slide-forward{
+ animation:bw-slide-forward-out 520ms cubic-bezier(.22,.61,.36,1) both
+}
+.bw-story-slider-layer.is-entering.bw-slide-backward{
+ animation:bw-slide-backward-in 520ms cubic-bezier(.22,.61,.36,1) both
+}
+.bw-story-slider-layer.is-leaving.bw-slide-backward{
+ animation:bw-slide-backward-out 520ms cubic-bezier(.22,.61,.36,1) both
+}
+@keyframes bw-slide-forward-in{from{transform:translate3d(100%,0,0)}to{transform:translate3d(0,0,0)}}
+@keyframes bw-slide-forward-out{from{transform:translate3d(0,0,0)}to{transform:translate3d(-100%,0,0)}}
+@keyframes bw-slide-backward-in{from{transform:translate3d(-100%,0,0)}to{transform:translate3d(0,0,0)}}
+@keyframes bw-slide-backward-out{from{transform:translate3d(0,0,0)}to{transform:translate3d(100%,0,0)}}
+@media(prefers-reduced-motion:reduce){
+ .bw-story-slider-layer.is-entering.bw-slide-forward,
+ .bw-story-slider-layer.is-leaving.bw-slide-forward,
+ .bw-story-slider-layer.is-entering.bw-slide-backward,
+ .bw-story-slider-layer.is-leaving.bw-slide-backward{animation:none}
+}
+
+/* The byline, article body, credit divider, and share row follow one reading column. */
+.bw-article .bw-article-source{width:100%;max-width:780px;box-sizing:border-box;margin-top:14px;padding-top:14px}
+.bw-article .bw-article-share{width:100%;box-sizing:border-box}
+
+/* Photo captions are larger than the old micro-caption and align with the image edge. */
+.bw-article figure>figcaption.bw-photo-caption,
+.bw-article .bw-rich-article-body .bw-rich-figure>figcaption.bw-photo-caption{
+ display:block;width:100%;box-sizing:border-box;margin:7px 0 0;
+ padding:0;text-align:left;color:var(--bw-muted,#69746c);
+ font:400 14px/1.75 var(--bw-serif)
+}
+.bw-photo-caption-credit{color:inherit;font-style:italic}
+.bw-photo-caption-credit:not(.bw-photo-caption-credit--alone){
+ display:inline;border-inline-start:2px solid var(--bw-green,#0b4838);
+ padding-inline-start:9px;margin-inline-start:9px
+}
+@media(max-width:760px){
+ .bw-article figure>figcaption.bw-photo-caption,
+ .bw-article .bw-rich-article-body .bw-rich-figure>figcaption.bw-photo-caption{font-size:13px;line-height:1.7}
+}
+
+/* Editorial article hyperlinks: green by default, blue on hover, red once visited. */
+.bw-article .bw-rich-article-body a:link{color:#087e60}
+.bw-article .bw-rich-article-body a:visited{color:#bb2b2b}
+.bw-article .bw-rich-article-body a:hover,
+.bw-article .bw-rich-article-body a:visited:hover{
+ color:#1261a5;text-decoration-thickness:2px
+}

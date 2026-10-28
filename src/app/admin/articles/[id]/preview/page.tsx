@@ -7,6 +7,7 @@ import {NewsImage} from "@/components/news-image";
 import {RichArticleBody} from "@/components/rich-article-body";
 import {ArticleSource} from "@/components/article-source";
 import {ArticleShareBar} from "@/components/article-share-bar";
+import {PhotoCaption} from "@/components/photo-caption";
 
 // This page is an authenticated editorial preview in BOTH Preview and Production; NEVER a public article.
 // Publishing is an explicit separate action on the edit form.
@@ -43,7 +44,7 @@ export default async function PreviewArticle({params}:{
 
   let fullImage:string|null=null;
   let altText=item.headline;
-  let caption="";
+  let caption="",credit="";
   if(item.hero_media_id){
     const {data:media}=await supabase.from("media_assets")
       .select("storage_path,alt_text,caption,credit")
@@ -51,8 +52,8 @@ export default async function PreviewArticle({params}:{
     if(media){
       fullImage=publicNewsImageUrl(supabase,media.storage_path,"full");
       altText=media.alt_text||item.headline;
-      caption=[media.caption,media.credit?"ছবি: "+media.credit:null]
-        .filter(Boolean).join(" · ");
+      caption=media.caption||"";
+      credit=media.credit||"";
     }
   }
 
@@ -86,7 +87,7 @@ export default async function PreviewArticle({params}:{
               sizes="(max-width: 600px) 100vw, (max-width: 940px) 95vw, 940px"
             />
           </div>
-          {caption&&<figcaption>{caption}</figcaption>}
+          <PhotoCaption caption={caption} credit={credit}/>
         </figure>
         <RichArticleBody body={item.body}/>
         <ArticleSource sourceName={item.source_name} sourceUrl={item.source_url}/>

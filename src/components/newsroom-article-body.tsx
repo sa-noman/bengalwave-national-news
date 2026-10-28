@@ -3,13 +3,14 @@ import {parseNewsroomBody} from "@/lib/newsroom-document";
 import type {NewsJSON,NewsPhoto} from "@/lib/newsroom-document";
 import {safeStoryImageUrl} from "@/lib/rich-article";
 import {ArticleSlideshow} from "@/components/article-slideshow";
+import {PhotoCaption} from "@/components/photo-caption";
 
 function mediaImage(photo:NewsPhoto,preview:boolean){
  const src=safeStoryImageUrl(photo.src)||(preview&&/^blob:https?:\/\//.test(photo.src)?photo.src:null);
  if(!src)return null;
  return <figure className="bw-rich-figure" key={photo.id}>
   <img src={src} alt={photo.alt||photo.caption||"সংবাদের ছবি"} loading="lazy" decoding="async"/>
-  {(photo.caption||photo.credit)&&<figcaption>{photo.caption}{photo.credit&&<span> · ছবি: {photo.credit}</span>}</figcaption>}
+  <PhotoCaption caption={photo.caption} credit={photo.credit}/>
  </figure>;
 }
 function draw(node:NewsJSON,key:number|string,preview:boolean):React.ReactNode{

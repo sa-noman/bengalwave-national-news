@@ -8,6 +8,7 @@ import {NewsMediaNode,NewsCalloutNode} from "./newsroom-nodes";
 import {NewsroomArticleBody} from "@/components/newsroom-article-body";
 import {ArticleSource} from "@/components/article-source";
 import {ArticleShareBar} from "@/components/article-share-bar";
+import {PhotoCaption} from "@/components/photo-caption";
 import {existingBodyToNewsJSON,serializeNewsroomBody} from "@/lib/newsroom-document";
 import type {NewsJSON,NewsPhoto} from "@/lib/newsroom-document";
 
@@ -393,7 +394,7 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
       {preview.summary&&<p className="bw-article-deck">{preview.summary}</p>}
       {preview.cover&&<figure className="bw-doc-preview-cover">
        <img src={preview.cover} alt="প্রধান ছবি"/>
-       {(preview.coverCaption||preview.coverCredit)&&<figcaption>{preview.coverCaption}{preview.coverCredit&&<span>{preview.coverCaption?" · ":""}ছবি: {preview.coverCredit}</span>}</figcaption>}
+       <PhotoCaption caption={preview.coverCaption} credit={preview.coverCredit}/>
       </figure>}
       <NewsroomArticleBody body={preview.body} allowLocalImages/>
       <ArticleSource sourceName={preview.sourceName} sourceUrl={preview.sourceUrl}/>
