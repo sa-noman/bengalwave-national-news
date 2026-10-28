@@ -31,6 +31,7 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
  const paintRef=useRef<Paint|null>(null),filesRef=useRef(new Map<string,string>());
  const coverRef=useRef<string|null>(null);
  const linkRange=useRef<LinkRange|null>(null);
+ const uploadingRef=useRef(false),resubmittingRef=useRef(false);
  const draftKey=useRef("bw-newsroom-draft-new");
  const saveSnapshot=useCallback((doc:NewsJSON)=>{
   const value=serializeNewsroomBody(doc);
@@ -102,6 +103,94 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
  },[editor]);
 
  useEffect(()=>()=>{filesRef.current.forEach(URL.revokeObjectURL);if(coverRef.current)URL.revokeObjectURL(coverRef.current);},[]);
+
+ /**
+  * Vercel accepts only 4.5 MB per Function request, regardless of the
+  * Next.js 30 MB Server Action parser setting. A slideshow can contain
+  * several 4 MB files. Pre-upload each inline photo separately when the
+  * combined form payload would be too large, then send a small Server Action
+  * preserving the original submit button (draft/review/publish).
+  */
+ useEffect(()=>{
+  if(!editor)return;
+  const form=rackRef.current?.closest("form");
+  if(!form)return;
+  const publishWithImages=async(event:SubmitEvent)=>{
+   if(resubmittingRef.current){resubmittingRef.current=false;return;}
+   if(uploadingRef.current){event.preventDefault();event.stopImmediatePropagation();return;}
+   const inputs=[...rackRef.current?.querySelectorAll<HTMLInputElement>('input[type="file"][data-photo-id]')||[]]
+    .filter(input=>input.files?.[0]);
+   if(!inputs.length)return;
+   const hero=(form.elements.namedItem("image_file") as HTMLInputElement|null)?.files?.[0];
+   const totalBytes=inputs.reduce((total,input)=>total+(input.files?.[0]?.size||0),hero?.size||0);
+   // Under the limit: keep the existing, already tested Server Action path.
+   if(totalBytes<=3_600_000)return;
+
+   event.preventDefault();
+   event.stopImmediatePropagation();
+   const submitter=event.submitter instanceof HTMLButtonElement||event.submitter instanceof HTMLInputElement
+    ?event.submitter:null;
+   uploadingRef.current=true;
+   setMessage("ছবিগুলো আলাদাভাবে নিরাপদে আপলোড হচ্ছে। পেজ বন্ধ করবেন না।");
+   try{
+    for(let i=0;i<inputs.length;i++){
+     const input=inputs[i],file=input.files?.[0],id=input.dataset.photoId;
+     if(!file||!id)continue;
+     const doc=editor.getJSON() as NewsJSON;
+     let photo:NewsPhoto|undefined;
+     const find=(node:NewsJSON)=>{
+      if(node.type==="newsMedia"){
+       photo=((node.attrs?.photos||[]) as NewsPhoto[]).find(p=>p.id===id)||photo;
+      }
+      node.content?.forEach(find);
+     };
+     find(doc);
+     if(!photo)throw new Error("ছবিটি খুঁজে পাওয়া যায়নি। সংবাদের লেখা অক্ষত আছে।");
+     const data=new FormData();
+     data.set("image",file);
+     data.set("alt",photo.alt||"সংবাদের ছবি");
+     data.set("caption",photo.caption||"");
+     data.set("credit",photo.credit||"");
+     const answer=await fetch("/admin/newsroom-upload",{
+      method:"POST",body:data,credentials:"same-origin",cache:"no-store",
+      headers:{"x-bw-editor-upload":"1"}
+     });
+     const output=await answer.json().catch(()=>null) as {ok?:boolean;url?:string;error?:string}|null;
+     if(!answer.ok||!output?.ok||!output.url){
+      const code=output?.error||String(answer.status);
+      throw new Error(code==="preview-protected"
+       ?"Preview-তে ছবি আপলোড বন্ধ। Production Admin ব্যবহার করুন।"
+       :code==="too_large"?"ছবিটি ৪ MB-এর মধ্যে রাখুন।"
+       :"ছবি আপলোড ব্যর্থ হয়েছে ("+code+"). আবার চেষ্টা করুন।");
+     }
+     // The editor owns the source of truth for the hidden body field.
+     const apply=(node:NewsJSON)=>{
+      if(node.type==="newsMedia"){
+       const photos=(node.attrs?.photos||[]) as NewsPhoto[];
+       if(photos.some(p=>p.id===id))
+        node.attrs={...node.attrs,photos:photos.map(p=>p.id===id?{...p,src:output.url!}:p)};
+      }
+      node.content?.forEach(apply);
+     };
+     apply(doc);
+     editor.commands.setContent(doc);
+     input.remove();
+     const tempUrl=filesRef.current.get(id);
+     if(tempUrl){URL.revokeObjectURL(tempUrl);filesRef.current.delete(id);}
+     setMessage("ছবি "+(i+1)+"/"+inputs.length+" আপলোড হয়েছে…");
+    }
+    // Allow React to update the hidden JSON value before submitting.
+    await new Promise<void>(resolve=>requestAnimationFrame(()=>resolve()));
+    resubmittingRef.current=true;
+    form.requestSubmit(submitter||undefined);
+   }catch(error){
+    setMessage(error instanceof Error?error.message:"ছবি আপলোড করা যায়নি। আবার চেষ্টা করুন।");
+   }finally{uploadingRef.current=false;}
+  };
+  form.addEventListener("submit",publishWithImages,true);
+  return ()=>form.removeEventListener("submit",publishWithImages,true);
+ },[editor]);
+
 
  useEffect(()=>{
   const open=()=>showPreview();
