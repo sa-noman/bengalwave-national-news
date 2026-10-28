@@ -4,6 +4,54 @@ import {requireStaff} from "@/lib/auth/require-staff";
 import {parseRichBody} from "@/lib/rich-article";
 import {parseNewsroomBody,textContent} from "@/lib/newsroom-document";
 
+const seoGeminiModel="gemini-3.5-flash-lite";
+const seoGeminiKey=()=>process.env.Gemini_Seo_Key || process.env.GEMINI_API_KEY;
+
+type SlugResult={ok:true;slug:string}|{ok:false;reason:"missing_key"|"invalid"|"provider"|"auth"|"quota"|"model"|"network"|"blocked"};
+/** Uses the exact same configured Gemini key and model as the SEO description. */
+export async function generateSeoSlug(headline:string,currentArticleId?:string):Promise<SlugResult>{
+ const {supabase}=await requireStaff();
+ if(typeof headline!=="string"||headline.trim().length<5||headline.length>300)return {ok:false,reason:"invalid"};
+ const apiKey=seoGeminiKey();
+ if(!apiKey)return {ok:false,reason:"missing_key"};
+ try{
+  const ctl=new AbortController(),timer=setTimeout(()=>ctl.abort(),18000);
+  let response:Response;
+  try{
+   response=await fetch("https://generativelanguage.googleapis.com/v1beta/models/"+seoGeminiModel+":generateContent",{
+    method:"POST",signal:ctl.signal,cache:"no-store",
+    headers:{"Content-Type":"application/json","x-goog-api-key":apiKey},
+    body:JSON.stringify({
+     contents:[{role:"user",parts:[{text:"Bangla news headline: "+headline.trim()}]}],
+     systemInstruction:{parts:[{text:"Generate a short accurate English SEO URL slug from this Bengali news headline. Reply with ONLY lowercase ASCII words joined by hyphens (a-z, 0-9, hyphen). Prefer 3-7 meaningful words. Preserve names and essential facts, do not invent details. No explanations or punctuation."}]},
+     generationConfig:{maxOutputTokens:100,temperature:0.1,thinkingConfig:{thinkingLevel:"minimal"}}
+    })
+   });
+  }finally{clearTimeout(timer);}
+  if(!response.ok){
+   console.warn("BengalWave slug Gemini request failed",{httpStatus:response.status,model:seoGeminiModel});
+   if([401,402,403].includes(response.status))return {ok:false,reason:"auth"};
+   if(response.status===429)return {ok:false,reason:"quota"};
+   if(response.status===404)return {ok:false,reason:"model"};
+   return {ok:false,reason:"provider"};
+  }
+  const data=await response.json() as {candidates?:{content?:{parts?:{text?:string;thought?:boolean}[]}}[]};
+  const output=(data.candidates?.[0]?.content?.parts||[]).filter(p=>!p.thought).map(p=>p.text||"").join(" ").trim().toLowerCase();
+  const base=output.replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,140).replace(/-+$/,"");
+  if(!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(base))return {ok:false,reason:"blocked"};
+  for(let suffix=0;suffix<25;suffix++){
+   const candidate=suffix===0?base:base+"-"+(suffix+1);
+   const {data:existing,error}=await supabase.from("articles").select("id").eq("slug",candidate).maybeSingle();
+   if(error)return {ok:false,reason:"provider"};
+   if(!existing||existing.id===currentArticleId)return {ok:true,slug:candidate};
+  }
+  return {ok:false,reason:"provider"};
+ }catch{
+  console.warn("BengalWave slug Gemini request timed out or failed",{model:seoGeminiModel});
+  return {ok:false,reason:"network"};
+ }
+}
+
 type SeoResult={ok:true;summary:string}|{ok:false;reason:"missing_key"|"invalid"|"provider"|"empty"|"auth"|"quota"|"model"|"request"|"network"|"blocked"};
 function textFromBody(body:string):string{
  const blocks=parseRichBody(body),doc=parseNewsroomBody(body);
@@ -19,10 +67,10 @@ export async function generateSeoSummary(headline:string,body:string):Promise<Se
   headline.length>300||body.length>80000)return {ok:false,reason:"invalid"};
  const title=headline.trim(),text=textFromBody(body);
  if(title.length<5||text.length<60)return {ok:false,reason:"empty"};
- const apiKey=process.env.Gemini_Seo_Key || process.env.GEMINI_API_KEY;
+ const apiKey=seoGeminiKey();
  if(!apiKey)return {ok:false,reason:"missing_key"};
  // Google limits Gemini 2.5 access for new projects; use the current stable Free Tier model.
- const model="gemini-3.5-flash-lite";
+ const model=seoGeminiModel;
  try{
   const ctl=new AbortController();
   const timeout=setTimeout(()=>ctl.abort(),18000);
