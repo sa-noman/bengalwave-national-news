@@ -2,6 +2,7 @@ import React from "react";
 import {legacyStoryBlocks,parseRichBody,safeStoryImageUrl} from "@/lib/rich-article";
 import type {StoryBlock} from "@/lib/rich-article";
 import {ArticleSlideshow} from "@/components/article-slideshow";
+import {PhotoCaption} from "@/components/photo-caption";
 import {isNewsroomBody} from "@/lib/newsroom-document";
 import {NewsroomArticleBody} from "@/components/newsroom-article-body";
 
@@ -37,7 +38,7 @@ function ImageUnit({src,alt,caption,credit,allowLocalImages=false}:{src:string;a
       without granting Next.js server image optimization access to arbitrary hosts. */}
   {/* eslint-disable-next-line @next/next/no-img-element */}
   <img src={source} alt={alt||caption||"প্রতিবেদনের ছবি"} loading="lazy" decoding="async"/>
-  {(caption||credit)&&<figcaption>{caption}{credit&&<span>{caption?" · ":""}ছবি: {credit}</span>}</figcaption>}
+  <PhotoCaption caption={caption} credit={credit}/>
  </figure>;
 }
 function RichBlock({block,allowLocalImages=false}: {block:StoryBlock;allowLocalImages?:boolean}){
