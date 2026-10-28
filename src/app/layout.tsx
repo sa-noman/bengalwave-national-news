@@ -23,9 +23,10 @@ export const metadata:Metadata={
  title:{default:"Bengal Wave | বাংলা নিউজ",template:"%s | Bengal Wave"},
  description:"Bengal Wave | ইতিহাস, সংবাদ ও সংস্কৃতির প্রতিচ্ছবি",
  metadataBase:new URL("https://bengalwave.news"),
+ openGraph:{locale:"bn_BD",siteName:"Bengal Wave",type:"website"},
  robots:{index:process.env.VERCEL_ENV==="production",follow:process.env.VERCEL_ENV==="production"},
 };
-export const viewport:Viewport={width:"device-width",initialScale:1,themeColor:"#053d36"};
+export const viewport:Viewport={width:"device-width",initialScale:1,viewportFit:"cover",themeColor:"#053d36"};
 // Apply saved preference or system setting before React hydrates, avoiding
 // a flash of the wrong theme and respecting manual light mode on dark devices.
 const themeInitScript=`(function(){

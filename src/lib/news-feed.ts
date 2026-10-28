@@ -1,7 +1,23 @@
 import "server-only";
+import {cache} from "react";
+import {unstable_cache} from "next/cache";
 import {createSupabasePublicClient} from "@/lib/supabase/public";
 import type {NewsItem} from "@/lib/demo-news";
 import {publicNewsImageUrl} from "@/lib/news-media-paths";
+import {PUBLIC_NEWS_CACHE_TAG} from "@/lib/news-feed-cache";
+
+/**
+ * Public news data cache.
+ *
+ * Pages still render per request (the strict nonce CSP requires it), but the
+ * anonymous, published-only Supabase reads below are cached in the Next.js
+ * Data Cache. CMS actions call revalidateTag(PUBLIC_NEWS_CACHE_TAG) so edits
+ * and publications appear immediately; the short revalidate window also
+ * surfaces scheduled stories whose published_at time has just passed.
+ * Errors are thrown inside the cached functions so failures are never cached.
+ */
+export {PUBLIC_NEWS_CACHE_TAG};
+const PUBLIC_NEWS_REVALIDATE_SECONDS=60;
 
 type CategoryRef={slug:string;label_bn:string};
 type DatabaseArticle={
@@ -80,6 +96,12 @@ type AttachedMedia={
   storage_path:string;alt_text:string;caption:string|null;credit:string|null;
 };
 type PublishedMediaRow=AttachedMedia & {article_id:string};
+type PublishedArticle=NewsItem & {body:string;sourceName:string|null;sourceUrl:string|null};
+
+/** Thrown inside cached readers so a failed Supabase read is never cached. */
+class PublicNewsReadError extends Error {
+  constructor(readonly label:string,readonly code:string|undefined){super(label);}
+}
 
 /**
  * Resolve CMS images using a published-only, read-only database function.
@@ -111,8 +133,8 @@ async function loadAttachedMedia(supabase:PublicClient,rows:DatabaseArticle[]){
   const {data:legacy,error:legacyError}=await supabase.from("media_assets")
     .select("id,storage_path,alt_text,caption,credit").in("id",mediaIds);
   if(legacyError){
-    console.error("Bengal Wave: published image metadata unavailable",legacyError.code);
-    return new Map<string,AttachedMedia>();
+    // Do not cache a list whose images silently disappeared.
+    throw new PublicNewsReadError("Bengal Wave: published image metadata unavailable",legacyError.code);
   }
   const byMediaId=new Map<string,AttachedMedia>((legacy||[]).map(m=>[m.id,m]));
   return new Map<string,AttachedMedia>(withHero.flatMap(row=>{
@@ -141,14 +163,14 @@ function asNewsItem(row:DatabaseArticle,media:AttachedMedia|undefined,supabase:P
     imageCredit:media?.credit||(row.slug===aramcoArchivePhotoSlug?"Eagleamn / Wikimedia Commons (পাবলিক ডোমেইন)":row.slug==="cumilla-jamaat-factional-clash-office-car-vandalism-oct-2026"?"সংগৃহীত":undefined),
   };
 }
-export async function getPublishedNews(limit=60):Promise<NewsItem[]> {
+async function readPublishedNews(limit:number):Promise<NewsItem[]> {
   const supabase=createSupabasePublicClient();
   if(!supabase) return [];
   const {data,error}=await supabase.from("articles")
     .select("id,slug,headline,summary,is_featured,published_at,hero_media_id,categories(slug,label_bn)")
     .eq("status","published").lte("published_at",new Date().toISOString())
     .order("published_at",{ascending:false}).limit(limit);
-  if(error){console.error("Bengal Wave: public news fetch failed",error.code);return [];}
+  if(error)throw new PublicNewsReadError("Bengal Wave: public news fetch failed",error.code);
   const rows=(data||[]) as unknown as DatabaseArticle[];
   const media=await loadAttachedMedia(supabase,rows);
   return rows.map(row=>asNewsItem(row,media.get(row.id),supabase));
@@ -157,7 +179,7 @@ export async function getPublishedNews(limit=60):Promise<NewsItem[]> {
  * Unlike filtering the site's latest stories in memory, older exclusive
  * reports remain available even after many unrelated stories are published.
  */
-export async function getPublishedNewsByCategory(slug:string,limit=100):Promise<NewsItem[]> {
+async function readPublishedNewsByCategory(slug:string,limit:number):Promise<NewsItem[]> {
   const supabase=createSupabasePublicClient();
   if(!supabase)return [];
   const {data,error}=await supabase.from("articles")
@@ -165,21 +187,44 @@ export async function getPublishedNewsByCategory(slug:string,limit=100):Promise<
     .eq("categories.slug",slug)
     .eq("status","published").lte("published_at",new Date().toISOString())
     .order("published_at",{ascending:false}).limit(limit);
-  if(error){console.error("Bengal Wave: category news fetch failed",error.code);return [];}
+  if(error)throw new PublicNewsReadError("Bengal Wave: category news fetch failed",error.code);
   const rows=(data||[]) as unknown as DatabaseArticle[];
   const media=await loadAttachedMedia(supabase,rows);
   return rows.map(row=>asNewsItem(row,media.get(row.id),supabase));
 }
 
-export async function getPublishedArticle(slug:string) {
+async function readPublishedArticle(slug:string):Promise<PublishedArticle|null> {
   const supabase=createSupabasePublicClient();
   if(!supabase) return null;
   const {data,error}=await supabase.from("articles")
     .select("id,slug,headline,summary,body,source_name,source_url,is_featured,published_at,hero_media_id,categories(slug,label_bn)")
     .eq("slug",slug).eq("status","published")
     .lte("published_at",new Date().toISOString()).maybeSingle();
-  if(error || !data)return null;
+  if(error)throw new PublicNewsReadError("Bengal Wave: public article fetch failed",error.code);
+  if(!data)return null;
   const row=data as unknown as DatabaseArticle;
   const media=await loadAttachedMedia(supabase,[row]);
   return {...asNewsItem(row,media.get(row.id),supabase),body:row.body,sourceName:row.source_name,sourceUrl:safePublishedSourceUrl(row.source_url)};
 }
+
+const cacheOptions={tags:[PUBLIC_NEWS_CACHE_TAG],revalidate:PUBLIC_NEWS_REVALIDATE_SECONDS};
+const cachedPublishedNews=unstable_cache(readPublishedNews,["bw-published-news-v1"],cacheOptions);
+const cachedPublishedNewsByCategory=unstable_cache(readPublishedNewsByCategory,["bw-published-category-v1"],cacheOptions);
+const cachedPublishedArticle=unstable_cache(readPublishedArticle,["bw-published-article-v1"],cacheOptions);
+
+function logReadFailure(error:unknown){
+  if(error instanceof PublicNewsReadError)console.error(error.label,error.code);
+  else console.error("Bengal Wave: public news read failed");
+}
+
+// React.cache de-duplicates identical calls within one request, e.g.
+// generateMetadata and the article page both requesting the same slug.
+export const getPublishedNews=cache(async(limit=60):Promise<NewsItem[]>=>{
+  try{return await cachedPublishedNews(limit);}catch(error){logReadFailure(error);return [];}
+});
+export const getPublishedNewsByCategory=cache(async(slug:string,limit=100):Promise<NewsItem[]>=>{
+  try{return await cachedPublishedNewsByCategory(slug,limit);}catch(error){logReadFailure(error);return [];}
+});
+export const getPublishedArticle=cache(async(slug:string):Promise<PublishedArticle|null>=>{
+  try{return await cachedPublishedArticle(slug);}catch(error){logReadFailure(error);return null;}
+});

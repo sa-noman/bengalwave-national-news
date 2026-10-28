@@ -9,6 +9,11 @@ export async function setInvitedPassword(formData:FormData) {
   const supabase=await createSupabaseServerClient();
   const {data:{user},error}=await supabase.auth.getUser();
   if(error || !user || !user.email_confirmed_at) redirect("/admin/login?error=invite");
+  // A stolen aal1 session must not silently replace the password of a staff
+  // member who enrolled MFA. Invited users with no factor (nextLevel aal1)
+  // can still set their first password.
+  const {data:aal,error:aalError}=await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+  if(aalError || !aal || (aal.nextLevel==="aal2" && aal.currentLevel!=="aal2")) redirect("/admin/mfa");
 
   const password=String(formData.get("password")||"");
   const repeated=String(formData.get("confirm_password")||"");
@@ -18,6 +23,7 @@ export async function setInvitedPassword(formData:FormData) {
 
   const compromised=await isKnownCompromisedPassword(password);
   if(compromised===true)redirect("/admin/set-password?error=compromised");
+  if(compromised===null)console.warn("BengalWave password leak check unavailable; proceeding with fail-open policy");
   const {error:changeError}=await supabase.auth.updateUser({password});
   if(changeError) redirect("/admin/set-password?error=update");
   // The dashboard separately enforces the user's active editorial role.

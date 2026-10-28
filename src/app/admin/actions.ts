@@ -1,7 +1,8 @@
 "use server";
-import {revalidatePath} from "next/cache";
+import {revalidatePath,revalidateTag} from "next/cache";
 import {redirect} from "next/navigation";
 import {requireStaff} from "@/lib/auth/require-staff";
+import {PUBLIC_NEWS_CACHE_TAG} from "@/lib/news-feed-cache";
 import {parseArticleInput} from "@/lib/validation/article";
 import {resolveStoryInlineImages} from "@/lib/story-inline-images";
 import {newsroomPublishableText} from "@/lib/newsroom-document";
@@ -21,6 +22,8 @@ function imageFields(formData:FormData,headline:string){
   };
 }
 function refreshArticle(slug:string){
+  // Public pages read published news through a tagged Data Cache.
+  revalidateTag(PUBLIC_NEWS_CACHE_TAG);
   revalidatePath("/admin");
   revalidatePath("/");
   revalidatePath("/latest");

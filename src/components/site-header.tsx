@@ -27,6 +27,8 @@ export function SiteHeader(){
  const today=headerDates.gregorian;
  const closeButton=useRef<HTMLButtonElement>(null);
  const menuButton=useRef<HTMLButtonElement>(null);
+ const drawerRef=useRef<HTMLElement>(null);
+ const drawerTriggerRef=useRef<HTMLElement|null>(null);
 
  useEffect(()=>{
    const refresh=()=>setHeaderDates(getHeaderDates(new Date()));
@@ -36,7 +38,25 @@ export function SiteHeader(){
  },[]);
  useEffect(()=>{
    if(!drawerOpen)return;
-   const onKey=(e:KeyboardEvent)=>{if(e.key==="Escape"){setDrawerOpen(false);menuButton.current?.focus();}};
+   const onKey=(e:KeyboardEvent)=>{
+     if(e.key==="Escape"){
+       setDrawerOpen(false);
+       (drawerTriggerRef.current||menuButton.current)?.focus();
+       return;
+     }
+     if(e.key==="Tab"&&drawerRef.current){
+       const focusables=Array.from(drawerRef.current.querySelectorAll<HTMLElement>('a[href],button:not([disabled]),input:not([disabled]),[tabindex]:not([tabindex="-1"])'));
+       if(!focusables.length)return;
+       const first=focusables[0],last=focusables[focusables.length-1];
+       if(e.shiftKey&&(document.activeElement===first||!drawerRef.current.contains(document.activeElement))){
+         e.preventDefault();
+         last.focus();
+       }else if(!e.shiftKey&&(document.activeElement===last||!drawerRef.current.contains(document.activeElement))){
+         e.preventDefault();
+         first.focus();
+       }
+     }
+   };
    document.addEventListener("keydown",onKey);
    const old=document.body.style.overflow;
    document.body.style.overflow="hidden";
@@ -76,7 +96,12 @@ export function SiteHeader(){
    title={theme==="dark"?"লাইট মোড":"ডার্ক মোড"}
    onClick={toggleTheme}
  >{theme==="dark"?<SunIcon/>:<MoonIcon/>}</button>;
- const openMenu=()=>{setSearchOpen(false);setDrawerOpen(true);};
+ const openMenu=()=>{
+   drawerTriggerRef.current=document.activeElement instanceof HTMLElement?document.activeElement:menuButton.current;
+   setSearchOpen(false);
+   setDrawerOpen(true);
+ };
+ const closeMenu=()=>{setDrawerOpen(false);(drawerTriggerRef.current||menuButton.current)?.focus();};
  return <>
    <div className="bw-topbar"><div className="bw-wrap bw-topbar-inner">
      <span>{today||"বাংলাদেশ সময়"}</span>
@@ -93,11 +118,11 @@ export function SiteHeader(){
        <div className="bw-follow-shell">
         <a className="bw-follow-button" href="https://www.facebook.com/BengalWaveOfficial" target="_blank" rel="noopener noreferrer">ফলো করুন</a>
        </div>
-       <button className="bw-head-icon bw-head-search" type="button" aria-label="সংবাদ খুঁজুন" aria-expanded={searchOpen} onClick={()=>setSearchOpen(!searchOpen)}><SearchIcon/></button>
+       <button className="bw-head-icon bw-head-search" type="button" aria-label="সংবাদ খুঁজুন" aria-expanded={searchOpen} aria-controls="bw-header-search-form" onClick={()=>setSearchOpen(!searchOpen)}><SearchIcon/></button>
        {themeButton("bw-theme-mobile-toggle")}
       </div>
     </div>
-    {searchOpen&&<form className="bw-search-popup bw-wrap" role="search" action="/search">
+    {searchOpen&&<form id="bw-header-search-form" className="bw-search-popup bw-wrap" role="search" action="/search" onKeyDown={e=>{if(e.key==="Escape")setSearchOpen(false);}}>
        <label htmlFor="bw-header-query">সংবাদ অনুসন্ধান</label>
        <div><input id="bw-header-query" autoFocus name="q" placeholder="বাংলায় সংবাদ খুঁজুন" required maxLength={120}/><button type="submit">খুঁজুন</button></div>
     </form>}
@@ -107,12 +132,12 @@ export function SiteHeader(){
       {themeButton("bw-theme-nav-toggle")}
       <button ref={menuButton} type="button" className="bw-head-icon bw-menu-trigger" aria-expanded={drawerOpen} aria-controls="bw-side-drawer" aria-label="সব বিভাগ খুলুন" onClick={openMenu}><MenuIcon/></button>
    </div></nav>
-   {drawerOpen&&<div className="bw-overlay" role="presentation" onClick={()=>setDrawerOpen(false)}/>}
-   <aside id="bw-side-drawer" className={"bw-drawer"+(drawerOpen?" bw-drawer-open":"")} aria-label="বেঙ্গল ওয়েভ মেনু" aria-hidden={!drawerOpen} inert={!drawerOpen}>
+   {drawerOpen&&<div className="bw-overlay" role="presentation" onClick={closeMenu}/>}
+   <aside ref={drawerRef} id="bw-side-drawer" role="dialog" aria-modal={drawerOpen?"true":undefined} className={"bw-drawer"+(drawerOpen?" bw-drawer-open":"")} aria-label="বেঙ্গল ওয়েভ মেনু" aria-hidden={!drawerOpen} inert={!drawerOpen}>
     <div className="bw-menu-background" aria-hidden="true"><img className="bw-bg-art" src="/prototype/offcanvas-menu-watermark.svg" alt="" draggable={false}/></div>
     <div className="bw-drawer-head">
      <Link href="/" className="bw-drawer-mark" onClick={()=>setDrawerOpen(false)} aria-label="প্রচ্ছদ"><img src="/brand/logo-prototype.webp" alt="Bengal Wave"/></Link>
-     <button ref={closeButton} type="button" className="bw-drawer-close" onClick={()=>{setDrawerOpen(false);menuButton.current?.focus()}} aria-label="মেনু বন্ধ করুন">✕</button>
+     <button ref={closeButton} type="button" className="bw-drawer-close" onClick={closeMenu} aria-label="মেনু বন্ধ করুন">✕</button>
     </div>
     <form className="bw-drawer-search" action="/search" role="search"><input name="q" type="search" placeholder="সংবাদ খুঁজুন..." maxLength={120} aria-label="সংবাদ খুঁজুন"/></form>
     <nav className="bw-drawer-links" aria-label="সব বিভাগ">{allLinks.map(l=><Link key={l.href} href={l.href} onClick={()=>setDrawerOpen(false)}>{l.label}</Link>)}</nav>
