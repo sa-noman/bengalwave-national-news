@@ -5,6 +5,8 @@ import {requireStaff} from "@/lib/auth/require-staff";
 import {publicNewsImageUrl} from "@/lib/news-media-paths";
 import {NewsImage} from "@/components/news-image";
 import {RichArticleBody} from "@/components/rich-article-body";
+import {ArticleSource} from "@/components/article-source";
+import {ArticleShareBar} from "@/components/article-share-bar";
 
 // This page is an authenticated editorial preview in BOTH Preview and Production; NEVER a public article.
 // Publishing is an explicit separate action on the edit form.
@@ -35,7 +37,7 @@ export default async function PreviewArticle({params}:{
   if(!/^[a-f\d-]{36}$/i.test(id))notFound();
 
   const {data:item,error}=await supabase.from("articles")
-    .select("id,slug,headline,summary,body,status,published_at,hero_media_id,categories(slug,label_bn)")
+    .select("id,slug,headline,summary,body,status,published_at,hero_media_id,source_name,source_url,categories(slug,label_bn)")
     .eq("id",id).maybeSingle();
   if(error||!item)notFound();
 
@@ -87,6 +89,8 @@ export default async function PreviewArticle({params}:{
           {caption&&<figcaption>{caption}</figcaption>}
         </figure>
         <RichArticleBody body={item.body}/>
+        <ArticleSource sourceName={item.source_name} sourceUrl={item.source_url}/>
+        <ArticleShareBar url={"https://bengalwave.news/news/"+item.slug} title={item.headline} preview/>
       </article>
       <Link href={editorHref} className="bw-article-back">← সংবাদ সম্পাদনায় ফিরুন</Link>
     </div>

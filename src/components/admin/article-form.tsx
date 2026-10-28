@@ -3,6 +3,7 @@ import {ArticleImageField} from "./article-image-field";
 import {ArticleSubmitControls} from "./article-submit-controls";
 import {ArticleBodyEditor} from "./article-body-editor";
 import {ArticleSummaryField} from "./article-summary-field";
+import {ArticleSlugField} from "./article-slug-field";
 type Category={id:string;label_bn:string};
 type Article={
  id:string;slug:string;headline:string;summary:string;body:string;
@@ -21,23 +22,23 @@ export function ArticleForm({categories,article,role,media}:{
       <label>শিরোনাম <span className="required">*</span>
         <input name="headline" required minLength={5} maxLength={300} defaultValue={article?.headline} placeholder="সংবাদের শিরোনাম"/>
       </label>
-      <label>URL Slug (ইংরেজি ছোট হাতের অক্ষর) <span className="required">*</span>
-        <input name="slug" required pattern="[a-z0-9]+(-[a-z0-9]+)*" maxLength={150} defaultValue={article?.slug} placeholder="example-news-headline"/>
-      </label>
+      <ArticleSlugField initialSlug={article?.slug||""} articleId={article?.id} status={article?.status}/>
       <label>বিভাগ
         <select name="category_id" defaultValue={article?.category_id||""}>
           <option value="">বিভাগ নির্বাচন</option>
           {categories.map(c=><option key={c.id} value={c.id}>{c.label_bn}</option>)}
         </select>
       </label>
-      <label>সংবাদ উৎস
-        <input name="source_name" maxLength={150} defaultValue={article?.source_name||""} placeholder="প্রতিষ্ঠানের নাম"/>
-      </label>
+      <div className="bw-source-fields">
+        <label>সংবাদ উৎস
+          <input name="source_name" maxLength={150} defaultValue={article?.source_name||""} placeholder="প্রতিষ্ঠানের নাম"/>
+        </label>
+        <label>সংবাদ উৎসের লিংক (ঐচ্ছিক)
+          <input name="source_url" type="url" maxLength={1200} defaultValue={article?.source_url||""} placeholder="https://example.com/article"/>
+        </label>
+      </div>
       <ArticleSummaryField initialSummary={article?.summary||""}/>
       <ArticleBodyEditor initialBody={article?.body||""} initialCoverUrl={media?.url}/>
-      <label className="full-span">উৎসের URL (ঐচ্ছিক)
-        <input name="source_url" type="url" defaultValue={article?.source_url||""} placeholder="https://example.com/article"/>
-      </label>
       <ArticleImageField
         currentUrl={media?.url}
         currentAlt={media?.alt}

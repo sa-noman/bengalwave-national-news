@@ -72,7 +72,7 @@
 html[data-theme="dark"] .bw-article .bw-newsroom-published-body,
 html[data-theme="dark"] .bw-article .bw-newsroom-published-body>p{color:#f0f1ed!important}
 .bw-newsroom-published-body>h2,.bw-newsroom-published-body>h3{margin:1.1em 0 .4em}
-.bw-newsroom-published-body .bw-rich-callout{border-left:4px solid #0b4838!important;border-top:0!important}
+.bw-newsroom-published-body .bw-rich-callout{border-left-width:4px!important;border-left-style:solid!important;border-top:0!important}
 .bw-newsroom-published-body .bw-rich-callout p{margin:0}
 @media(max-width:760px){
  .bw-nr-header{padding:13px;flex-wrap:wrap}
@@ -116,4 +116,48 @@ html[data-theme="dark"] .bw-article .bw-newsroom-published-body>p{color:#f0f1ed!
 @media(max-width:760px){
  .bw-nr-link-panel{gap:8px;padding:10px}
  .bw-nr-link-panel label{flex-basis:100%}
+}
+
+
+/* Editorial polishing: editing controls are separate from the story content. */
+.bw-source-fields{display:grid;gap:10px;min-width:0;align-content:start}
+.bw-source-fields label{display:grid;gap:6px;min-width:0}
+.bw-ai-slug-field{display:grid;align-content:start;gap:7px;min-width:0}
+.bw-ai-slug-heading{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.bw-ai-slug-heading label{font-weight:600}
+.bw-ai-slug-heading button{padding:7px 10px;border:1px solid #0b4838;border-radius:6px;background:#0b4838;color:#fff;font:600 12px var(--bw-serif);cursor:pointer}
+.bw-ai-slug-heading button:disabled{opacity:.55;cursor:wait}
+.bw-ai-slug-field input{min-width:0;width:100%}
+.bw-ai-slug-field small{font-size:11px;color:#647269}
+.bw-ai-slug-status{line-height:1.5}
+.bw-nr-main .bw-nr-editable{font-size:20px;line-height:1.82}
+.bw-nr-main .bw-nr-editable p{line-height:1.82}
+.bw-nr-editable a:link,.bw-newsroom-published-body a:link{color:#1261a5;text-decoration:underline;text-underline-offset:3px}
+.bw-nr-editable a:visited,.bw-newsroom-published-body a:visited{color:#765098}
+.bw-nr-editable a:hover,.bw-newsroom-published-body a:hover,
+.bw-nr-editable a:visited:hover,.bw-newsroom-published-body a:visited:hover{color:#087e60;text-decoration-thickness:2px}
+.bw-nr-editable a:focus-visible,.bw-newsroom-published-body a:focus-visible{outline:2px solid #d6a326;outline-offset:3px}
+.bw-nr-callout{position:relative;min-width:0;margin:26px 0;padding:15px 18px 18px;border-radius:0 7px 7px 0}
+.bw-nr-callout-controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-start;
+ background:transparent;border-bottom:1px solid #e2e7de;padding-bottom:10px;margin-bottom:16px}
+.bw-nr-callout-controls>strong{font:700 11px/1.5 var(--bw-serif);color:#557060;margin-right:auto}
+.bw-nr-callout-controls>label{display:inline-flex;align-items:center;gap:7px;font-size:11px;color:#51695b}
+.bw-nr-callout-controls input[type="color"]{width:29px;height:29px;padding:2px;border:1px solid #a9c4b2;border-radius:5px;background:#fff}
+.bw-nr-callout-controls>button{white-space:nowrap;font-size:11px}
+.bw-nr-callout-content{min-width:0}
+.bw-nr-callout-content p:last-child{margin-bottom:0}
+.bw-nr-callout-quote{background:transparent;margin-inline:auto;max-width:720px;border-left:0!important;padding:14px 20px 18px}
+.bw-nr-callout-quote:before{top:67px;left:14px;color:var(--bw-quote-accent,#0b4838);font:700 70px/1 Georgia,serif}
+.bw-nr-callout-quote .bw-nr-callout-content{padding-left:64px;min-height:45px;font-size:20px;font-weight:700;color:#929292;line-height:1.65}
+.bw-nr-callout-quote .bw-nr-callout-content p{line-height:1.65}
+.bw-nr-quote-credit{display:block;margin:12px 0 0 64px;width:calc(100% - 64px);max-width:calc(100% - 64px);
+ min-height:36px;background:#fbfcfb;border:1px solid #d3e0d5;border-radius:6px;padding:7px 11px}
+.bw-nr-callout-highlight .bw-nr-callout-content{font-weight:700;line-height:1.76}
+.bw-nr-callout-highlight .bw-nr-callout-content p{line-height:1.76}
+@media(max-width:760px){
+ .bw-nr-main .bw-nr-editable{font-size:20px;line-height:1.78}
+ .bw-nr-callout{padding:12px}
+ .bw-nr-callout-quote .bw-nr-callout-content{padding-left:43px;font-size:20px}
+ .bw-nr-callout-quote:before{top:80px;left:9px;font-size:55px}
+ .bw-nr-quote-credit{margin-left:43px;width:calc(100% - 43px)}
 }
