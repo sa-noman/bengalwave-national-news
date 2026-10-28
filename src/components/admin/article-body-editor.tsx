@@ -15,7 +15,7 @@ type Mode="image"|"gallery"|"slideshow"|"split";
 const ACCEPT=["image/jpeg","image/png","image/webp","image/avif"];
 const fontSizes=[14,16,18,20,22,24,28,32];
 type Paint={bold:boolean;italic:boolean;underline:boolean;strike:boolean;fontSize?:string;color?:string;heading:number};
-type Preview={title:string;summary:string;category:string;cover:string|null;body:string;sourceName:string;sourceUrl:string};
+type Preview={title:string;summary:string;category:string;cover:string|null;coverCaption:string;coverCredit:string;body:string;sourceName:string;sourceUrl:string};
 type LinkRange={from:number;to:number;text:string;href:string};
 
 export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initialBody?:string;initialCoverUrl?:string|null}){
@@ -269,7 +269,8 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
   setPreview({
    title:field("headline")||"সংবাদের শিরোনাম",summary:field("summary"),
    category:category?.selectedOptions[0]?.textContent||"সংবাদ",
-   cover:cover||null,body:serializeNewsroomBody(editor.getJSON() as NewsJSON),
+   cover:cover||null,coverCaption:field("image_caption"),coverCredit:field("image_credit"),
+   body:serializeNewsroomBody(editor.getJSON() as NewsJSON),
    sourceName:field("source_name"),sourceUrl:field("source_url")
   });
  };
@@ -390,7 +391,10 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
      <article className="bw-article">
       <span className="bw-tag">{preview.category}</span><h1>{preview.title}</h1>
       {preview.summary&&<p className="bw-article-deck">{preview.summary}</p>}
-      {preview.cover&&<figure className="bw-doc-preview-cover"><img src={preview.cover} alt="প্রধান ছবি"/></figure>}
+      {preview.cover&&<figure className="bw-doc-preview-cover">
+       <img src={preview.cover} alt="প্রধান ছবি"/>
+       {(preview.coverCaption||preview.coverCredit)&&<figcaption>{preview.coverCaption}{preview.coverCredit&&<span>{preview.coverCaption?" · ":""}ছবি: {preview.coverCredit}</span>}</figcaption>}
+      </figure>}
       <NewsroomArticleBody body={preview.body} allowLocalImages/>
       <ArticleSource sourceName={preview.sourceName} sourceUrl={preview.sourceUrl}/>
       <ArticleShareBar url="" title={preview.title} preview/>
