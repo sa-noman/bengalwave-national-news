@@ -161,3 +161,11 @@ html[data-theme="dark"] .bw-article .bw-newsroom-published-body>p{color:#f0f1ed!
  .bw-nr-callout-quote:before{top:80px;left:9px;font-size:55px}
  .bw-nr-quote-credit{margin-left:43px;width:calc(100% - 43px)}
 }
+
+
+/* The same editorial link states in the WYSIWYG editor and newsroom article. */
+.bw-nr-editable a:link,.bw-article .bw-newsroom-published-body a:link{color:#087e60}
+.bw-nr-editable a:visited,.bw-article .bw-newsroom-published-body a:visited{color:#bb2b2b}
+.bw-nr-editable a:hover,.bw-nr-editable a:visited:hover,
+.bw-article .bw-newsroom-published-body a:hover,
+.bw-article .bw-newsroom-published-body a:visited:hover{color:#1261a5;text-decoration-thickness:2px}
