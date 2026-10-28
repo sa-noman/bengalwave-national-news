@@ -1,15 +1,18 @@
 /**
  * One consistent caption for hero and inline newsroom photos.
- * The CMS credit can already contain "ছবি:"; avoid "ছবি: ছবি:".
+ * Photo credits may already start with "ছবি:"; never emit "ছবি: ছবি:".
  */
-export function PhotoCaption({caption="",credit=""}:{
- caption?:string|null;credit?:string|null;
-}){
+export function getPhotoCaptionParts(caption?:string|null,credit?:string|null){
  const normalizeCredit=(value:string)=>value.trim().replace(/^(?:(?:ছবি|ফটো|photo)\s*[:：]\s*)+/giu,"").trim();
  let captionText=(caption||"").trim();
  let creditText=normalizeCredit(credit||"");
- // Some older articles store a credit at the end of the caption itself.
- // Separate it so the green divider and attribution are rendered only once.
+ const standalone=/^(?:ছবি\s*[:：]\s*)+(.+)$/u.exec(captionText);
+ if(standalone){
+  const found=normalizeCredit(standalone[1]);
+  if(found&&(!creditText||found.toLocaleLowerCase()===creditText.toLocaleLowerCase())){
+   captionText="";if(!creditText)creditText=found;
+  }
+ }
  const embedded=/(?:\s*[|·•]\s*|\s+)(?:ছবি\s*[:：]\s*)+([^|·\n]+)\s*$/u.exec(captionText);
  if(embedded){
   const found=normalizeCredit(embedded[1]);
@@ -18,6 +21,12 @@ export function PhotoCaption({caption="",credit=""}:{
    if(!creditText)creditText=found;
   }
  }
+ return {captionText,creditText};
+}
+export function PhotoCaption({caption="",credit=""}:{
+ caption?:string|null;credit?:string|null;
+}){
+ const {captionText,creditText}=getPhotoCaptionParts(caption,credit);
  if(!captionText&&!creditText)return null;
  return <figcaption className="bw-photo-caption">
   {captionText&&<span className="bw-photo-caption-text">{captionText}</span>}
