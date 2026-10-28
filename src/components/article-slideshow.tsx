@@ -6,6 +6,7 @@ import {safeStoryImageUrl} from "@/lib/rich-article";
 import {getPhotoCaptionParts} from "@/components/photo-caption";
 
 const TRANSITION_MS=520;
+const banglaNumber=(value:number)=>String(value).replace(/[0-9]/g,digit=>"০১২৩৪৫৬৭৮৯"[Number(digit)]);
 
 export function ArticleSlideshow({slides,allowLocalImages=false}:{slides:StorySlide[];allowLocalImages?:boolean}){
  const [index,setIndex]=useState(0);
@@ -42,8 +43,8 @@ export function ArticleSlideshow({slides,allowLocalImages=false}:{slides:StorySl
   <div className="bw-story-slider-stage">
    {outgoing!==null&&layer(outgoing,true)}
    {layer(index)}
+   <span className="bw-story-slider-counter" aria-live="polite" aria-atomic="true">{banglaNumber(index+1)} / {banglaNumber(slides.length)}</span>
    <div className="bw-story-slider-controls">
-    <span className="bw-story-slider-counter" aria-live="polite" aria-atomic="true">{index+1} / {slides.length}</span>
     <button type="button" onClick={previous} aria-label="আগের ছবি" title="আগের ছবি">‹</button>
     <button type="button" onClick={next} aria-label="পরের ছবি" title="পরের ছবি">›</button>
    </div>
