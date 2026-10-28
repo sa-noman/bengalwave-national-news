@@ -7,6 +7,7 @@ import {TextStyleKit} from "@tiptap/extension-text-style";
 import {NewsMediaNode,NewsCalloutNode} from "./newsroom-nodes";
 import {NewsroomArticleBody} from "@/components/newsroom-article-body";
 import {ArticleSource} from "@/components/article-source";
+import {ArticleShareBar} from "@/components/article-share-bar";
 import {existingBodyToNewsJSON,serializeNewsroomBody} from "@/lib/newsroom-document";
 import type {NewsJSON,NewsPhoto} from "@/lib/newsroom-document";
 
@@ -392,6 +393,7 @@ export function ArticleBodyEditor({initialBody="",initialCoverUrl=null}:{initial
       {preview.cover&&<figure className="bw-doc-preview-cover"><img src={preview.cover} alt="প্রধান ছবি"/></figure>}
       <NewsroomArticleBody body={preview.body} allowLocalImages/>
       <ArticleSource sourceName={preview.sourceName} sourceUrl={preview.sourceUrl}/>
+      <ArticleShareBar url="" title={preview.title} preview/>
      </article>
     </div>
    </div>
