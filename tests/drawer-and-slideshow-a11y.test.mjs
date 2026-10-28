@@ -1,0 +1,27 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
+const read=p=>readFileSync(new URL("../"+p,import.meta.url),"utf8");
+
+test("mobile off-canvas drawer exposes dialog semantics, traps focus, and restores opener focus",()=>{
+ const header=read("src/components/site-header.tsx");
+ assert.match(header,/role="dialog" aria-modal=\{drawerOpen\?"true":undefined\}/);
+ assert.match(header,/e\.key==="Tab"&&drawerRef\.current/);
+ assert.match(header,/drawerTriggerRef\.current=document\.activeElement instanceof HTMLElement/);
+ assert.match(header,/const closeMenu=\(\)=>\{setDrawerOpen\(false\);\(drawerTriggerRef\.current\|\|menuButton\.current\)\?\.focus\(\);\}/);
+ assert.match(header,/aria-controls="bw-header-search-form"/);
+ assert.match(header,/id="bw-header-search-form"/);
+});
+
+test("article slideshow supports arrow keys, single live counter, and >=24px dot touch targets",()=>{
+ const slider=read("src/components/article-slideshow.tsx");
+ const css=read("src/app/rich-article.css");
+ assert.match(slider,/e\.key==="ArrowLeft"/);
+ assert.match(slider,/e\.key==="ArrowRight"/);
+ assert.match(slider,/className="bw-story-slider-counter" aria-live="polite" aria-atomic="true"/);
+ assert.doesNotMatch(slider,/className="bw-story-slider-caption" aria-live/);
+ assert.match(slider,/className="bw-story-slider-dots" role="group"/);
+ assert.match(css,/\.bw-story-slider-dots button\{[^}]*min-width:24px;min-height:24px/);
+ assert.match(css,/\.bw-story-slider-dots button::before\{[^}]*width:8px;height:8px/);
+ assert.match(css,/\.bw-story-slider-dots button\[aria-current="true"\]::before\{width:24px/);
+});

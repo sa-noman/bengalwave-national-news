@@ -14,7 +14,8 @@ Run all three before every push (Node 22+):
 |---|------|--------|
 | 1 | Phase 1 SEO: NewsArticle JSON-LD, OpenGraph/Twitter, canonical, `bn_BD`; Gemini SEO test fixed | `00c658e` |
 | 2 | Public news Data Cache (`unstable_cache`, tag `bw-public-news`, 60 s) + per-request `React.cache` dedupe; CMS actions call `revalidateTag` | `a7a7641` |
-| 3 | Set-password requires AAL2 when MFA is enrolled (invite flow unaffected); all admin server actions confirmed to call `requireStaff` | see git log |
+| 3 | Set-password requires AAL2 when MFA is enrolled (invite flow unaffected); all admin server actions confirmed to call `requireStaff` | `5ffb74a` |
+| 4 | Mobile drawer dialog semantics, focus trap & opener focus restore; header search `aria-controls` & Escape; slideshow arrow keys, single `aria-live` & >=24px dot touch targets | see git log |
 
 ## Design decisions
 - **Strict nonce CSP is kept.** Pages stay dynamically rendered because the nonce is per request. Speed comes from caching the Supabase reads (Data Cache), not from static HTML. Do not add `'unsafe-inline'` or remove the nonce to enable ISR.
