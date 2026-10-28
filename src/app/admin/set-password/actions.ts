@@ -23,6 +23,7 @@ export async function setInvitedPassword(formData:FormData) {
 
   const compromised=await isKnownCompromisedPassword(password);
   if(compromised===true)redirect("/admin/set-password?error=compromised");
+  if(compromised===null)console.warn("BengalWave password leak check unavailable; proceeding with fail-open policy");
   const {error:changeError}=await supabase.auth.updateUser({password});
   if(changeError) redirect("/admin/set-password?error=update");
   // The dashboard separately enforces the user's active editorial role.

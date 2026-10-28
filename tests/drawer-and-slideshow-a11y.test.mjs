@@ -25,3 +25,14 @@ test("article slideshow supports arrow keys, single live counter, and >=24px dot
  assert.match(css,/\.bw-story-slider-dots button::before\{[^}]*width:8px;height:8px/);
  assert.match(css,/\.bw-story-slider-dots button\[aria-current="true"\]::before\{width:24px/);
 });
+
+test("mobile safe-area bottom inset, fail-open leak-check logging, and env template hygiene",()=>{
+ const css=read("src/app/newsroom.css");
+ const layout=read("src/app/layout.tsx");
+ const setPass=read("src/app/admin/set-password/actions.ts");
+ const envExample=read(".env.example");
+ assert.match(css,/body\{padding-bottom:calc\(57px \+ env\(safe-area-inset-bottom,0px\)\)\}/);
+ assert.match(layout,/viewportFit:"cover"/);
+ assert.match(setPass,/if\(compromised===null\)console\.warn\(/);
+ assert.doesNotMatch(envExample,/lkleykmjphmliqybmwff/);
+});

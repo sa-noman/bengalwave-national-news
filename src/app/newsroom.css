@@ -301,7 +301,7 @@ body{background:var(--bw-bg);color:var(--bw-ink);font-family:var(--bw-sans)}
  .bw-home .bw-lead-band .bw-card-title{
    color:var(--bw-mobile-lead-title-color,#192820);
  }
- body{padding-bottom:57px}
+ body{padding-bottom:calc(57px + env(safe-area-inset-bottom,0px))}
  .bw-bottom-nav{display:grid;grid-template-columns:repeat(4,1fr);position:fixed;left:0;right:0;bottom:0;z-index:49;background:var(--bw-green);box-shadow:0 -2px 10px #0003;padding-bottom:env(safe-area-inset-bottom,0px)}
  .bw-bottom-nav>a,.bw-bottom-nav>button{display:grid;justify-items:center;align-content:center;gap:0;background:none;border:0;color:#fff;min-height:54px;padding:6px 0;font:500 12px var(--bw-serif);text-decoration:none;cursor:pointer}
  .bw-bottom-nav span{font-size:21px;line-height:1.3}
