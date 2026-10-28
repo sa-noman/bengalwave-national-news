@@ -1,5 +1,3 @@
-import React from "react";
-
 /** Shared, safe and subdued attribution for published and editorial previews. */
 export function ArticleSource({sourceName,sourceUrl}:{
   sourceName?:string|null;sourceUrl?:string|null;
