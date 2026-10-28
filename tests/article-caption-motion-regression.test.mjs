@@ -26,8 +26,9 @@ test("hero, draft, saved and inline photos all use one caption component",()=>{
  assert.match(code,/className="bw-photo-caption"/);
  assert.match(code,/bw-photo-caption-credit/);
  const css=read("src/app/rich-article.css");
- assert.match(css,/font:400 14px\/1\.75/);
- assert.match(css,/border-inline-start:2px solid var\(--bw-green/);
+ assert.match(css,/font:400 12px\/1\.6/);
+ assert.match(css,/border-inline-start:1px solid var\(--bw-green/);
+ assert.match(css,/color:#858b87/);
 });
 
 test("arrows drive opposite directional translations of photo and its blurred background",()=>{
@@ -53,4 +54,17 @@ test("article and CMS hyperlinks are green, blue on hover and red after visiting
  assert.match(css,/a:visited:hover\{\s*color:#1261a5/);
  assert.match(editor,/\.bw-nr-editable a:link,\.bw-article \.bw-newsroom-published-body a:link\{color:#087e60\}/);
  assert.match(editor,/\.bw-nr-editable a:visited,\.bw-article \.bw-newsroom-published-body a:visited\{color:#bb2b2b\}/);
+});
+
+test("copy link switches its own icon to a checkmark without a visible status message",()=>{
+ const share=read("src/components/article-share-bar.tsx");
+ const css=read("src/app/rich-article.css");
+ assert.match(share,/const \[copied,setCopied\]=useState\(false\)/);
+ assert.match(share,/navigator\.clipboard\.writeText\(url\);setCopied\(true\)/);
+ assert.match(share,/<ShareIcon kind=\{copied\?"check":"link"\}/);
+ assert.match(share,/bw-share-copied/);
+ assert.match(share,/bw-share-visually-hidden" role="status"/);
+ assert.doesNotMatch(share,/className="bw-share-status"/);
+ assert.match(css,/\.bw-article-share \.bw-share-icon\.bw-share-copied/);
+ assert.match(css,/\.bw-share-visually-hidden\{position:absolute/);
 });

@@ -19,6 +19,10 @@ test("article slideshow supports arrow keys, single live counter, and >=24px dot
  assert.match(slider,/e\.key==="ArrowLeft"/);
  assert.match(slider,/e\.key==="ArrowRight"/);
  assert.match(slider,/className="bw-story-slider-counter" aria-live="polite" aria-atomic="true"/);
+ assert.match(slider,/const banglaNumber=\(value:number\)=>String\(value\)\.replace/);
+ assert.match(slider,/\{banglaNumber\(index\+1\)\} \/ \{banglaNumber\(slides\.length\)\}/);
+ assert.match(css,/\.bw-story-slider-counter\{position:absolute;left:12px;top:12px;z-index:3/);
+ assert.match(css,/\.bw-story-slider-controls\{position:absolute;right:12px;top:12px/);
  assert.doesNotMatch(slider,/className="bw-story-slider-caption" aria-live/);
  assert.match(slider,/className="bw-story-slider-dots" role="group"/);
  assert.match(css,/\.bw-story-slider-dots button\{[^}]*min-width:24px;min-height:24px/);
