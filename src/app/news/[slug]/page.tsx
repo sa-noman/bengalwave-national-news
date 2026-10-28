@@ -11,6 +11,7 @@ import {PreviewNotice} from "@/components/preview-notice";
 import {RichArticleBody} from "@/components/rich-article-body";
 import {ArticleSource} from "@/components/article-source";
 import {ArticleShareBar} from "@/components/article-share-bar";
+import {PhotoCaption} from "@/components/photo-caption";
 
 const SITE_ORIGIN="https://bengalwave.news";
 function resolveAbsoluteMediaUrl(src:string):string{
@@ -61,9 +62,7 @@ export default async function ArticlePage({params}:{params:Promise<{slug:string}
        timeZone:"Asia/Dhaka",hour:"2-digit",minute:"2-digit",hourCycle:"h23",
      }).format(publishedDate)
    :null;
- const cmsCaption=item.imageCaption
-   ? item.imageCaption+(item.imageCredit?" · ছবি: "+item.imageCredit:"")
-   : item.imageCredit?"ছবি: "+item.imageCredit:null;
+ const cmsCaption=item.imageCaption||item.imageCredit;
  const articleUrl=SITE_ORIGIN+"/news/"+encodeURIComponent(item.slug);
  const imageUrl=resolveAbsoluteMediaUrl(item.fullImage||item.image);
  const newsArticleJsonLd=!item.isDemo?{
@@ -100,7 +99,7 @@ export default async function ArticlePage({params}:{params:Promise<{slug:string}
           <time dateTime={item.publishedAt}>প্রকাশ: {publishedLabel}</time>}
       </div>
     </div>
-    <figure><div className="bw-img-frame bw-article-image-frame"><NewsImage src={item.fullImage||item.image} quality={90} alt={resolveArticleImageAlt(item)} eager sizes="(max-width: 812px) calc(100vw - 32px), 780px"/></div>{(!item.imageAlt || cmsCaption) && <figcaption>{cmsCaption || (item.slug==="shaheed-jehad-day-student-unity-oct-2026"?"শহীদ নাজির উদ্দিন আহমেদ জেহাদ। ছবি: সংগৃহীত":item.slug==="mithun-cabinet-rank-cultural-adviser-oct-2026"?"সিনেমায় মিঠুন চক্রবর্তী। ফাইল ছবি: সংগৃহীত":item.slug==="nana-patekar-dies-at-75-oct-2026"?"ছবি: সংগৃহীত":item.slug==="us-israel-iran-attack-plan-election-report-oct-2026"?"ছবি: সংগৃহীত":item.slug==="nationwide-postal-service-week-oct-2026"?"ছবি: সংগৃহীত":item.slug==="litton-miraz-resistance-afghanistan-test-oct-2026"?"ছবি: সংগৃহীত":item.slug==="delhi-cockroach-protest-internet-shutdown-oct-2026"?"দিল্লিতে পুলিশের নিরাপত্তাব্যবস্থার ফাইল ছবি: সংগৃহীত":item.slug==="pm-mental-health-stigma-awareness-oct-2026"?"ছবি: সংগৃহীত":item.slug==="bobby-hajjaj-drug-control-social-change-oct-2026"?"ছবি: সংগৃহীত":item.slug==="charmonai-pir-local-election-shariah-oct-2026"?"ছবি: ইসলামী আন্দোলনের সৌজন্যে":item.slug==="us-sanctions-icc-after-navi-pillay-nobel-2026"?"আন্তর্জাতিক অপরাধ আদালতের ভবন":"প্রতীকী অলংকরণ")}</figcaption>}</figure>
+    <figure><div className="bw-img-frame bw-article-image-frame"><NewsImage src={item.fullImage||item.image} quality={90} alt={resolveArticleImageAlt(item)} eager sizes="(max-width: 812px) calc(100vw - 32px), 780px"/></div>{(!item.imageAlt || cmsCaption) && <PhotoCaption caption={item.imageCaption || (cmsCaption ? "" : (item.slug==="shaheed-jehad-day-student-unity-oct-2026"?"শহীদ নাজির উদ্দিন আহমেদ জেহাদ। ছবি: সংগৃহীত":item.slug==="mithun-cabinet-rank-cultural-adviser-oct-2026"?"সিনেমায় মিঠুন চক্রবর্তী। ফাইল ছবি: সংগৃহীত":item.slug==="nana-patekar-dies-at-75-oct-2026"?"ছবি: সংগৃহীত":item.slug==="us-israel-iran-attack-plan-election-report-oct-2026"?"ছবি: সংগৃহীত":item.slug==="nationwide-postal-service-week-oct-2026"?"ছবি: সংগৃহীত":item.slug==="litton-miraz-resistance-afghanistan-test-oct-2026"?"ছবি: সংগৃহীত":item.slug==="delhi-cockroach-protest-internet-shutdown-oct-2026"?"দিল্লিতে পুলিশের নিরাপত্তাব্যবস্থার ফাইল ছবি: সংগৃহীত":item.slug==="pm-mental-health-stigma-awareness-oct-2026"?"ছবি: সংগৃহীত":item.slug==="bobby-hajjaj-drug-control-social-change-oct-2026"?"ছবি: সংগৃহীত":item.slug==="charmonai-pir-local-election-shariah-oct-2026"?"ছবি: ইসলামী আন্দোলনের সৌজন্যে":item.slug==="us-sanctions-icc-after-navi-pillay-nobel-2026"?"আন্তর্জাতিক অপরাধ আদালতের ভবন":"প্রতীকী অলংকরণ"))} credit={item.imageCredit}/>}</figure>
     <RichArticleBody body={item.body}/>
     {!item.isDemo&&<ArticleSource sourceName={item.sourceName} sourceUrl={item.sourceUrl}/>}
     {!item.isDemo&&<ArticleShareBar url={articleUrl} title={item.title}/>}
