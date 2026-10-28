@@ -50,8 +50,9 @@ test("SEO generation is staff-only and does not pretend fallback is AI",()=>{
  const summary=read("src/components/admin/article-summary-field.tsx");
  const action=read("src/app/admin/seo-summary-action.ts");
  assert.match(action,/await requireStaff\(\)/);
- assert.match(action,/process\.env\.OPENAI_API_KEY/);
- assert.match(action,/store:false/);
+ assert.match(action,/process\.env\.Gemini_Seo_Key\s*\|\|\s*process\.env\.GEMINI_API_KEY/);
+ assert.match(action,/cache:"no-store"/);
+ assert.match(action,/"x-goog-api-key":apiKey/);
  assert.match(action,/textContent\(doc\)/);
  assert.match(summary,/AI দিয়ে তৈরি নয়/);
  assert.match(summary,/parseNewsroomBody/);

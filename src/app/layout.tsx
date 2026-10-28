@@ -23,6 +23,7 @@ export const metadata:Metadata={
  title:{default:"Bengal Wave | বাংলা নিউজ",template:"%s | Bengal Wave"},
  description:"Bengal Wave | ইতিহাস, সংবাদ ও সংস্কৃতির প্রতিচ্ছবি",
  metadataBase:new URL("https://bengalwave.news"),
+ openGraph:{locale:"bn_BD",siteName:"Bengal Wave",type:"website"},
  robots:{index:process.env.VERCEL_ENV==="production",follow:process.env.VERCEL_ENV==="production"},
 };
 export const viewport:Viewport={width:"device-width",initialScale:1,themeColor:"#053d36"};

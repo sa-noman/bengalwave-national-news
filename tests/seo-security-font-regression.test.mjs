@@ -86,3 +86,20 @@ test("CMS middleware is positioned alongside src/app and refreshes sessions",()=
  assert.match(session,/supabase\.auth\.getUser\(\)/);
  assert.match(session,/NextResponse\.redirect/);
 });
+
+test("published articles expose NewsArticle JSON-LD, canonical URL, OpenGraph, Twitter card, and bn_BD locale",()=>{
+ const root=read("src/app/layout.tsx");
+ const article=read("src/app/news/[slug]/page.tsx");
+ assert.match(root,/openGraph:\{locale:"bn_BD",siteName:"Bengal Wave",type:"website"\}/);
+ assert.match(article,/if\(item\.isDemo\)return \{title:item\.title,description:item\.summary,robots:\{index:false,follow:false\}\};/);
+ assert.match(article,/alternates:\{canonical:articleUrl\}/);
+ assert.match(article,/type:"article"/);
+ assert.match(article,/locale:"bn_BD"/);
+ assert.match(article,/publishedTime:item\.publishedAt/);
+ assert.match(article,/card:"summary_large_image"/);
+ assert.match(article,/"@context":"https:\/\/schema\.org"/);
+ assert.match(article,/"@type":"NewsArticle"/);
+ assert.match(article,/datePublished:item\.publishedAt/);
+ assert.match(article,/type="application\/ld\+json"/);
+ assert.match(article,/replace\(\/</);
+});
