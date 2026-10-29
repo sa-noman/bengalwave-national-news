@@ -339,6 +339,11 @@ html[data-theme="dark"] .bw-article .bw-rich-article-body blockquote.bw-rich-quo
 .bw-article-share .bw-share-icon.bw-share-copied:hover{
  background:transparent;border-color:var(--bw-line,#d8ded8);color:inherit
 }
+.bw-article-share .bw-share-icon.bw-share-copy-flash,
+.bw-article-share .bw-share-icon.bw-share-copy-flash:hover{
+ background:rgba(11,72,56,.08);border-color:var(--bw-green,#0b4838);
+ color:var(--bw-green,#0b4838)
+}
 .bw-article-share .bw-share-icon:disabled{opacity:.42;cursor:not-allowed}
 .bw-share-visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 @media(max-width:480px){
