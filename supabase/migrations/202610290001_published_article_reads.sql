@@ -74,7 +74,7 @@ as $$
  where a.status='published' and a.published_at<=pg_catalog.now()
    and t.view_count>0
  order by t.view_count desc,t.last_read_at desc,a.published_at desc
- limit pg_catalog.least(pg_catalog.greatest(pg_catalog.coalesce(p_limit,5),1),5);
+ limit least(greatest(coalesce(p_limit,5),1),5);
 $$;
 revoke execute on function public.get_most_read_article_ids(integer) from public, anon, authenticated;
 grant execute on function public.get_most_read_article_ids(integer) to anon, authenticated;
