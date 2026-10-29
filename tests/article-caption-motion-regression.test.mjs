@@ -20,9 +20,9 @@ test("hero, draft, saved and inline photos all use one caption component",()=>{
  for(const path of paths)assert.match(read(path),/PhotoCaption/,path);
  const code=read("src/components/photo-caption.tsx");
  assert.match(code,/getPhotoCaptionParts/);
- assert.match(code,/creditText=\\(credit\\|\\|""\\)\\.trim\\(\\)/);
- assert.match(code,/\\{creditText\\}<\\/span>/);
- assert.doesNotMatch(code,/>ছবি: \\{creditText\\}/);
+ assert.ok(code.includes('let creditText=(credit||"").trim();'));
+ assert.ok(code.includes('{creditText}</span>'));
+ assert.ok(!code.includes('>ছবি: {creditText}'));
  assert.match(code,/standalone=/);
  assert.match(code,/embedded=/);
  assert.match(code,/className="bw-photo-caption"/);
