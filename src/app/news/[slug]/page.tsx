@@ -12,6 +12,7 @@ import {RichArticleBody} from "@/components/rich-article-body";
 import {ArticleSource} from "@/components/article-source";
 import {ArticleShareBar} from "@/components/article-share-bar";
 import {PhotoCaption} from "@/components/photo-caption";
+import {ArticleReadTracker} from "@/components/article-read-tracker";
 
 const SITE_ORIGIN="https://bengalwave.news";
 function resolveAbsoluteMediaUrl(src:string):string{
@@ -103,6 +104,7 @@ export default async function ArticlePage({params}:{params:Promise<{slug:string}
     <RichArticleBody body={item.body}/>
     {!item.isDemo&&<ArticleSource sourceName={item.sourceName} sourceUrl={item.sourceUrl}/>}
     {!item.isDemo&&<ArticleShareBar url={articleUrl} title={item.title}/>}
+    {!item.isDemo&&<ArticleReadTracker slug={item.slug}/>}
    </article>
   </div>
  </main>;
