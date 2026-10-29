@@ -23,7 +23,8 @@ test("homepage latest title remains visible and category/article views stay ligh
   const home=read("src/app/page.tsx");
   const css=read("src/app/newsroom.css");
   const type=read("src/app/typography.css");
-  assert.match(home,/<SectionHeading title="সর্বশেষ সংবাদ" href="\/latest"\/>/);
+  assert.match(home,/HomeNewsSidebar latest=\{latest\} popular=\{popular\}/);
+  assert.match(read("src/components/home-news-sidebar.tsx"),/সর্বশেষ সংবাদ/);
   assert.match(css,/\.bw-home \.bw-lead-band\{background:#fff;[^}]*color:#192820/);
   assert.match(css,/\.bw-home \.bw-section\{[^}]*background:#fff;[^}]*color:#192820/);
   assert.match(type,/\.bw-section-heading h2 > a\s*\{\s*color:inherit;/);
