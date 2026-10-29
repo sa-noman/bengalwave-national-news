@@ -84,7 +84,7 @@ export default async function ArticlePage({params}:{params:Promise<{slug:string}
   },
  }:null;
  return <main className="bw-website">{isDesignPreview()&&<PreviewNotice samples={Boolean(item.isDemo)}/>}
-  <div className="bw-wrap bw-article">
+  <div className="bw-wrap bw-article bw-article-page">
    <nav className="bw-breadcrumb" aria-label="অবস্থান"><Link href="/">প্রচ্ছদ</Link><span>›</span><Link href="/latest">সংবাদ</Link></nav>
    <article>
     {newsArticleJsonLd&&<script nonce={nonce} type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(newsArticleJsonLd).replace(/</g,"\\u003c")}}/>}
