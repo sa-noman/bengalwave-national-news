@@ -14,7 +14,7 @@ export default async function AdminDashboard() {
     ?await supabase.rpc("get_staff_article_view_counts",{p_article_ids:articleIds})
     :{data:[],error:null};
   const viewCounts=new Map<string,number>(
-    (viewRows||[]).map(row=>[row.article_id,Number(row.view_count)||0])
+    ((viewRows||[]) as {article_id:string;view_count:number}[]).map(row=>[row.article_id,Number(row.view_count)||0])
   );
   const bnCount=(count:number)=>new Intl.NumberFormat("bn-BD").format(count);
   return <main className="container admin-surface">
