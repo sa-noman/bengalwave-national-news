@@ -15,7 +15,9 @@ test("all homepage section titles link to their existing destinations",()=>{
   ]){
     assert.ok(page.includes('title="'+label+'" href="/category/'+route+'"'),label+" category target missing");
   }
-  assert.ok(page.includes('title="সর্বশেষ সংবাদ" href="/latest"'));
+  const sidebar=read("src/components/home-news-sidebar.tsx");
+  assert.ok(sidebar.includes('<Link href="/latest">সর্বশেষ সংবাদ</Link>'));
+  assert.ok(sidebar.includes('সর্বাধিক পঠিত'));
   assert.ok(page.includes('title="ফিচার ও সংস্কৃতি" href="/category/features"'));
 });
 
