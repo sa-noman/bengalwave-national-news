@@ -5,6 +5,8 @@ import {PreviewNotice} from "@/components/preview-notice";
 import {getDisplayNews,isDesignPreview} from "@/lib/news-display";
 import type {NewsItem} from "@/lib/demo-news";
 import {HeritageStories} from "@/components/heritage-stories";
+import {HomeNewsSidebar} from "@/components/home-news-sidebar";
+import {getMostReadNews} from "@/lib/news-feed";
 
 function SectionHeading({title,href="/latest",linkText="আরও"}:{title:string;href?:string;linkText?:string}){
  return <div className="bw-section-heading"><h2><Link href={href}>{title}</Link></h2><Link href={href}>{linkText} <span aria-hidden="true">›</span></Link></div>;
@@ -27,6 +29,7 @@ function choose(items:NewsItem[],slugs:string[],exclude:Set<string>,limit=4) {
 }
 export default async function Home(){
  const {items:articles,showingSamples}=await getDisplayNews(100);
+ const popular=showingSamples?[]:await getMostReadNews();
  const lead=articles[0];
  const rest=articles.slice(1);
  const latest=articles.slice(3,8);
@@ -55,8 +58,7 @@ export default async function Home(){
       {rest.slice(2,4).map(item=><NewsCard key={item.id} item={item} variant="middle"/>)}
     </div>
     <aside className="bw-hero-latest" id="latest-news">
-      <SectionHeading title="সর্বশেষ সংবাদ" href="/latest"/>
-      <div className="bw-latest-list">{latest.map(item=><NewsCard key={item.id} item={item} variant="latest"/>)}</div>
+      <HomeNewsSidebar latest={latest} popular={popular}/>
     </aside>
    </div></section>
    <NewsSection title="এক্সক্লুসিভ" href="/category/exclusive" boxed hideCategory items={select}/>
