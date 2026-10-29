@@ -16,6 +16,15 @@ function ShareIcon({kind}:{kind:"facebook"|"x"|"whatsapp"|"telegram"|"link"|"che
 export function ArticleShareBar({url,title,preview=false}:{url:string;title:string;preview?:boolean}){
  const [status,setStatus]=useState("");
  const [copied,setCopied]=useState(false);
+ // Green confirmation remains for one second; checkmark stays for 2.4s.
+ const [copyFlash,setCopyFlash]=useState(false);
+ const [copyCycle,setCopyCycle]=useState(0);
+ useEffect(()=>{
+  if(!copyCycle)return;
+  setCopyFlash(true);
+  const timeout=window.setTimeout(()=>setCopyFlash(false),1000);
+  return ()=>window.clearTimeout(timeout);
+ },[copyCycle]);
  useEffect(()=>{
   if(!copied)return;
   const timeout=window.setTimeout(()=>setCopied(false),2400);
@@ -23,7 +32,7 @@ export function ArticleShareBar({url,title,preview=false}:{url:string;title:stri
  },[copied]);
  const copy=async()=>{
   if(preview)return;
-  try{await navigator.clipboard.writeText(url);setCopied(true);setStatus("সংবাদের লিংক কপি হয়েছে।");}
+  try{await navigator.clipboard.writeText(url);setCopied(true);setCopyCycle(v=>v+1);setStatus("সংবাদের লিংক কপি হয়েছে।");}
   catch{setCopied(false);setStatus("লিংক কপি করা যায়নি।");}
  };
  const share=async()=>{
@@ -47,7 +56,7 @@ export function ArticleShareBar({url,title,preview=false}:{url:string;title:stri
    {targets.map(target=>preview
     ?<button type="button" key={target.kind} className="bw-share-icon" disabled title="প্রকাশের পরে শেয়ার করা যাবে" aria-label={target.label}><ShareIcon kind={target.kind}/></button>
     :<a key={target.kind} className="bw-share-icon" href={target.href} target="_blank" rel="noopener noreferrer nofollow" aria-label={target.label} title={target.label}><ShareIcon kind={target.kind}/></a>)}
-   <button type="button" className={"bw-share-icon"+(copied?" bw-share-copied":"")} onClick={()=>void copy()} disabled={preview} aria-label={copied?"সংবাদের লিংক কপি হয়েছে":"সংবাদের লিংক কপি করুন"} title="লিংক কপি করুন"><ShareIcon kind={copied?"check":"link"}/></button>
+   <button type="button" className={"bw-share-icon"+(copied?" bw-share-copied":"")+(copyFlash?" bw-share-copy-flash":"")} onClick={()=>void copy()} disabled={preview} aria-label={copied?"সংবাদের লিংক কপি হয়েছে":"সংবাদের লিংক কপি করুন"} title="লিংক কপি করুন"><ShareIcon kind={copied?"check":"link"}/></button>
   </div>
   <div className="bw-article-share-actions">
    <button type="button" className="bw-share-icon" onClick={()=>void share()} disabled={preview} aria-label="অন্যান্য অ্যাপে শেয়ার করুন" title="শেয়ার করুন"><ShareIcon kind="share"/></button>
