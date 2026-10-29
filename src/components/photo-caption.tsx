@@ -8,13 +8,13 @@ export function getPhotoCaptionParts(caption?:string|null,credit?:string|null){
  let creditText=(credit||"").trim();
  // Old article captions sometimes contain a trailing credit. Suppress a
  // duplicate only when that embedded credit is identical to the credit field.
- const comparable=(value:string)=>value.trim().replace(/^(?:(?:ছবি|ফটো|photo)\\s*[:：]\\s*)+/giu,"").trim().toLocaleLowerCase();
- const standalone=/^(?:ছবি\\s*[:：]\\s*)+(.+)$/u.exec(captionText);
+ const comparable=(value:string)=>value.trim().replace(/^(?:(?:ছবি|ফটো|photo)\s*[:：]\s*)+/giu,"").trim().toLocaleLowerCase();
+ const standalone=/^(?:ছবি\s*[:：]\s*)+(.+)$/u.exec(captionText);
  if(standalone){
   if(!creditText){creditText=captionText;captionText="";}
   else if(comparable(standalone[1])===comparable(creditText))captionText="";
  }
- const embedded=/(?:\\s*[|·•]\\s*|\\s+)(?:ছবি\\s*[:：]\\s*)+([^|·\\n]+)\\s*$/u.exec(captionText);
+ const embedded=/(?:\s*[|·•]\s*|\s+)(?:ছবি\s*[:：]\s*)+([^|·\n]+)\s*$/u.exec(captionText);
  if(embedded&&comparable(embedded[1])===comparable(creditText)){
   captionText=captionText.slice(0,embedded.index).trim();
  }
