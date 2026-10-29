@@ -159,3 +159,16 @@ body{background:#fffefa}
 .bw-editorial-preview-banner p{font-size:13px;margin:3px 0 0;line-height:1.65}
 .bw-editorial-preview-banner a{font-size:13px;font-weight:700;text-decoration:underline;color:#0b4c3a}
 @media(max-width:700px){.admin-editor-preview-action{align-items:flex-start;flex-direction:column}.bw-editorial-preview-banner{align-items:flex-start;flex-direction:column}}
+
+
+/* CMS only: quiet read statistics beside published stories. */
+.admin-view-note{font-size:13px;line-height:1.7;margin:0 0 14px;color:var(--sub)}
+.admin-article-row small.admin-view-count{
+ display:inline-flex;align-items:center;gap:6px;width:max-content;max-width:100%;
+ margin-top:5px;padding:4px 9px;border-radius:5px;
+ font:600 12px/1.5 var(--bw-local-font),"Noto Serif Bengali",serif;
+ background:#edf6ef;color:var(--green)
+}
+.admin-article-row small.admin-view-count strong{
+ display:inline;font-size:12px;line-height:inherit;font-weight:700;color:inherit
+}
