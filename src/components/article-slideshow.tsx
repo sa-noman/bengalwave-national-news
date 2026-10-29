@@ -49,7 +49,7 @@ export function ArticleSlideshow({slides,allowLocalImages=false}:{slides:StorySl
     <button type="button" onClick={next} aria-label="পরের ছবি" title="পরের ছবি">›</button>
    </div>
    {(activeCaption.captionText||activeCaption.creditText)&&<div className="bw-story-slider-caption">
-    {activeCaption.captionText}{activeCaption.creditText&&<span> | ছবি: {activeCaption.creditText}</span>}
+    {activeCaption.captionText}{activeCaption.creditText&&<span> | {activeCaption.creditText}</span>}
    </div>}
   </div>
   <div className="bw-story-slider-dots" role="group" aria-label="স্লাইড নির্বাচন করুন">

@@ -212,6 +212,31 @@ const cachedPublishedNews=unstable_cache(readPublishedNews,["bw-published-news-v
 const cachedPublishedNewsByCategory=unstable_cache(readPublishedNewsByCategory,["bw-published-category-v1"],cacheOptions);
 const cachedPublishedArticle=unstable_cache(readPublishedArticle,["bw-published-article-v1"],cacheOptions);
 
+/**
+ * Most read: real database counts only. No recency-derived or arbitrary
+ * fallback rankings; fresh installations may initially have zero results.
+ * The RPC never includes drafts, scheduled or unpublished articles.
+ */
+async function readMostReadNews():Promise<NewsItem[]>{
+ const supabase=createSupabasePublicClient();
+ if(!supabase)return [];
+ const {data:ranks,error:rankError}=await supabase.rpc("get_most_read_article_ids",{p_limit:5});
+ if(rankError)throw new PublicNewsReadError("Bengal Wave: most-read ranking unavailable",rankError.code);
+ const ids=((ranks||[]) as {article_id:string;view_count:number}[]).map(row=>row.article_id);
+ if(!ids.length)return [];
+ const {data,error}=await supabase.from("articles")
+  .select("id,slug,headline,summary,is_featured,published_at,hero_media_id,categories(slug,label_bn)")
+  .in("id",ids).eq("status","published").lte("published_at",new Date().toISOString());
+ if(error)throw new PublicNewsReadError("Bengal Wave: most-read stories unavailable",error.code);
+ const rows=(data||[]) as unknown as DatabaseArticle[];
+ const media=await loadAttachedMedia(supabase,rows);
+ const byId=new Map(rows.map(row=>[row.id,asNewsItem(row,media.get(row.id),supabase)]));
+ return ids.flatMap(id=>{const item=byId.get(id);return item?[item]:[];});
+}
+const cachedMostReadNews=unstable_cache(readMostReadNews,["bw-most-read-articles-v1"],{
+ revalidate:60,
+});
+
 function logReadFailure(error:unknown){
   if(error instanceof PublicNewsReadError)console.error(error.label,error.code);
   else console.error("Bengal Wave: public news read failed");
@@ -227,4 +252,10 @@ export const getPublishedNewsByCategory=cache(async(slug:string,limit=100):Promi
 });
 export const getPublishedArticle=cache(async(slug:string):Promise<PublishedArticle|null>=>{
   try{return await cachedPublishedArticle(slug);}catch(error){logReadFailure(error);return null;}
+});
+
+/** Most-read rankings reflect actual daily-deduplicated views, not editorial order. */
+export const getMostReadNews=cache(async():Promise<NewsItem[]>=>{
+ try{return await cachedMostReadNews();}
+ catch(error){logReadFailure(error);return [];}
 });
