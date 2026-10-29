@@ -25,7 +25,9 @@ test("no unowned domain is advertised in the footer",()=>{
 });
 test("prototype editorial sections are present",()=>{
  const home=read("src/app/page.tsx");
+ const sidebar=read("src/components/home-news-sidebar.tsx");
  for(const label of ["সর্বশেষ সংবাদ","জাতীয়","আন্তর্জাতিক","খেলাধুলা","অর্থনীতি","ফিচার ও সংস্কৃতি"]){
-  assert.ok(home.includes(label),label);
+  assert.ok((home+sidebar).includes(label),label);
  }
+ assert.match(sidebar,/সর্বাধিক পঠিত/);
 });
